@@ -9,8 +9,11 @@
 * Leveraging Firewall rules concepts in your products constraint policy configuration?
 * Why do we need a shared-service team (aka, Team X)?
 * Why cherography is prefered over orchestration in your distributed micro-services architecture?
+* What exactly a BFF layer bring to your distributed micro-services architecture?
 * Can we offer a person with TWO users from TWO different authentication providers with a SSO-like experience?
 * What can a Anti-Corruption Layer bring you? FormIO-Shadow, GSuite-Shadow etc.
+* Why Federated Authorization is such a hard beast to resolve?
+
 
 ## Distributed Systems
 * Open Tracing with Datadog
