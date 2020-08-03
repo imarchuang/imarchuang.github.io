@@ -40,7 +40,8 @@ to the same product in your organization?
     * Security
     * Traceability (Distributed Tracing)
     * Traffic Routing (Circuit Breakers)
-* Why is it so hard to have a 90% test automated in your delivery pipeline?    
+* Why is it so hard to have a 90% test automated in your delivery pipeline?
+* When do you need to adopt a sticky-session in your micro-frontend?
 
 ## Distributed Systems
 * Open Tracing with Datadog
