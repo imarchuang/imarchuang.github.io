@@ -7,8 +7,8 @@
 ### Promisify your Redis communications
 
 #### **Decoration with `bluebird`**
-```
-const redisClient       = (require('redis')).createClient(
+```js
+const redisClient = (require('redis')).createClient(
   process.env.REDIS_PORT,
   process.env.REDIS_HOSTNAME,
   {
