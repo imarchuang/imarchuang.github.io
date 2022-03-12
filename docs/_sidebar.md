@@ -1,7 +1,8 @@
 <!-- docs/_sidebar.md -->
 
 
-* [HOME](./)
+* [Home](./)
+* [Coding](./coding/index)
 
 * [Product Pattern](./products/index)
   * [Adapting to Legacy](./products/legacy/index)
