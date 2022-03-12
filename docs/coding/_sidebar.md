@@ -2,7 +2,8 @@
 
 
 * [HOME](./)
-* [链表](./)
+* [链表](./coding/linkedlist/index)
+** [trie](./coding/linkedlist/kgroupreverse)
 * [二叉树](./)
 * [图论基础](./)
 * [回溯](./)
