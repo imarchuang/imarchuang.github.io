@@ -96,6 +96,8 @@ const reverse = (a, b) => {
 [142.链表环II](https://leetcode.com/problems/linked-list-cycle-ii/) **`Notes`** 找环开始的位置，非常有技巧性，请参阅[这里](https://labuladong.github.io/algo/2/18/17/).
 
 [206.反转链表](https://leetcode.com/problems/reverse-linked-list/) **`Notes`** 迭代反转，递归翻转呢？非常有技巧性.
+
+![](../pictures/linkedlist/2.png)
 ```js
 /**
  * @param {ListNode} head
@@ -139,7 +141,9 @@ var deleteDuplicates = function(head) {
 };
 ```
 
-[25.K个一组翻转链表](https://leetcode.com/problems/reverse-nodes-in-k-group)
+[25.K个一组翻转链表](https://leetcode.com/problems/reverse-nodes-in-k-group) **`Notes`** 学会迭代法反转链表中[a，b)区间里的元素.
+
+![](../pictures/linkedlist/3.png)
 
 [24.两两交换节点](https://leetcode.com/problems/swap-nodes-in-pairs/) **`Notes`** 两个指针，第一个先走k步，然后第二个开始走，这样第一个指针到达终点需要n-k步，这时候第二个到达倒数第k个点.
 
