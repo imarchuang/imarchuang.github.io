@@ -1,9 +1,6 @@
 <!-- docs/_sidebar.md -->
-
-
 * [Home](./)
 * [Coding](./coding/index)
-
 * [Product Pattern](./products/index)
   * [Adapting to Legacy](./products/legacy/index)
   * [Authentication](./products/auth/index)

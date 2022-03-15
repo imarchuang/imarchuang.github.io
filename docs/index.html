@@ -8,6 +8,12 @@
   <meta charset="UTF-8">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify/themes/buble.css">
   <link rel="icon" href="/_media/favicon.ico?">
+  <link 
+    rel="stylesheet"
+    href="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/style.min.css"
+    title="docsify-darklight-theme"
+    type="text/css"
+  />
   <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
   <title>Marc Journey</title>
 </head>
@@ -21,10 +27,11 @@
       name: 'absolutely',
       logo: '/_media/icon.png',
       loadSidebar: true,
+      sidebarDisplayLevel: 1, // set sidebar display level
       autoHeader: true,
       loadNavbar: true,
       mergeNavbar: true,
-      subMaxLevel: 2,
+      subMaxLevel: 1,
       coverpage: true,
       externalLinkTarget: '_blank', //_blankIndicates to open external links in a new tab
       themeColor: '#c30aff',
@@ -41,6 +48,10 @@
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
+  <script 
+    src="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/index.min.js"
+    type="text/javascript">
+  </script>
 </body>
 <style>
   .sidebar .sidebar-nav>ul>li {
