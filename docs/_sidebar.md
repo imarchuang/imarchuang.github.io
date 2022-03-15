@@ -1,6 +1,7 @@
 <!-- docs/_sidebar.md -->
 * [Home](./)
-* [Coding](./coding/index)
+* [Algo](./coding/index)
+* [System Design](./coding/sysde)
 * [Product Pattern](./products/index)
   * [Adapting to Legacy](./products/legacy/index)
   * [Authentication](./products/auth/index)

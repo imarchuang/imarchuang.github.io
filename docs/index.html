@@ -32,10 +32,10 @@
       search: 'auto', 
       search: {
         maxAge: 86400000, 
-        paths: '/', 
+        paths: 'auto', 
         placeholder: 'Type to search',
         noData: 'No Results Found!',
-        depth: 2,
+        depth: 6,
         hideOtherSidebarContent: false,
         namespace: 'marcblog',
       }
@@ -44,6 +44,7 @@
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-javascript.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-java.min.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
 </body>
 <style>
   .sidebar .sidebar-nav>ul>li {

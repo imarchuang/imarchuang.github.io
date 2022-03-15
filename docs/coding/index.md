@@ -1,5 +1,5 @@
 
-# Tutorials for every technologist
+# 刷刷刷
 
 Learn about all these great technologies:
 
@@ -14,3 +14,5 @@ Learn about all these great technologies:
 [双指针](./)
 [数组技巧](./)
 [数据结构](./)
+
+![](./pictures/cover.png)
