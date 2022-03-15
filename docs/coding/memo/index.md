@@ -42,7 +42,7 @@ const dp(路径，选择列表，状态1，状态2，...){
 1. [494. 目标和（中等）](#目标和) 
 1. [514. 自由之路（困难）](#自由之路)
 1. [787. K站中转内最便宜的航班（中等）](#K站中转内最便宜的航班) 
-1. [10. 正则表达式匹配（困难）](#正则表达式匹配) https://leetcode.com/problems/regular-expression-matching/
+1. [10. 正则表达式匹配（困难）](#正则表达式匹配) 
 1. [44. 通配符匹配（困难）](#通配符匹配) https://leetcode.com/problems/wildcard-matching/
 1. [651. 四键键盘（中等）](#四键键盘) https://www.lintcode.com/problem/867/
 1. [107 单词拆分]() https://www.lintcode.com/problem/107/

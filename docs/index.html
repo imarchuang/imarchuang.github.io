@@ -4,9 +4,13 @@
 <html>
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta
+    name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+  />
   <meta charset="UTF-8">
   <link rel="icon" href="/_media/favicon.ico?">
+  <link rel="stylesheet" href="https://unpkg.com/gitalk@latest/dist/gitalk.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css">
   <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
   <title>Marc Journey</title>
@@ -38,13 +42,42 @@
         depth: 6,
         hideOtherSidebarContent: false,
         namespace: 'marcblog',
-      }
+      },
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-javascript.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-java.min.js"></script>
   <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+  <script src="//unpkg.com/docsify-copy-code"></script>
+  <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
+  <!-- Gitalk 评论系统 -->
+  <script src="https://wugenqiang.gitee.io/notebook/plugin/gitalk.js"></script>
+  <script src="https://wugenqiang.gitee.io/notebook/plugin/gitalk.min.js"></script>
+  <script src="https://wugenqiang.gitee.io/notebook/plugin/md5.min.js"></script>
+  <script>
+    // title_id需要初始化
+    window.title_id = window.location.hash.match(/#(.*?)([?]|$)/) ? window.location.hash.match(/#(.*?)([?]|$)/)[1] : '/';
+    const gitalk = new Gitalk({
+      clientID: '557cdf9eab6d13722dfc',
+      clientSecret: 'c048567f2f29006b07ae19c546e511fddfa363b5',
+      repo: 'imarchuang.github.io',
+      owner: 'imarchuang',
+      admin: ['imarchuang'],
+      title: decodeURI(window.title_id),
+      distractionFreeMode: false,    // 是否添加全屏遮罩
+      id: md5(window.location.hash),    // 页面的唯一标识，gitalk 会根据这个标识自动创建的issue的标签,我们使用页面的相对路径作为标识
+      enableHotKey: true,    // 提交评论快捷键(cmd/ctrl + enter)
+    })
+    // 监听URL中hash的变化，如果发现换了一个MD文件，那么刷新页面，解决整个网站使用一个gitalk评论issues的问题。
+    window.onhashchange = function (event) {
+      if (event.newURL.split('?')[0] !== event.oldURL.split('?')[0]) {
+        location.reload()
+      }
+    }
+  </script>
 </body>
 <style>
   .sidebar .sidebar-nav>ul>li {

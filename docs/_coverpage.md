@@ -1,24 +1,26 @@
-<h1 id="cover-heading">
-  DocsifyJS Template  <!-- TODO: Update title -->
-</h1>
+![icon](https://cdn.jsdelivr.net/gh/wugenqiang/StaticRepo/images/icon.png)
 
-[![GitHub tags](https://img.shields.io/github/tag/MichaelCurrin/docsify-js-template.svg)](https://GitHub.com/MichaelCurrin/docsify-js-template/tags/) <!-- TODO: Update username and repo name -->
+## 有CS背景的架构师
 
->  Starter template for a Markdown-based docs site <!-- TODO: Replace with your description -->
+- 业精于勤，行成于思。一路上都在努力！切忌眼高手低。
+
+<br>
+
+<br>
+
+<span id="busuanzi_container_site_pv" style='display:none'>
+    👀 本站总访问量：<span id="busuanzi_value_site_pv"></span> 次
+</span>
+<span id="busuanzi_container_site_uv" style='display:none'>
+    | 🚴‍♂️ 本站总访客数：<span id="busuanzi_value_site_uv"></span> 人
+</span>
+
+<br>
+
+[GitHub](https://github.com/imarchuang/imarchuang.github.io)
+[开始阅读](/README.md)
 
 
-<!-- TODO: Update to match your project's benefits/features. Git emojis work great here. -->
 
-- :hourglass_flowing_sand: Quickly set up an elegant, responsive site
-- :open_file_folder: Use your markdown docs as content
-- :sparkles: No compilation step and no templating syntax to learn
-- :nut_and_bolt: Built on [DocsifyJS](https://docsify.js.org/)
-- :pushpin: The library loads in the browser - no local dependencies
-- :cloud: Serve locally and on GitHub Pages or Netlify
-
-
-[Use this template](https://github.com/MichaelCurrin/docsify-js-template/generate) <!-- TODO: Remove on your copy of this template.-->
-[Get Started](#docsifyjs-template) <!-- TODO: Use ID of your homepage heading -->
-
-<!-- TODO: Set your background color or image. -->
-![color](#b3d9f8)
+<!-- 背景色 -->
+![color](#fff)
