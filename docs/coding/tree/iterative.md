@@ -1,11 +1,140 @@
-# 二叉树的两类思路：遍历法和分治法
+# 递归转迭代
 - [刷题列表(6道)](#刷题列表)
 
-这类题通常都相对简单，说白了就是二叉树模板的套用。理论上讲，如果一道题可以用遍历法解决，几乎可以肯定这道题也可以用分治法解决。只不过很多时候用分治法写出来的代码更容易让别人看懂。
+递归做法写起来非常简洁易懂，但是随着程序员行业的内卷，越来越多公司的面试官经常想考察candidate的迭代写码能力。
 
-这篇会尽量用两类思路（遍历法和分治法）来解题。**重要的事情说三遍**：一定要先思考对于每一个节点上，它需要做什么！！！
+简单总结一下递归转迭代的几种应用情况：
+1. [permutation相关]()
+1. [二叉树的前中后序遍历](#二叉树的前中后序遍历)
+1. [表达式的分解]()
+1. [二叉搜索树的迭代器](#二叉搜索树的迭代器)
 
-**敲黑板**：二叉树的遍历模板很简单但是`**狠狠重要**`，这是后序回溯思维的基础。这里再贴一遍二叉树遍历模板：
+不管那种递归转迭代的问题，stack是一定会用到的数据结构。
+
+**敲黑板**：这篇文章很多模板需要`**熟练背诵**`！
+
+##### 二叉树的前中后序遍历
+这里主要是怎么用迭代的方法把递归版的前中后序遍历转化成迭代写法：
+
+**递归模板**
+```js
+const traverse = (root) => {
+    if(!root) return;
+    /*前序遍历位置*/
+    traverse(root.left);
+    /*中序遍历位置*/
+    traverse(root.right);
+    /*后序遍历位置*/
+}
+```
+**迭代模板**
+```js
+const traverse = (root, stk) => {
+    //用visited指针真想上次遍历完成的子树根节点
+    let visited = new TreeNode(-1); 
+    pushLeftBranch(root, stk);
+    while(stk.length>0){
+        let p = stk[stk.length-1];
+
+        //p的左子树遍历完了，而且右子树没有被遍历
+        if((!p.left || p.left == visited) && p.right !=visited) {
+            /*中序遍历位置*/
+            ...
+            //去遍历右子树
+            pushLeftBranch(p.right, stk);
+        }
+        
+        //p的左右子树都遍历完了
+        if(!p.right || p.right == visited) {
+            /*后序遍历位置*/
+            ...
+            visited = stk.pop();
+        }
+    }
+}
+const pushLeftBranch(root, stk) => {
+    while(root) {
+        /*前序遍历位置*/
+        ...
+        stk.push(root);
+        root = root.left;
+    }
+}
+```
+1. [144 二叉树的前序遍历](https://leetcode.com/problems/binary-tree-preorder-traversal/) **纯练习**
+```js
+var stk = [];
+var res = [];
+var preorderTraversal = function(root) {
+    //纯练手
+    stk = [];
+    res = [];
+    
+    pushLeftBranch(root);
+    let visited = new TreeNode(-1);
+    while(stk.length>0){
+        let p = stk[stk.length-1];
+        if((!p.left || p.left==visited) && p.right != visited){
+            pushLeftBranch(p.right);
+        }
+
+        if(!p.right || p.right==visited){
+            visited=stk.pop();
+        }
+    }
+    
+    return res;
+}
+const pushLeftBranch = (root) => {
+    while(root){
+        res.push(root.val);
+        stk.push(root);
+        root=root.left;
+    }
+}
+```
+
+##### 二叉搜索树的迭代器
+
+**BST迭代器，请务必背诵**
+```js
+class BST {
+    constructor(root){
+        this.stk = [];
+        while(root){
+            this.stk.push(root);
+            root = root.left;
+        }
+    }
+
+    next() {
+        let cur = this.stk[this.stk.length-1];
+        let node = cur;
+        if(!node.right){
+            //next节点不存在右子树，那就一直退栈
+            //直到碰到第一个有左拐的节点
+            node = this.stk.pop(); //这里要记得pop()掉最后一个节点
+            while(this.stk.length>0 && this.stk[this.stk.length-1].right == node){
+                node = this.stk.pop();
+            }
+        } else {
+            //next节点存在右子树，那就简单了 
+            //一路向西压栈就好了
+             node = node.right;
+            while(node) {
+                this.stk.push(node);
+                node = node.left;
+            }
+        }
+
+        return cur;
+    }
+
+    hasNext() {
+        return this.stk.length>0;
+    }
+}
+```
 
 #### **刷题列表**
 ###### [104 二叉树最大深度 (简单)](#二叉树最大深度)
@@ -14,48 +143,6 @@
 ###### [114 二叉树展开为链表（中等）](#二叉树展开为链表)
 ###### [652 寻找重复的子树（中等）](#寻找重复的子树)
 ###### [116 填充每个节点的下一个右侧节点指针（中等）](#填充每个节点的下一个右侧节点指针)
-
-
-##### 二叉树最大深度
-[104 二叉树最大深度 (简单)](https://leetcode.com/problems/maximum-depth-of-binary-tree/)
-
-**[思路I]** 用分治法
-```js
-var maxDepth = function(root) {
-    if(!root) return 0;
-    
-    let left = maxDepth(root.left);
-    let right = maxDepth(root.right);
-    
-    return Math.max(left, right)+1;
-};
-```
-**[思路II]** 用遍历法，这里的code特别像回溯框架
-```js
-// 记录最大深度
-let res = 0;
-let depth = 0;
-var maxDepth = function(root) {
-    res = 0;
-    depth = 0;
-    traverse(root);
-    return res;
-};
-
-const traverse = (root) => {
-    if (!root) {
-		// 到达叶子节点
-		res = Math.max(res, depth);
-		return;
-	}
-	// 前序遍历位置
-	depth++;
-	traverse(root.left);
-	traverse(root.right);
-	// 后序遍历位置
-	depth--;
-}
-```
 
 ##### 二叉树的前序遍历
 [144 二叉树的前序遍历](https://leetcode.com/problems/binary-tree-preorder-traversal/) 
