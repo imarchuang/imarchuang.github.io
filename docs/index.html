@@ -43,6 +43,12 @@
         hideOtherSidebarContent: false,
         namespace: 'marcblog',
       },
+      count:{
+        countable:true,
+        fontsize:'0.9em',
+        color:'rgb(90,90,90)',
+        language:'chinese'
+      }
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
@@ -54,8 +60,8 @@
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/emoji.min.js"></script>
   <!-- Gitalk 评论系统 -->
-  <script src="https://wugenqiang.gitee.io/notebook/plugin/gitalk.js"></script>
-  <script src="https://wugenqiang.gitee.io/notebook/plugin/gitalk.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/gitalk.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/gitalk/dist/gitalk.min.js"></script>
   <script src="https://wugenqiang.gitee.io/notebook/plugin/md5.min.js"></script>
   <script>
     // title_id需要初始化
@@ -63,7 +69,7 @@
     const gitalk = new Gitalk({
       clientID: '557cdf9eab6d13722dfc',
       clientSecret: 'c048567f2f29006b07ae19c546e511fddfa363b5',
-      repo: 'imarchuang.github.io',
+      repo: 'https://github.com/imarchuang/imarchuang.github.io',
       owner: 'imarchuang',
       admin: ['imarchuang'],
       title: decodeURI(window.title_id),
@@ -77,6 +83,13 @@
         location.reload()
       }
     }
+  </script>
+  <script src="https://utteranc.es/client.js"
+    repo="https://github.com/imarchuang/imarchuang.github.io"
+    issue-term="pathname"
+    theme="github-light"
+    crossorigin="anonymous"
+    async>
   </script>
 </body>
 <style>

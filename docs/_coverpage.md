@@ -1,6 +1,6 @@
 ![icon](https://cdn.jsdelivr.net/gh/wugenqiang/StaticRepo/images/icon.png)
 
-## 有CS背景的架构师
+## 有产品情怀的架构师
 
 - 业精于勤，行成于思。一路上都在努力！切忌眼高手低。
 

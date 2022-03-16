@@ -44,7 +44,7 @@ const dp(路径，选择列表，状态1，状态2，...){
 1. [787. K站中转内最便宜的航班（中等）](#K站中转内最便宜的航班) 
 1. [10. 正则表达式匹配（困难）](#正则表达式匹配) 
 1. [44. 通配符匹配（困难）](#通配符匹配) 
-1. [651. 四键键盘（中等）](#四键键盘) https://www.lintcode.com/problem/867/
+1. [72. 编辑距离](#编辑距离)
 1. [107 单词拆分]() https://www.lintcode.com/problem/107/
 1. [683 单词拆分 III]() https://www.lintcode.com/problem/683/
 
@@ -392,6 +392,40 @@ const dp = (s, i, p, j) => {
     return res;
 }
 ```
+### 编辑距离
+[72. 编辑距离](https://leetcode.com/problems/edit-distance/)
 
-##### 四键键盘
-[651. 四键键盘（中等）](https://www.lintcode.com/problem/867/) 
+![](../pictures/dp/sub2.png)
+
+?> **[思路]** 这题是子序动规里很经典的问题，但是也是让人看了就蒙的hard题。不过还是按照套路来嘛，又是两个字符串的问题，凭经验也应该快速写出对应的dp函数`dp(s1, i, s2, j)`，然后顺着语义把这个dp函数定义清楚，`dp函数代表s1[0...i]和s2[0...j]之间的最小编辑距离`，然后接下来就是套我们记忆化搜索模板。这题需要注意的是，其实选择列表有四个选项，增删替，还有就是啥都不做。这题的自底而上解法会在[**这里**](./coding/dp/subsequence?id=编辑距离)给出，但是说实话，我个人能写出这个自底而上的解法完全是因为能先写出这个记忆化搜索的解法。
+
+```js
+var memo;
+var minDistance = function(word1, word2) {
+    memo = [...Array(word1.length)].map(x=>Array(word2.length));
+    return dp(word1, word1.length-1, word2, word2.length-1);
+};
+
+const dp = (s1, i, s2, j) => {
+    //base case
+    if(i<0) return j+1;
+    if(j<0) return i+1;
+
+    if(memo[i][j] != null && memo[i][j] !== undefined) return memo[i][j];
+
+    //选择列表
+    let res = 0;
+    if(s1.charAt(i) == s2.charAt(j)) {
+        res = dp(s1, i-1, s2, j-1); //啥都不做就是最好的编辑距离
+    }
+    else {
+        res = Math.min(
+            dp(s1, i-1, s2, j), //增
+            dp(s1, i, s2, j-1), //删
+            dp(s1, i-1, s2, j-1), //替换
+        ) + 1; //都是一个操作，所以加1
+    }
+    memo[i][j] = res;
+    return res;
+}
+```
