@@ -43,7 +43,7 @@ const dp(路径，选择列表，状态1，状态2，...){
 1. [514. 自由之路（困难）](#自由之路)
 1. [787. K站中转内最便宜的航班（中等）](#K站中转内最便宜的航班) 
 1. [10. 正则表达式匹配（困难）](#正则表达式匹配) 
-1. [44. 通配符匹配（困难）](#通配符匹配) https://leetcode.com/problems/wildcard-matching/
+1. [44. 通配符匹配（困难）](#通配符匹配) 
 1. [651. 四键键盘（中等）](#四键键盘) https://www.lintcode.com/problem/867/
 1. [107 单词拆分]() https://www.lintcode.com/problem/107/
 1. [683 单词拆分 III]() https://www.lintcode.com/problem/683/
@@ -331,3 +331,67 @@ const dp = (s, i, p, j) => {
     return res;
 }
 ```
+##### 通配符匹配
+[44. 通配符匹配（困难）](https://leetcode.com/problems/wildcard-matching/) 
+
+![](../pictures/memo/6.png)
+
+?> **[思路]** 又是一个经典问题，跟[正则表达式匹配](#正则表达式匹配)非常类似。这个题还是我们的经典成名思路：又是两个字符串，凭经验也应该快速写出对应的dp函数`dp(s, i, p, j)`，哈哈。然后再顺着原题语义把这个dp函数定义清楚，`s[i...] 是否能被p[j...]匹配`，这样暴力解法就出来了。再把memo加进去，一个正宗的记忆化搜索解法就出来了。再说一次，这题我其实根本没想过用dp数组自底而上来写代码。
+
+> 这题一个小技巧就是先把连续的'*'通配符trim成一个，这样会加速计算通过leetcode大哥。
+
+```js
+var memo;
+var isMatch = function(s, p) {
+    memo = [...Array(s.length)].map(x=>Array(p.length));
+    //trim off consecutive *
+    let pA = [];
+    let pre='';
+    for(let i=0; i<p.length; i++){
+        let c = p.charAt(i);
+        if(c!='*' || (c=='*' && pre!='*')){
+            pA.push(c);
+            pre=c;
+        }
+    }
+    p = pA.join('');
+    return dp(s, 0, p, 0);
+};
+
+//dp定义：s[i...] 是否能被p[j...]匹配
+const dp = (s, i, p, j) => {
+    //base case
+    if(j==p.length) return i==s.length;
+    
+    if(i==s.length) {
+        //看是否只剩'*'通配符
+        for(;j<p.length;j++){
+            if(p.charAt(j)!='*') return false;
+        }
+        
+        return true;
+    }
+    
+    // 记录状态 (i, j)，消除重叠子问题
+    if(memo[i][j] != null &&  memo[i][j] !== undefined) return memo[i][j];
+    
+    let res = false;
+    //做选择
+    if(s.charAt(i)==p.charAt(j) || p.charAt(j)=='?'){
+        res = dp(s, i+1, p, j+1);
+    } 
+    else if (p.charAt(j)=='*') {
+        //可以匹配0个字符或者多个字符
+        res = dp(s, i+1, p, j) || dp(s, i, p, j+1); //分别代表多个和0个
+    } 
+    else {
+        res = false;
+    }
+    
+    memo[i][j] = res;
+    return res;
+}
+```
+
+##### 四键键盘
+[651. 四键键盘（中等）](https://www.lintcode.com/problem/867/) 
