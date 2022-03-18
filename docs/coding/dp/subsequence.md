@@ -88,6 +88,7 @@ var minDistance = function(word1, word2) {
 ![](../pictures/dp/sub3.png)
 
 ?> **[思路]** 这题是子序动规里最经典的问题了(LIS)，而且这题的衍生题目也很多。最长增子序LIS咋整？先理解子序。就是说子序可以是不连续子序的组合，但是原序（前后序）还是要维持。所以要计算第i个位置的最长LIS，如果已经知道前i-1个元素每个的LIS，能否计算出来？答案是能的，因为只要遍历[0...i-1]区间里比nums[i]值小的元素，并把他们的LIS值加1（因为这个nums[i]比它大），再然后就是从这些值里找最大值, 这就是高中学的数学归纳法(mathmatical induction)。所以两个坐标指针i和j，用j指针遍历dp[0...i-1]。
+
 ```js
 var lengthOfLIS = function(nums) {
     //LIS问题是经典的数学归纳法(mathmatical induction)的案例，一维dp数列找答案，然后再遍历dp数列找最终答案
@@ -114,6 +115,10 @@ var lengthOfLIS = function(nums) {
 
 ### 最长公共子序
 [1143 最长公共子序](https://leetcode.com/problems/longest-common-subsequence/)
+
+![](../pictures/dp/sub5.png)
+
+?> **[思路]** 这题是子序动规里经典的问题了(LCS)，而且这题的衍生题目也很多，这篇文章会展示两个。。
 
 ```js
 var memo = [];
@@ -145,10 +150,91 @@ const dp = (s1, i, s2, j) => {
 ```
 
 ### 两字符串的删除和
-[712 两字符串的删除和](https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/) 
+[712 两字符串的删除和](https://leetcode.com/problems/minimum-ascii-delete-sum-for-two-strings/)
+
+![](../pictures/dp/sub7.png)
+
+```js
+var memo = [];
+var minimumDeleteSum = function(s1, s2) {
+    memo = [...Array(s1.length)].map(x=>Array(s2.length).fill(-1));
+    let s1Arr = s1.split('').map(x=>x.charCodeAt(0));
+    let s2Arr = s2.split('').map(x=>x.charCodeAt(0));
+    return dp(s1Arr, 0, s2Arr, 0);
+};
+
+const dp = (s1, i, s2, j) => {
+    
+    //base case
+    if(i==s1.length) {
+        let res=0;
+        for(;j<s2.length;j++){
+            res += s2[j];
+        }
+        return res;
+    }
+    
+    if(j==s2.length) {
+        let res=0;
+        for(;i<s1.length;i++){
+            res += s1[i];
+        }
+        return res;
+    }
+    
+    if(memo[i][j]!=-1) return memo[i][j];
+    //状态转化
+    let res = 0;
+    if(s1[i]==s2[j]) {
+        res = dp(s1, i+1, s2, j+1);
+    }
+    else {
+        res = Math.min(
+            dp(s1, i, s2, j+1) + s2[j], 
+            dp(s1, i+1, s2, j) + s1[i]
+        );
+    }
+    
+    memo[i][j]=res;
+    return res;
+}
+```
 
 ### 两字符串的删除
 [583 两字符串的删除](https://leetcode.com/problems/delete-operation-for-two-strings/)
+
+![](../pictures/dp/sub6.png)
+
+```js
+var minDistance = function(word1, word2) {
+    let m = word1.length, n=word2.length;
+    let dp = [...Array(m+1)].map(x=>Array(n+1));
+    
+    //先找公共子序
+    //base case
+    for(let j=0; j<=n; j++){
+        dp[0][j] = 0;
+    }
+    for(let i=0; i<=m; i++){
+        dp[i][0] = 0;
+    }
+    
+    //状态转化
+    for(let i=1; i<=m; i++){
+        for(let j=1; j<=n; j++){
+            if(word1[i-1]==word2[j-1]){
+                dp[i][j] = dp[i-1][j-1]+1;
+            }
+            else {
+                dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+    }
+    
+    return (m-dp[m][n]) + (n-dp[m][n]);
+    
+};
+```
 
 ### 最长回文子序
 [516 最长回文子序](https://leetcode.com/problems/longest-palindromic-subsequence/)
@@ -219,10 +305,37 @@ var longestPalindromeSubseq = function(s) {
     return dp[0][n-1];
 };
 ```
-
-
 ### 构造回文的最小插入次数
-[1312 构造回文的最小插入次数](https://leetcode.com/problems/longest-palindromic-subsequence/)
+[1312 构造回文的最小插入次数](https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/)
+
+![](../pictures/dp/sub9.png)
+
+?> **[思路]** 这题是一个严格意义上并不是子序类动规问题。与[最长回文子序](#最长回文子序)也很有关系，解法也很类似，甚至有种解法可以直接加层皮互相解。你琢磨琢磨，`把一个字符串变成回文串的最少操作次数`是不是可以先找`这个字符串的最长回文子序`，然后把那些不在`最长回文子串`的字符进行添加一个同字符操作就可以了？关于回文串，我觉得有必要专门写一篇文章来总结一下思路。
+
+```js
+
+var minInsertions = function(s) {
+    let n = s.length;
+    let dp = [...Array(n)].map(x=>Array(n).fill(0));
+
+    //base case
+    //dp[i][i] = 0;
+
+    //状态转化
+    for(let i=n-2; i>=0; i--) {
+        for(let j=i+1; j<n; j++) {
+            if(s[i]==s[j]){
+                dp[i][j] = dp[i+1][j-1];
+            }
+            else {
+                dp[i][j] = Math.min(dp[i+1][j], dp[i][j-1])+1;
+            }
+        }
+    }
+
+    return dp[0][n-1];
+};
+```
 
 ### 四键键盘
 [651. 四键键盘（中等）](https://www.lintcode.com/problem/867/) 

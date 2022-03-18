@@ -21,7 +21,7 @@
 ** [背包型](./coding/dp/knapsack)
 ** [博弈型](./coding/dp/gametheory)
 ** [区间型](./coding/dp/interval)
-** [股票买卖系列动规](./coding/dp/stock)
+** [股票买卖系列](./coding/dp/stock)
 ** [不知道型](./coding/dp/unknown)
 * [二分法](./)
 * [双指针](./)

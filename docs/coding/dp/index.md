@@ -5,8 +5,8 @@
 - [背包类动规](./coding/dp/knapsack.md) 
 - [博弈类动规](./coding/dp/gametheory.md) 
 - [区间型动规](./coding/dp/interval.md)
-- [股票买卖系列动规](./coding/dp/stock.md)
-- [不知道哪一类动规](./coding/dp/unknown.md)
+- [股票买卖系列](./coding/dp/stock.md)
+- [不知道哪一类](./coding/dp/unknown.md)
 
 #### **何为动规**
 **听说动规，这类题确实挺玄学，我刷到今天了(2022.03.15)了，依旧觉得有些题目拿来，知道是动规题，但是对状态转移方程依旧是存在于某种程度的运气。玄学的东西，需要的刷到一定量的题了，然后温故而知新，不定时总结感悟刷过的题，顿悟的过程是很痛苦的。**

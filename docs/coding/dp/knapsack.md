@@ -1,0 +1,16 @@
+# 坐标型动规
+
+**坐标型动规是动规里最简单的一类。与子序型动规需要看前i的元素[1...i-1]的特征来决定最优值相比，坐标型动规往往在dp[i][j]这个坐标上就能计算出最优子结构的最优值**
+
+?> 借着本文希望能体将子序型的动规问题扒扒皮，找出共性和解题套路来解答坐标型动规题。
+
+!> **敲黑板** 回溯框架没有分治版的，我这里多次提到回溯框架的分治版实际上指的是带返回值的dp函数定义，这种定义写的时候非常像回溯模板，只不过`做选择`的结果会直接传入递归的下一层，所以也就没有必要`撤销选择`了。这些传入递归的下一层参数，自变量参数就是所谓的动规的`状态`，而dp函数本身通过`遍历选择`进行一个`状态转化方程`，这个dp函数的递归出口就是所谓的`base case`。
+
+### **刷题列表**
+[416] https://leetcode.com/problems/partition-equal-subset-sum/
+[474] https://leetcode.com/problems/ones-and-zeroes/
+[494 目标和] https://leetcode.com/problems/target-sum/
+[518] https://leetcode.com/problems/coin-change-2/
+[1049] https://leetcode.com/problems/last-stone-weight-ii/
+-----------------------------------------------------------------------------------------------------
+[198, 213, 337 打家劫舍i,ii,iii] https://leetcode.com/problems/house-robber/ 
