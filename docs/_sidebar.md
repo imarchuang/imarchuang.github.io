@@ -1,7 +1,7 @@
 <!-- docs/_sidebar.md -->
 * [Home](./)
 * [Algo](./coding/index)
-* [System Design](./coding/sysde)
+* [System Design](./sysde/index)
 * [Product Pattern](./products/index)
 * [System Pattern](./system/index)
 * [Micro Frontend](./system/frontend/index)
