@@ -1,6 +1,5 @@
 <!-- docs/_sidebar.md -->
 
-
 * [HOME](./)
 * [副主页](./coding/index)
 * [链表](./coding/linkedlist/index)
@@ -12,8 +11,8 @@
 ** [BST模板题](./coding/tree/bst)
 ** [递归转迭代](./coding/tree/iterative)
 * [图论基础](./)
-* [回溯](./)
-* [宽搜](./)
+* [深搜](./coding/dfs/index)
+* [宽搜](./coding/bfs/index)
 * [记忆化搜索](./coding/memo/index)
 * [动态规划](./coding/dp/index)
 ** [子序型](./coding/dp/subsequence)

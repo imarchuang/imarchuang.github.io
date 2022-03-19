@@ -1,4 +1,4 @@
-# 深度搜素：回溯，分治
+# 宽度搜素：层级遍历，最短距离，拓扑排序
 
 ### **浅谈遍历的思维**
 **只要上过算法课的人，都会晓得深搜(DFS)和宽搜(BFS)。就这么说吧，搜索就是穷举遍历的过程，只不过有时候穷举遍历的过程中发现了可以exit的条件可以提前结束而已。宽搜的本质是面（或者说由点及面），属于集体作战。深搜的话属于一条线走到天黑，属于单打独斗。这篇主要是想借着[东哥的这篇帖子(一文秒杀所有岛屿题目)](https://labuladong.gitee.io/algo/4/30/111/)来整理加深一下DFS和BFS之间的不同作战规则。这里的题都是基于矩阵（也是图）的遍历，所以遍历起来的方向性也比较容易理解。**
@@ -51,6 +51,10 @@ const dfs = (grid, i, j, visited) => {
 }
 ```
 
+### 知识要点列表
+1. [二叉树的层级遍历](./levels.md)
+1. [YYDS, 拓扑排序](./topsort.md)
+
 ### **刷题列表**
 1. [200. 岛屿数量（中等）](#岛屿数量)
 1. [1254. 统计封闭岛屿的数目（中等）](#统计封闭岛屿的数目)
@@ -58,53 +62,3 @@ const dfs = (grid, i, j, visited) => {
 1. [695. 岛屿的最大面积（中等）](#岛屿的最大面积)
 1. [1905. 统计子岛屿（中等）](#统计子岛屿)
 1. [694. 不同的岛屿数量（中等）](#不同的岛屿数量)
-
-### 岛屿数量
-[200. 岛屿数量（中等）](https://leetcode.com/problems/number-of-islands/)
-
-比如说题目给你输入下面这个 grid 有四片岛屿，算法应该返回 4：
-
-![](./pictures/200.jpeg)
-
-```js
-//这是BFS的解法
-var DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
-var numIslands = function(grid) {
-    let q = [];
-    let step = 0;
-    for(let i=0; i<grid.length;i++){
-        for(let j=0; j<grid[0].length;j++){
-            if(grid[i][j] == '1'){
-                q.push([i,j]);
-                grid[i][j] = '-1'; //代表已经visited过
-                //BFS
-                while(q.length > 0) {
-                    let curr = q.shift();
-                    //上下左右扩散
-                    for(const dir of DIRS){
-                       y = curr[0] + dir[0]; 
-                       x = curr[1] + dir[1];
-                        
-                       if(y<0 || y>grid.length-1 || x<0 || x>grid[0].length-1){
-                           continue;
-                       }
-                        
-                       if(grid[y][x] == '1') {
-                           q.push([y,x]);
-                       } 
-                       
-                       grid[y][x] = '-1'; 
-                    }
-                    
-                }
-                step++;
-            } 
-        }
-    }
-    
-    return step;
-    
-};
-```
-
-
