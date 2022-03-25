@@ -30,7 +30,7 @@
 * As such, if all the creation request (aka, `POST` traffic) of the **BusinessNumber** can be routed to the same instance of your application, then your application can leverage well-known `optimistic locking` (e.g., RW lock etc.) for the business critical zone.
 * **Solution Snippet**: 
     * In your Kubernetes ingress controller spec, configure your corresponding ingress rule as following:
-    ```
+    ```yaml
     apiVersion: extensions/v1beta1
     kind: Ingress
     metadata:
@@ -50,7 +50,7 @@
 *  
 * **Solution Snippet**: 
     * In your Kubernetes ingress controller spec, configure your corresponding ingress rule as following:
-    ```
+    ```yaml
     apiVersion: extensions/v1beta1
     kind: Ingress
     metadata:

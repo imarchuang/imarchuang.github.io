@@ -2,7 +2,7 @@
 
 ## General Philosophy
 * Can we make cdata with an efficient key-value pairing system?
-* Why [kubernetes] adopts implicit/dynamic grouping whereever possible?
+* Why [kubernetes] adopts implicit/dynamic grouping whereever possible? THREE general principles of Kubernetes.
 
 ## Product Pattern 
 
@@ -22,7 +22,7 @@
 * Why do you want to marry your operations (Content Administrators) to your analytics (Content Viewers)
 to the same product in your organization?
 * I am not sure how many organizations are really adopting Chaos Monkey...
-* What is the better/faster way of supporing your product in IE?
+* What is the better/faster way of supporting your product in IE?
 
 ## System Pattern
 

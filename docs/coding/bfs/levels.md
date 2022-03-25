@@ -2,6 +2,26 @@
 
 !> 说的二叉树层级遍历，如果题目不要求在最小的层数结束，其实BFS和DFS思路都是可行的，这篇文章对相应的题会展示两个思路的解法，以加深对BFS和DFS的理解。
 
+> 这篇文章里会用DFS思路去解决涉及到层级遍历的题，这里有个通用的思维框架，其实就是回溯框架的缩小版应用在二叉树上。`depth++`就是做选择，`depth--`就是撤销选择。
+
+```js
+const traverse = (root, depth, res) => {
+    if(!root) return;
+    if(res.length<depth){
+        //说明是这一层的第一个元素，该做点啥...
+        //比如说 res.push([root.val, 1]);
+    } else {
+        //说明已经不是这一层的第一个元素，该做点啥...
+        //比如说，res[depth-1] = ...;
+    }
+    
+    depth++;
+    traverse(root.left, depth, res);
+    traverse(root.right, depth, res);
+    depth--;
+}
+```
+
 ### **刷题列表**
 1. [111. 二叉树的最小深度（简单）](#二叉树的最小深度)
 1. [107. 二叉树的层级遍历II（中等）](#二叉树的层级遍历II)

@@ -28,7 +28,7 @@ I would like to leverage this post to cover how async await works, by using a re
 #### Scenario:
 Imagine yourself as a software Project Manager, and you just got a new project to deliver a solution in your existing Enterprise Resource Planning system, which will enable users to digitize their expense approval process.
 
-```
+```js
 function process_duration(duration) {
   return new Promise(r => setTimeout(r, duration*1000));
 }
@@ -64,7 +64,7 @@ In the initial phase, the project manager could not do much except for coordinat
 Once the initial solution spec is out, this is when project managers would try to parallelize the communication process with project dependencies.
 
 One way to do this would be doing all these sequentially:
-```
+```js
 async function wantTobeFired() {
   await wait_for_spec(); // Wait for 10 days  
   await wait_for_timeline_review(); // Wait for 14 days 
@@ -78,7 +78,7 @@ This would lead to 124 days to deliver that desired solution.
 
 In real-life, the project managers would take a risk to start communicating to dependencies (e.g., PMO office for timeline and resource review, IT Department for security review and hardware purchasing, and of course the implementation team) simultaneously, which would lead to a similar pattern like below:
 
-```
+```js
 async function realLife() {
   await wait_for_spec(); // Wait for 10 days  
   let timelineReview = wait_for_timeline_review(); // Wait for 14 days 
