@@ -2,6 +2,7 @@
 * [Home](./)
 * [Algo](./coding/index)
 * [System Design](./sysde/index)
+* [Behavorial](./behavorial/index)
 * [Product Pattern](./products/index)
 * [System Pattern](./system/index)
 * [Micro Frontend](./system/frontend/index)
