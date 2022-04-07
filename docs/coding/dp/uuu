@@ -1,0 +1,10 @@
+- Modernized legacy monolithic applications running on legacy platforms (e.g., AS400, JBoss stack etc.) to micro-services and micro-frontends running on Kubernetes, with hybrid cloud approach (i.e., on-prem, GKE and AKS etc).
+
+- Migrated 90% of existing on-premise workload to Azure.
+
+- Strategized, Designed and Implemented enterpriseDevOps practices from scratch to production in the following areas, namely, CICD, DataOps, Test Automation,API first, Event storming and TDD.
+
+- Strategized, Designed and Implemented enterprise data practices from scratch to production in the following domains, namely, data lake, ETL, ELT, change data capture, data warehouse, and data visualization via BI.
+Designed and Implemented the network architecture to optimize the balance between communication efficiency and network security (both on layer4 and layer7).
+
+- Strategized and Designed enterprise API gateway as the unified authentication, authorization, rate throttling, introspection and service management gateway.
