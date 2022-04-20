@@ -3,6 +3,7 @@
 
 * [HOME](./)
 * [副主页](./sysde/index)
+* [面试真题](./sysde/past)
 * [数据库拆分](./sysde/sharding)
 ** [实时统计系统](./sysde/linkedlist/kgroupreverse)
 * [服务层API设计](./sysde/tree/index)
