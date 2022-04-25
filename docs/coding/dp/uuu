@@ -8,3 +8,90 @@
 Designed and Implemented the network architecture to optimize the balance between communication efficiency and network security (both on layer4 and layer7).
 
 - Strategized and Designed enterprise API gateway as the unified authentication, authorization, rate throttling, introspection and service management gateway.
+
+
+
+
+/*
+Suppose we have some input data describing a graph of relationships between parents and children over multiple generations. The data is formatted as a list of (parent, child) pairs, where each individual is assigned a unique positive integer identifier.
+
+For example, in this diagram, 6 and 8 have common ancestors of 4 and 14.
+
+               15
+              / \
+         14  13  21
+         |   |
+1   2    4   12
+ \ /   / | \ /
+  3   5  8  9
+   \ / \     \
+    6   7     11
+
+pairs = [
+    (1, 3), (2, 3), (3, 6), (5, 6), (5, 7), (4, 5),
+    (15, 21), (4, 8), (4, 9), (9, 11), (14, 4), (13, 12),
+    (12, 9), (15, 13)
+]
+
+Write a function that takes this data and the identifiers of two individuals as inputs and returns true if and only if they share at least one ancestor. 
+
+Sample input and output:
+
+hasCommonAncestor(pairs, 3, 8)   => false
+hasCommonAncestor(pairs, 5, 8)   => true
+hasCommonAncestor(pairs, 6, 8)   => true
+hasCommonAncestor(pairs, 6, 9)   => true
+hasCommonAncestor(pairs, 1, 3)   => false
+hasCommonAncestor(pairs, 3, 1)   => false
+hasCommonAncestor(pairs, 7, 11)  => true
+hasCommonAncestor(pairs, 6, 5)   => true
+hasCommonAncestor(pairs, 5, 6)   => true
+hasCommonAncestor(pairs, 3, 6)   => true
+hasCommonAncestor(pairs, 21, 11) => true
+
+n: number of pairs in the input
+*/
+"use strict";
+
+const pairs = [
+  [5, 6], [1, 3], [2, 3], [3, 6], [15, 12],
+  [5, 7], [4, 5], [4, 9], [9, 12], [30, 16]
+];
+
+const findNodesWithZeroAndOneParents = (pairs) => {
+  let childSet = new Set();
+  let zeroParentSet = new Set();
+  let parentCounter = {};
+  for(const pair of pairs) {
+    let parent = pair[0], child = pair[1];
+
+    if(parentCounter[child]){
+      parentCounter[child]++;
+    } else {
+      parentCounter[child] = 1;
+    }
+
+    childSet.add(child);
+    //zero parent
+    if(zeroParentSet.has(child) || childSet.has(parent)) {
+      zeroParentSet.delete(child);
+    } else {
+      zeroParentSet.add(parent);
+    }
+
+  }
+
+  let zeroParentRes = Array.from(zeroParentSet);
+  let oneParentRes = [];
+  for(const [key, val] of Object.entries(parentCounter)){
+    if(val==1) oneParentRes.push(key);
+  }
+
+  return [zeroParentRes, oneParentRes];
+}
+
+console.log(findNodesWithZeroAndOneParents(pairs));
+
+const hasCommonAncestor = (pairs, p, q) => {
+  
+}

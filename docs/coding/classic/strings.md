@@ -1,7 +1,7 @@
 # 关于字符串的几大类问题
 
 ### 第一类：穷举呗，回溯遍历或者分治都是思考路线
-!> **敲黑板** 这里穷举问题多数都是子串切割问题，那么既然是子串（连续性），那算法复杂度就应该是控制在O(n^2)这样子。这类穷举问题里通常会用到一种递归思想，那就是把一个字符串切割成两段子串：头部是`s.substring(0, i+1)`和尾部`s.substring(i+1)`。这样就可以这么假设头部符合某个条件（比如说头部是一个word），那么基于这个假设成立再证明尾部是正确的就可以了，这样这个问题的思路就很容易转化到递归思维已经证明尾部的问题。
+!> **敲黑板** 这里穷举问题多数都是子串切割问题，那么既然是子串（连续性），那算法复杂度就应该是控制在O(n^2)这样子。q这类穷举问题里通常会用到一种递归思想，那就是把一个字符串切割成两段子串：头部是`s.substring(0, i+1)`和尾部`s.substring(i+1)`。这样就可以这么假设头部符合某个条件（比如说头部是一个word），那么基于这个假设成立再证明尾部是正确的就可以了，这样这个问题的思路就很容易转化到递归思维已经证明尾部的问题。
 1. [212. 单词查找II](#单词查找II)
 1. [140. 单词拆分II](#单词拆分II) 
 1. [131. 回文串切割](#回文串切割) 
@@ -37,6 +37,9 @@
 
 ### 第IV类：单调栈类
 1. [316. 去重重复字母](#去重重复字母) 
+
+### 第V类：单调栈类
+1. [面试真题. 找字符串中符合word的子序列](#找字符串中符合word的子序列)
 
 ### 单词查找II
 [212. 单词查找II](https://leetcode.com/problems/word-search-ii/) 
@@ -337,4 +340,56 @@ var removeDuplicateLetters = function(s) {
     
     return stk.join('');
 };
+```
+
+### 找字符串中符合word的子序列
+[找字符串中符合word的子序列](#找字符串中符合word的子序列)
+
+> **题目描述**
+> 给出一个字典words，例如[cat, tax, baby, bird, sky]，判断一个字符串str中是否含有一个子序能够形成字典中的任意word。**注意**：这个子序的异构词能形成word即可。
+>
+> **思路** 拿到这题，我的第一反应是用类似滑动窗口处理子串问题的思想，即：给出一个window，这个window里记录某个word的所有字符的出现次数，比如说cat这个词，就可以形成`{'c':1, 'a':1, 't':1}`。然后遍历str的每个字符，如果遍历过程中能让cat所对应的window里的键值对都满足，那就说明这个word就是答案。因为给出的是一个多个word的字典，那么就字典里的每个word都建立各自的window就好了。
+>
+```js
+const find_embedded_word = (words, str) => {
+   let wordMap = [];
+   //先把每个word建成字母和occurance的键值对map
+   for(const word of words) {
+     let window = {};
+     for(const c of word){
+       if(window[c]){
+         window[c]++;
+       } else {
+         window[c] = 1;
+       }
+     }
+     wordMap.push(window);
+   }
+
+   //console.log(wordMap);
+
+   for(const c of str) {
+     for(let i=0; i<wordMap.length; i++){
+       let word = wordMap[i];
+       if(word[c]){
+         word[c]--;
+       }
+
+       if(word[c]==0) delete word[c];
+       //console.log(wordMap);
+
+       //如果json object中的键值对都被删除了，说明这个对应的word就是答案
+       if(Object.keys(word)==null || Object.keys(word).length==0) return words[i];
+     } 
+   }
+
+   return null;
+}
+
+// console.log(find_embedded_word(words, string1));
+// console.log(find_embedded_word(words, string2));
+// console.log(find_embedded_word(words, string3));
+// console.log(find_embedded_word(words, string4));
+// console.log(find_embedded_word(words, string5));
+// console.log(find_embedded_word(words, string6));
 ```
