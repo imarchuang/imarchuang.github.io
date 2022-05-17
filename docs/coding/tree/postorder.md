@@ -7,19 +7,21 @@
 2. 而且这些题都得用到分治法概念，因为左右子树都得return他们各自的答案，这个各自子树的return并非直接跟题目要求的最终答案一致。
 3. 因此要同时需要维护一个global variable，目的在于能够在traversal的过程中把目前已知的最佳答案cache起来。
 
-**敲黑板**：如果你感觉需要多次遍历二叉树了，说明你的后序遍历没写好。
+!> **敲黑板**：如果你感觉需要多次遍历二叉树了，说明你的后序遍历没写好。之前提过，刷题中如果你的code里出现了多次遍历树的代码，这个时候一定回头仔细仔细考虑是不是一次`后序遍历`就可以全部解决了？这里的核心就是在你的遍历函数的return值是为了保证`可递归性`，就是说能够不破坏`子问题结果层层上传`的写法，与此同时呢，题目的答案却需要跨越左右儿子子问题的单边结果。
 
 #### **刷题列表**
 1. [543 二叉树直径](#二叉树直径)
 1. [124 二叉树的最大路径和](#二叉树的最大路径和)
 1. [687 最长重复值路径](#最长重复值路径)
 1. [1339 分割二叉树的最大乘积](#分割二叉树的最大乘积)
-1. [2049 二叉树最大乘积分割](#二叉树最大乘积分割)
+1. [2049 统计最高分的节点数目](#二叉树最大乘积分割)
 1. [1373 二叉搜索树中的最大子树和](#二叉搜索树中的最大子树和)
+1. [650 领扣 - 二叉树叶子顺序遍历](#二叉树叶子顺序遍历)
+1. [93 领扣 - 平衡二叉树](#平衡二叉树)
 
-
-##### 二叉树直径
-[543 二叉树直径](https://leetcode.com/problems/diameter-of-binary-tree/) **[思路]** 维护一个maxDiameter的global参数，然后分治函数里返回子树的最大深度并打擂台maxDiameter
+### 二叉树直径
+[543 二叉树直径](https://leetcode.com/problems/diameter-of-binary-tree/) 
+> **[思路]** 维护一个maxDiameter的global参数，然后分治函数里返回子树的最大深度并打擂台maxDiameter
 ```js
 var maxDiameter = 0;
 //典型的后序遍历/分治代码 -> 直径 = 左子树最大深度 + 右子树最大深度
@@ -40,8 +42,29 @@ const maxDepth = (root) => {
     return depth;
 }
 ```
-##### 二叉树的最大路径和
-[124 二叉树的最大路径和](https://leetcode.com/problems/binary-tree-maximum-path-sum/) **[思路]** 维护一个maxDiameter的global参数，然后分治函数里返回子树的最大深度并打擂台maxSum
+```java
+class Solution {
+    
+    private int maxDiameter = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        maxDepth(root);
+        
+        return maxDiameter;
+    }
+    
+    public int maxDepth(TreeNode node) {
+        if(node==null) return 0;
+        int left = maxDepth(node.left);
+        int right = maxDepth(node.right);
+        maxDiameter = Math.max(maxDiameter, left+right);
+        
+        return Math.max(left, right)+1;
+    }
+}
+```
+### 二叉树的最大路径和
+[124 二叉树的最大路径和](https://leetcode.com/problems/binary-tree-maximum-path-sum/) 
+> **[思路]** 维护一个maxSum的global参数，然后分治函数里返回子树的最大深度并打擂台maxSum
 ```js
 /**
  * @param {TreeNode} root
@@ -67,8 +90,36 @@ const traverse = (root) => {
     return Math.max(root.val, root.val+left, root.val+right);
 }
 ```
-##### 最长重复值路径
-[687 最长重复值路径](https://leetcode.com/problems/longest-univalue-path/) **[思路]** 维护一个res的global参数。这里有个小技巧就是要传入父节点的值val，因为可以根据当前根节点与父节点是否同值来决定返回0还是路径延长
+```java
+import java.util.stream.*;
+public class Solution {
+    /**
+     * @param root: The root of binary tree.
+     * @return: An integer
+     */
+    private int maxPathSum = Integer.MIN_VALUE;
+    public int maxPathSum(TreeNode root) {
+        // write your code here
+        traverse(root);
+        return maxPathSum;
+    }
+
+    private int traverse(TreeNode node){
+        if(node==null) 
+            return 0;
+
+        int left = traverse(node.left);
+        int right = traverse(node.right);
+
+        maxPathSum = IntStream.of(node.val, left+node.val, right+node.val, left+node.val+right, maxPathSum).max().getAsInt();
+
+        return IntStream.of(node.val, left+node.val, right+node.val).max().getAsInt();
+    }
+}
+```
+### 最长重复值路径
+[687 最长重复值路径](https://leetcode.com/problems/longest-univalue-path/) 
+> **[思路]** 维护一个res的global参数。这里有个小技巧就是要传入父节点的值val，因为可以根据当前根节点与父节点是否同值来决定返回0还是路径延长
 ```js
 /**
  * @param {TreeNode} root
@@ -95,7 +146,7 @@ const traverse = (root, val) => {
     
 }
 ```
-**[思路II]** 依旧是维护一个res的global参数。但是能不能不传入父节点的值val？答案是可以的，因为可以向左向右peek
+> **[思路II]** 依旧是维护一个res的global参数。但是能不能不传入父节点的值val？答案是可以的，因为可以向左向右peek
 ```js
 var res = 0;
 var longestUnivaluePath = function(root) {
@@ -130,8 +181,64 @@ const traverse = (root) => {
     
 }
 ```
-##### 分割二叉树的最大乘积
-[1339 分割二叉树的最大乘积](https://leetcode.com/problems/maximum-product-of-splitted-binary-tree/) **[思路]** 维护一个maxProd的global参数，然后分治函数里返回子树的节点和并打擂台maxProd
+```java
+class Solution {
+    
+    private int longestPath = 0;
+    public int longestUnivaluePath(TreeNode root) {
+        maxStretch(root);
+        return longestPath;
+    }
+    
+    private int maxStretch(TreeNode node) {
+        if(node==null) return 0;
+    
+        int left=maxStretch(node.left);
+        int right=maxStretch(node.right);
+        if(node.left != null && node.val == node.left.val){
+            left++;
+        } else {
+            left = 0;
+        }
+        if(node.right != null && node.val == node.right.val){
+            right++;
+        } else {
+            right = 0;
+        }
+        
+        longestPath = Math.max(longestPath, left+right);
+        
+        return Math.max(left,right);
+    }
+}
+```
+```java
+class Solution {
+    private int maxProd = 0;
+    private int total = 0;
+    public int maxProduct(TreeNode root) {
+        total = treeSum(root);
+        treeSum(root);
+        
+        return (int)(maxProd%(Math.pow(10,9) + 7));
+    }
+    
+    private int treeSum(TreeNode node){
+        if(node==null) return 0;
+        
+        int left  = treeSum(node.left);
+        int right  = treeSum(node.right);
+        
+        maxProd = IntStream.of(maxProd, left*(total-left), right*(total-right)).max().getAsInt();
+        
+        return left+right+node.val;
+    }
+}
+```
+
+### 分割二叉树的最大乘积
+[1339 分割二叉树的最大乘积](https://leetcode.com/problems/maximum-product-of-splitted-binary-tree/) 
+> **[思路]** 根据判断，答案肯定是要跨越单个子树的左右两边了；而且这题要维护两个global参数，一个是total，一个是maxProd；因为计算时候一定要先知道整棵树的节点总和total，然后分治函数里返回子树的节点和并打擂台maxProd
 ```js
 /**
  * @param {TreeNode} root
@@ -158,8 +265,9 @@ const treeSum = (root) => {
     
 }
 ```
-##### 二叉树最大乘积分割
-[2049 二叉树最大乘积分割](https://leetcode.com/problems/count-nodes-with-the-highest-score/) **[思路]** 先根据输入的parents数组把二叉树建出来，然后用一个map来cache把每个节点删除时候形成的乘积。最后for循环这个map找到最大的乘积，并返回最大乘积对应的数值
+### 统计最高分的节点数目
+[2049 统计最高分的节点数目](https://leetcode.com/problems/count-nodes-with-the-highest-score/) 
+> **[思路]** 先根据输入的parents数组把二叉树建出来，然后用一个map来cache把每个节点删除时候形成的乘积。最后for循环这个map找到最大的乘积，并返回最大乘积对应的数值
 ```js
 /**
  * @param {number[]} parents
@@ -225,8 +333,9 @@ const buildATree = (parents) => {
     return nodes[rootIdx];
 }
 ```
-##### 二叉搜索树中的最大子树和
-[1373 二叉搜索树中的最大子树和](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree) **[思路]** 维护一个maxVal的global变量，然后分治遍历，在后序遍历位置维护这样一个数组[isBST（子树是不是BST）, 以root为根的子树最小值, 以root为根的子树最大值, subTreeSum（子树的节点和）]
+### 二叉搜索树中的最大子树和
+[1373 二叉搜索树中的最大子树和](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree) 
+> **[思路]** 维护一个maxVal的global变量，然后分治遍历，在后序遍历位置维护这样一个数组`[isBST(子树是不是BST), 以root为根的子树最小值, 以root为根的子树最大值, subTreeSum(子树的节点和)]`
 ```js
 let maxVal = -Number.MAX_VALUE;
 var maxSumBST = function(root) {
@@ -263,5 +372,97 @@ const traverse = (root) => {
     }
          
     return res;
+}
+```
+### 二叉树叶子顺序遍历
+[650 领扣 - 二叉树叶子顺序遍历](https://www.lintcode.com/problem/650/description)
+>
+> **[思路]** 维护一个res的`global`变量，然后分治遍历，类似于二叉树的最大深度, 把自己尽量往最大深度那个层上塞。 
+
+```java
+public class Solution {
+    /*
+     * @param root: the root of binary tree
+     * @return: collect and remove all leaves
+     */
+    public List<List<Integer>> findLeaves(TreeNode root) {
+        // write your code here
+        List<List<Integer>> ans =  new ArrayList<>();
+        this.traverse(root, ans);
+        return ans;
+
+    }
+
+    private int traverse(TreeNode root, List<List<Integer>> ans){
+        if(root==null) return -1;
+        int left = this.traverse(root.left, ans);
+        int right = this.traverse(root.right, ans);
+
+        int level = Math.max(left, right)+1;
+        if(level>=ans.size()){
+            ans.add(new ArrayList<Integer>());
+        }
+
+        ans.get(level).add(root.val);        
+        return level;
+    }
+
+}
+```
+### 平衡二叉树
+1. [93 领扣 - 平衡二叉树](https://www.lintcode.com/problem/93/description)
+>
+> **[思路]** 原题说了，一棵高度平衡的二叉树的定义是：一棵二叉树中每个节点的两个子树的深度相差不会超过1。所以肯定是后序遍历看左右两个子树的高度差。那我们就先看个无脑的解法：那就开一个单独的`treepDepth(TreeNode node)`的函数算高度呗，然后在主函数的前序位置判断`Math.abs(left-right)>1`，最后再递归左右子树`isBalanced(root.right) && isBalanced(root.left)`。
+```java
+public class Solution {
+    /**
+     * @param root: The root of binary tree.
+     * @return: True if this Binary tree is Balanced, or false.
+     */
+    public boolean isBalanced(TreeNode root) {
+        if(root==null) return true;
+
+        int left = treeDepth(root.left);
+        int right = treeDepth(root.right);
+
+        if(Math.abs(left-right)>1) return false;
+
+        return isBalanced(root.right) && isBalanced(root.left);
+    }
+
+    private int treeDepth(TreeNode root) {
+        if(root==null) return 0;
+        int leftD = treeDepth(root.left);
+        int rightD = treeDepth(root.right);
+
+        return Math.max(leftD, rightD) +1;
+    }
+}
+```
+
+> 之前提过，如果你感觉需要多次遍历二叉树了，说明你的后序遍历没写好。这题如果用javascript写，你肯定会在写的过程中很快意识到其实在遍历算treeDepth的时候可以把子树是否是balanced一起判断了。只不过用java写，你就只能return一个数组，用数字的第一位表示子树是否为balanced。
+
+```java
+public class Solution {
+    /**
+     * @param root: The root of binary tree.
+     * @return: True if this Binary tree is Balanced, or false.
+     */
+    public boolean isBalanced(TreeNode root) {
+        if(root==null) return true;
+
+        return treeDepth(root)[0]==1;
+    }
+
+    private int[] treeDepth(TreeNode root) {
+        if(root==null) return new int[]{1,0};
+        int[] left = treeDepth(root.left);
+        int[] right = treeDepth(root.right);
+
+        if(left[0]==0 || right[0]==0) return new int[]{0,1};
+        if(Math.abs(left[1]-right[1])>1) return new int[]{0,1};
+
+        return new int[]{1, Math.max(left[1], right[1]) + 1};
+    }
 }
 ```

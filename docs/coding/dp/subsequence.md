@@ -17,6 +17,7 @@
 1. [516 最长回文子序](#最长回文子序)
 1. [1312 构造回文的最小插入次数](#构造回文的最小插入次数)
 1. [651. 四键键盘（中等）](#四键键盘) 
+1. [857. 领扣-最小的窗口子序列](https://www.lintcode.com/problem/857)
 
 ### 最大子数组
 [53 最大子数组](https://leetcode.com/problems/maximum-subarray/)
@@ -305,6 +306,72 @@ var longestPalindromeSubseq = function(s) {
     return dp[0][n-1];
 };
 ```
+```java
+class Solution {
+    
+    private int[][] memo;
+    
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+        memo = new int[n][n];
+        
+        return dp(s, 0, n-1);
+    }
+    
+    //自顶而下 记忆化搜索
+    private int dp(String s, int i, int j){
+        //base case
+        if(i==j) return 1;
+        if(i>j) return 0;
+        
+        if(memo[i][j] != 0) return memo[i][j];
+        
+        if(s.charAt(i)==s.charAt(j)) {
+            memo[i][j] = 2 + dp(s, i+1, j-1);
+        } 
+        else {
+            memo[i][j] = Math.max(
+               dp(s, i+1, j),
+               dp(s, i, j-1)
+            );
+        }
+
+        return memo[i][j];
+        
+    }
+}
+```
+```java
+class Solution {
+    
+    //自底而上
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+        int[][] dp = new int[n][n]; //都初始化为0
+        
+        //base case
+        for(int i=0; i<n; i++){
+            dp[i][i] = 1; //字符串本身必定是回文
+        }
+        
+        //状态转化，斜着遍历(从下往上，再从左往右)
+        for(int i=n-2; i>=0; i--){
+            for(int j=i+1; j<n; j++){
+                if(s.charAt(i) == s.charAt(j)){
+                    dp[i][j] = dp[i+1][j-1] + 2; 
+                }
+                else {
+                    dp[i][j] = Math.max(dp[i][j-1], dp[i+1][j]); 
+                }
+            }
+        }
+        return dp[0][n-1];
+    }
+    
+    
+}
+```
+
 ### 构造回文的最小插入次数
 [1312 构造回文的最小插入次数](https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/)
 

@@ -7,6 +7,7 @@
 
 #### **刷题列表**
 > 1. [Karat面试真题 - 矩阵内单词查找](#矩阵内单词查找)
+> 1. [领扣1723 网格中的最短路径](#网格中的最短路径)
 
 
 ### 矩阵内单词查找
@@ -186,5 +187,57 @@ const traverse = (wordPath, grid, i, j, word) => {
 
   return false;
 
+}
+```
+### 网格中的最短路径
+[领扣1723 网格中的最短路径](#网格中的最短路径)
+> **思路** 这个题乍一看非常像动规，而且跟这题长得很像[K站中转内最便宜的航班](./coding/memo/index?id=#K站中转内最便宜的航班)，都是有个限制条件k。不过这题其实不是动规，因为k这个限制条件导致到达网格中的某个点的状态是很多个[[k, dis]]的组合，这样写起code来很不好写。这题直接用回溯会很容易理解，二者这个暴力的回溯算法已经是多项式级别的时间复杂度。
+
+```java
+public class Solution {
+    /**
+     * @param grid: a list of list
+     * @param k: an integer
+     * @return: Return the minimum number of steps to walk
+     */
+    private int m,n,minLen;
+    private int[][] DIRS = {{-1,0},{1,0},{0,1},{0,-1}};
+    public int shortestPath(int[][] grid, int k) {
+        // write your code here
+        m = grid.length;
+        n = grid[0].length;
+        minLen = Integer.MAX_VALUE;
+        int count = 0;
+        backtrack(count, grid, k, 0, 0);
+        return minLen == Integer.MAX_VALUE?-1:minLen;
+    }
+
+    private void backtrack(int count, int[][] grid, int k, int i, int j) {
+        
+        if(i<0 || j<0 || i>=m || j>=n) return;
+        if(grid[i][j]==-1) return;
+        if(minLen==m+n-2) return; //已经最小
+
+        if(grid[i][j]==1) k--;
+        if(k<0) return;
+
+        if(i==m-1 && j==n-1) {
+            minLen = Math.min(minLen, count);
+            return;
+        }
+
+        int temp = grid[i][j];
+        grid[i][j] = -1;
+
+        for(int[] dir : DIRS){
+            int x = i + dir[0];
+            int y = j + dir[1];
+
+            backtrack(count+1, grid, k, x, y);
+        }
+
+        grid[i][j] = temp;
+
+    }
 }
 ```

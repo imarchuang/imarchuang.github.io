@@ -1,11 +1,10 @@
-# 关于字符串的几大类问题
+# 表达式相关的几个问题
 
-### 第一类：穷举呗，回溯遍历或者分治都是思考路线
-!> **敲黑板** 这里穷举问题多数都是子串切割问题，那么既然是子串（连续性），那算法复杂度就应该是控制在O(n^2)这样子。q这类穷举问题里通常会用到一种递归思想，那就是把一个字符串切割成两段子串：头部是`s.substring(0, i+1)`和尾部`s.substring(i+1)`。这样就可以这么假设头部符合某个条件（比如说头部是一个word），那么基于这个假设成立再证明尾部是正确的就可以了，这样这个问题的思路就很容易转化到递归思维已经证明尾部的问题。
-1. [212. 单词查找II](#单词查找II)
-1. [140. 单词拆分II](#单词拆分II) 
-1. [131. 回文串切割](#回文串切割) 
-1. [829. 单词模式II](#单词模式II)
+### 第一类：表达式拆分
+!> **敲黑板** 这里穷举问题多数都是子串切割问题，
+1. [领扣424. 逆波兰表达式求值](#逆波兰表达式求值) https://www.lintcode.com/problem/424
+
+
 
 ### 第二类：动规类，通常是两个字符串作为输入
 !> **敲黑板** 这类动规问题里通常会用到一种状态转化思想，那就是答案里不含有s1[i]，或者答案里不含有s2[j]，或者答案里不含有s1[i]和s2[j]，最后一种情况就当`s1[i]==s2[j]`时怎么处理。
@@ -39,78 +38,48 @@
 1. [316. 去重重复字母](#去重重复字母) 
 
 ### 第V类：子序列类
-1. [Karat面试真题 - 找字符串中符合word的子序列](#找字符串中符合word的子序列)
+1. [面试真题. 找字符串中符合word的子序列](#找字符串中符合word的子序列)
 
-### 单词查找II
-[212. 单词查找II](https://leetcode.com/problems/word-search-ii/) 
+### 逆波兰表达式求值
+[领扣424. 逆波兰表达式求值](https://www.lintcode.com/problem/424) 
 
-> **思路** 这题本质是图（矩阵）的遍历问题，这题矩阵吧不像是flood-fill那类的问题，可以直接替换原矩阵的值来标记是否已经visited过，所以外加一个visited变量，这个变量可以用二维数组也可以用json object，不过不考虑空间的话，二维数组比较简单易懂。这题要想通过leetcode的online judge的话，`最关键的是init一个prefixSet变量`。
->
-> **敲黑板** 图的遍历和回溯框架的核心区别：
-> 1. 把节点加入path的代码和之后pop出去的代码（`做选择和撤销选择`）要放到For循环外，要不会漏掉记录起始点的遍历；
-> 1. For循环内，进入递归下一层前进行必要的剪枝检查，比如说有没有出界啊，有没有已经visited过了呀之类的；
+> **思路** 经典题目，逆波兰的好处就是用一个stack从前往后遍历即可。
 
-```js
-/**
- * @param {character[][]} board
- * @param {string[]} words
- * @return {string[]}
- */
-var findWords = function(board, words) {
-    //form a prefix set to speed up
-    let prefixSet = new Set();
-    for(const word of words) {
-        for(let i=1; i<=word.length; i++){
-            let pre = word.substring(0,i);
-            prefixSet.add(pre);
-        }
-    }
-    maxLen = Math.max(...words.map(x=>x.length));
-    
-    //loop thru the whole matrix
-    let m=board.length, n=board[0].length;
-    let visited=[...Array(m)].map(x=>Array(n).fill(false));
-    
-    words = new Set(words);
-    let res = [];
-    for(let i=0; i<m; i++){
-        for(let j=0; j<n; j++){
-           dfs([], board, words, i, j, prefixSet, visited, res); 
-        }
-    }
-    
-    return res;
-};
-var DIRS = [[-1,0],[1,0],[0,-1],[0,1]];
-var maxLen = 0;
+```java
+public class Solution {
+    /**
+     * @param tokens: The Reverse Polish Notation
+     * @return: the value
+     */
+    public int evalRPN(String[] tokens) {
+        // 表达式拆解，肯定是用stack的
+        Stack<Integer> stack = new Stack<>();
 
-const dfs = (path, board, words, i, j, prefixSet, visited, res) => {
-    let m=board.length, n=board[0].length;
-    path.push(board[i][j]);
-    visited[i][j] = true;
-    let word = path.join('');
-    if(words.has(word)){
-        res.push(word);
-        words.delete(word);
-        //继续走下去，因为cat还有cats
-    }
-    
-    for(const dir of DIRS){
-        if(path.length>maxLen) break;
-        if(!prefixSet.has(word)) break;
-        let x=i+dir[0];
-        let y=j+dir[1];
-        
-        if(x<0 || y<0 || x>=m || y>=n){
-            continue;
+        for(String c : tokens){
+            if("+".equals(c)){
+                int second = stack.pop();
+                int first = stack.pop();
+                stack.push(first+second);
+
+            } else if("-".equals(c)){
+                int second = stack.pop();
+                int first = stack.pop();
+                stack.push(first-second);
+            } else if("*".equals(c)){
+                int second = stack.pop();
+                int first = stack.pop();
+                stack.push(first*second);
+            } else if("/".equals(c)){
+                int second = stack.pop();
+                int first = stack.pop();
+                stack.push((int) first/second);
+            } else {
+                stack.push(Integer.valueOf(c));
+            }
         }
-        if(visited[x][y]){
-            continue;
-        }
-        dfs(path, board, words, x, y, prefixSet, visited, res);
+
+        return stack.pop();
     }
-    visited[i][j] = false;
-    path.pop();
 }
 ```
 
@@ -342,41 +311,6 @@ var removeDuplicateLetters = function(s) {
 };
 ```
 
-```java
-class Solution {
-    public String removeDuplicateLetters(String s) {
-        //建occurance数列
-        int[] occurance = new int[26];
-        for(char c : s.toCharArray()){
-            occurance[c-'a']++;
-        }
-        
-        boolean[] visited = new boolean[26];
-        Arrays.fill(visited, false);
-        Stack<Character> stk = new Stack<>();
-        
-        //用单调栈
-        for(char c : s.toCharArray()){
-            occurance[c-'a']--;
-            
-            //if(occurance[c-'a']==0) continue;
-            if(visited[c-'a']) continue;
-            visited[c-'a'] = true;
-            while(!stk.isEmpty() && occurance[stk.peek()-'a']>0 && c<stk.peek()){
-                char e = stk.pop();
-                visited[e-'a'] = false;
-            }
-            
-            stk.push(c);
-        }
-        
-        //return new String(stk.toArray());
-        return String.join("", stk.stream().map(c->String.valueOf(c)).collect(Collectors.toList()));
-
-    }
-}
-```
-
 ### 找字符串中符合word的子序列
 [找字符串中符合word的子序列](#找字符串中符合word的子序列)
 [领扣样题](https://www.lintcode.com/problem/1024/)
@@ -384,7 +318,7 @@ class Solution {
 > **题目描述**
 > 给出一个字典words，例如[cat, tax, baby, bird, sky]，判断一个字符串str中是否含有一个子序能够形成字典中的任意word。**注意**：这个子序的异构词能形成word即可。
 >
-> **思路** 拿到这题，我的第一反应是用类似滑动窗口处理子串问题的思想，即：给出一个window，这个window里记录某个word的所有字符的出现次数，比如说cat这个词，就可以形成`{'c':1, 'a':1, 't':1}`。然后遍历str的每个字符，如果遍历过程中能让cat所对应的window里的键值对都满足，那就说明这个word就是答案。因为给出的是一个多个word的字典，那么就字典里的每个word都建立各自的window就好了。我说这个思路的原因是因为这样解题是错误的，因为严格意义上子序列是要遵循原序的，所以这样解题会输出错误答案。这题正确的答案会在第二部分给出。
+> **思路** 拿到这题，我的第一反应是用类似滑动窗口处理子串问题的思想，即：给出一个window，这个window里记录某个word的所有字符的出现次数，比如说cat这个词，就可以形成`{'c':1, 'a':1, 't':1}`。然后遍历str的每个字符，如果遍历过程中能让cat所对应的window里的键值对都满足，那就说明这个word就是答案。因为给出的是一个多个word的字典，那么就字典里的每个word都建立各自的window就好了。我说这个思路的原因是因为这样解题是错误的，因为严格意义上子序列是要遵循原序的，所以这样解题会输出错误答案。之后会给出正确的答案。
 >
 ```js
 const find_embedded_word = (words, str) => {
@@ -430,109 +364,52 @@ const find_embedded_word = (words, str) => {
 // console.log(find_embedded_word(words, string6));
 ```
 >
-> **正确答案** 其实这题技巧性特别强，核心就是`isSubseq`函数，这个函数一定要吃透。
+> **正确答案** 
 ```js
-export class Solution {
-  /**
-   * @param s: a string
-   * @param words: a dictionary of words
-   * @return: the number of words[i] that is a subsequence of S
-   */
-  numMatchingSubseq(S, words) {
-    let n = S.length;
-    let nxtPos = [...Array(n)].map(x=> Array(26));
-    
-    for (let i = 0; i < 26; i++)
-        nxtPos[n - 1][i] = -1;
-        
-    for (let i = n - 1; i >= 0; i--) {
-        nxtPos[i][S[i].charCodeAt(0) - 97] = i;
-        if (i == 0) {
-            break;
-        }
-        for (let j = 0; j < 26; j++)
-            nxtPos[i - 1][j] = nxtPos[i][j];
-    }
-    
-    let ans = 0;
-    for (const word of words) {
-        if (this.isSubseq(word, nxtPos)) {
-            ans++;        
-        }
-    }
-    
-    return ans;
-  }
 
-  isSubseq(word, nxtPos) {
+const find_embedded_word = (words, str) => {
+    //先建一个二维数组把每个字符的ascii存起来，
+    let n = str.length;
+
+    定义 memo[n][26], 其中 memo[i][j] 表示串str的第i个位置起, 下标最靠前的字符 str[j] (ascii代码-97) 的位置.
+    let memo = [...Array(n)].map(x=>Array(26));
+    //init
+    for(let j=0; i<26; j++){
+        memo[n-1][j]=-1;
+    }
+
+    //遍历每个字符，让每个字符str[i]都填入相应的位置
+    for(let i=n-1; i>=0; i++){
+        memo[i][str[i].charCodeAt(0)-97] = i;
+        if(i==0) break;
+        
+        for(let j=0; i<26; j++){
+            memo[i-i][j] = memo[i][j];
+        }
+    }
+
+    let res = 0;
+    for(const word of words){
+        if(isSubseq(word, memo)){
+            res++;
+        }
+    }
+
+    return res;
+}
+
+const isSubseq = (word, memo) => {
     let lenw = word.length;
-    let lens = nxtPos.length;
+    let lens = memo.length;
     let i,j;
-    for (i = 0, j = 0; i < lenw && j < lens; i++, j++) {
-        j = nxtPos[j][word[i].charCodeAt(0) - 97];
+    for(i=0, j=0; i < lenw && j < lens; i++, j++){
+        j = memo[j][word[i].charCodeAt(0) - 97];
         if (j < 0) {
             return false;
         }
     }
     return i == lenw;
-  }
 }
-```
-```java
-public class Solution {
-    /**
-     * @param s: a string
-     * @param words: a dictionary of words
-     * @return: the number of words[i] that is a subsequence of S
-     */
-    public int numMatchingSubseq(String s, String[] words) {
-        //先建一个二维数组把每个字符的ascii存起来，
-        int n = s.length();
-        int[][] memo = new int[n][26];
 
-        //把最下一行进行init，之后再一行一行的像是填充数据
-        for(int j=0; j<26; j++){
-            memo[n-1][j]=-1;
-        }
-
-        //遍历每个字符，让每个字符str.charAt(i)都填入相应的位置
-        for(int i=n-1; i>=0; i--){
-            //memo[i][j] 表示串str的第i个位置起, 下标最靠前的字符 str[j] (ascii代码-97) 的位置.
-            memo[i][(int) s.charAt(i)-'a'] = i;
-            if(i==0) break;
-            
-            //把当前行的数据，先拷贝一份去上一行
-            for(int j=0; j<26; j++){
-                memo[i-1][j] = memo[i][j];
-            }
-        }
-
-        int res = 0;
-        for(String word : words){
-            if(isSubseq(word, memo)){
-                res++;
-            }
-        }
-
-        return res;
-    }
-
-    private boolean isSubseq(String word, int[][] memo){
-        int lenw = word.length();
-        int lens = memo.length;
-        int i=0,j=0;
-        for(; i < lenw && j < lens; i++, j++){
-            //找到字符word.charAt(i)在当前行j的出现位置，这样就是字符word.charAt(i)在word[j...]子串里最早出现的位置
-            // j++ 说明去到当前行之后的行
-            j = memo[j][word.charAt(i) - 'a'];
-
-            // j<0 说明在word[j...]里找不到字符word.charAt(i)
-            if (j < 0) {
-                return false;
-            }
-        }
-        return i == lenw;
-    }
-}
 ```
 

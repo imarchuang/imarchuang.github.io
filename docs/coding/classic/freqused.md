@@ -1,0 +1,152 @@
+# javascript刷题时的常用技巧
+
+**敲黑板**：刷题时常用的一些奇淫异巧。
+
+#### **技巧分类**
+1. [队列相关](#队列相关)
+1. [map/set相关](#map-set相关)
+1. [json相关](#json相关)
+1. [字符串相关](#字符串相关)
+1. [2049 二叉树最大乘积分割](#二叉树最大乘积分割)
+1. [1373 二叉搜索树中的最大子树和](#二叉搜索树中的最大子树和)
+1. [650 领扣 - 二叉树叶子顺序遍历](#二叉树叶子顺序遍历)
+
+
+### 队列相关
+> **JS里所以数组都是双端队列** 既可以当queue，又可以当stack
+```js
+// declare一个MxN的二维数组并初始化为0
+let dp = [...Array(m)].map(x=>Array(n).fill(0)); 
+
+// declare一个“双端队列”
+let queue = []; 
+//入列和出列
+queue.push(val);
+queue.shift();
+
+//入栈和出栈
+queue.push(val);
+queue.pop();
+
+//peek()元素
+queue[queue.length-1]；
+
+// 看队列是否为空
+while(queue.length>0){...}；
+
+//遍历
+for(const ele of queue){...}
+
+//从队列最头上加元素(不常用)
+queue.unshift();
+
+//转化
+queue.map(x=>x.length); //直接返回新的array
+
+//过滤
+queue.filter(x=>x>3); //直接返回新的array
+
+//删除某一位置的元素via splice()
+let scores = [1, 2, 3, 4, 5];
+/*从第0位起删除三位
+会在原数组上原地操作，返回值是被删掉的元素，没删掉的保留在原数组
+*/
+let deletedScores = scores.splice(0, 3); 
+console.log(scores); //  [4, 5]
+console.log(deletedScores); // [1, 2, 3]
+
+//插入某一位置的元素via splice()
+let colors = ['red', 'green', 'blue'];
+/*在原数组插入，注意这里的函数会返回一个空数组*/
+colors.splice(2, 0, 'purple', 'yellow'); //在数组从第2(0-based)位起插入['purple', 'yellow']
+console.log(colors); // ["red", "green", "purple", 'yellow', "blue"]
+
+//替换某一位置的元素via splice()
+let languages = ['C', 'C++', 'Java', 'JavaScript'];
+languages.splice(1, 1, 'Python'); //在第一位上插入Python，并删除第一位起的一位；这里会返回一个数组['C++']
+console.log(languages); //['C', 'Python', 'Java', 'JavaScript']
+languages.splice(2,1,'C#','Swift','Go');
+console.log(languages); // ["C", "Python", "C#", "Swift", "Go", "JavaScript"]
+
+//分割数组
+var colors = ['red','green','blue','yellow','purple'];
+var rgb = colors.slice(0,3);
+console.log(rgb); // ['red','green','blue']
+console.log(colors); //原数组不变：['red','green','blue','yellow','purple'];
+
+```
+### map set相关
+> **JS里map几乎都可以被json object代替** 
+```js
+
+let map = new Map(), set = new Set();
+
+//从array里直接建立set
+let arr = [1,1,2,3,4,5];
+let s = new Set(arr);
+
+//插入、更新
+map.set('a', 1);
+set.add('a');
+
+//查找
+map.get('a');
+map.has('a'); //true false
+set.has('a'); //true false
+
+//删除
+map.delete('a');
+set.delete('a');
+
+//遍历
+for(const [k,v] of map.entries()){...}
+for(const k of map.keys()){...}
+for(const v of map.values()){...}
+
+for(const s of set){...}
+
+```
+### json相关
+> **JS里的Object完全可以当做一个map用**
+```js
+let map = {};
+
+//检查key是否存在
+if('key1' in map){...} //有个问题!!!就是即使对应的value为underfined，这个判定也会是true
+
+if(map['key1']){...} //这个写法要注意！！！：如果map['key1']==0，这里会认定为false
+
+if(map.hasOwnProperty('key1')){...} //这种写法会保证key的value不是undefined
+
+if(map['key1']===undefined){...} //这样确保是存在{'key1':'val1'}键值对的
+
+//遍历
+for(const [k,v] of Object.entries(map)){...}
+for(const k of Object.keys(map)){...}
+for(const v of Object.values(map)){...}
+
+for(const prop in map){...} //这样写的大问题！！！就是继承来的property也会被遍历
+
+
+```
+
+### 字符串相关
+> **JS里string是primitive type，并非object** 
+```js
+//ascii与字符转换
+let c = String.fromCharCode(97); //返回‘a'
+let k='abc'.charCodeAt(0); //返回97
+
+//替换
+const p = 'monkeys love bananas';
+let rp = p.replace('monkey', 'dog'); //这里会返回'dogs love bananas'，原来p不变
+
+let regexP = p.replace(/love/i, 'like'); //这里会返回'monkeys like bananas'，原来p不变
+
+//检测字符是否为数组
+let c = '23';
+if(!isNaN(c)){...}
+if(/^\d+$/.test(c)){...}
+if(/^-?\d*\.?\d*$/.test(c)){...} //这个也会检查负数
+
+```

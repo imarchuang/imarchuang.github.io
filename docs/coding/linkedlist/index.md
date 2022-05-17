@@ -3,7 +3,7 @@
 - [找链表中点](#找链表的中点)  
 - [dummy虚拟头结点](#dummy虚拟头结点)  
 - [迭代遍历反转链表](#迭代遍历反转链表)
-- [刷题列表(16道)](#刷题列表)
+- [刷题列表](#刷题列表)
 
 #### **找链表`中点`**
 **关于中点，当链表长度为偶数的时候，其实有两个意义的`中点`，如下图所示：**
@@ -93,11 +93,13 @@ const reverse = (a, b) => {
 
 [141.链表环](https://leetcode.com/problems/linked-list-cycle/) **`Notes`** 快慢指针找环.
 
-[142.链表环II](https://leetcode.com/problems/linked-list-cycle-ii/) **`Notes`** 找环开始的位置，非常有技巧性，请参阅[这里](https://labuladong.github.io/algo/2/18/17/).
+[142.链表环II](https://leetcode.com/problems/linked-list-cycle-ii/) 
+> **`Notes`** 找环开始的位置，非常有技巧性，请参阅[这里](https://labuladong.github.io/algo/2/18/17/).
 
-[206.反转链表](https://leetcode.com/problems/reverse-linked-list/) **`Notes`** 迭代反转，递归翻转呢？非常有技巧性.
-
+[206.反转链表](https://leetcode.com/problems/reverse-linked-list/) 
+> **`Notes`** 迭代反转，递归翻转呢？非常有技巧性.
 ![](../pictures/linkedlist/2.png)
+
 ```js
 /**
  * @param {ListNode} head
@@ -117,6 +119,29 @@ var reverseList = function(head) {
 [92.反转链表II](https://leetcode.com/problems/reverse-linked-list-ii/) **`Notes`** 用递归写非常有意思，请参阅[这里](https://labuladong.github.io/algo/2/18/18/).
 
 [234.回文链表](https://leetcode.com/problems/palindrome-linked-list/) **`Notes`** 迭代可解题，但是用递归更有意思.
+```java
+class Solution {
+    private ListNode left;
+    public boolean isPalindrome(ListNode head) {
+        left = head;
+        return traverse(head);
+    }
+    
+    private boolean traverse(ListNode right){
+        if(right==null) return true;
+        
+        boolean next = traverse(right.next);
+        if(!next) return false;
+        
+        if(right.val == left.val){
+            left = left.next;
+            return true;
+        }
+        
+        return false;
+    }
+}
+```
 
 [876.链表中点](https://leetcode.com/problems/middle-of-the-linked-list/) **`Notes`** 经典快慢双指针.
 
@@ -152,4 +177,22 @@ var deleteDuplicates = function(head) {
 [23.k路归并有序链表](https://leetcode.com/problems/merge-k-sorted-lists/) **`Notes`** 用heap，或者两两合并，或者递归形式两两合并.
 
 [160.两链表交点](https://leetcode.com/problems/intersection-of-two-linked-lists/) **`Notes`** 把两个链表连起来，请参阅[这里](https://labuladong.github.io/algo/2/18/17/).
+
+
+[372. 领扣 - 在O(1)时间复杂度删除链表节点](https://www.lintcode.com/problem/372/) 
+> **思路** 题的关键是说这个节点在中间，不是最后一个节点，所以`node.next.next`肯定存在。没啥好说的，其实要找节点node上修改数值成它的next的val，然后跳过它原本的next。
+```java
+public class Solution {
+    /*
+     * @param node: the node in the list should be deleted
+     * @return: nothing
+     */
+    public void deleteNode(ListNode node) {
+        // write your code here
+        if(node == null) return;
+        node.val = node.next.val;
+        node.next = node.next.next;
+    }
+}
+```
 

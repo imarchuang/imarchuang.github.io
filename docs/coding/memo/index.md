@@ -41,12 +41,13 @@ const dp(路径，选择列表，状态1，状态2，...){
 #### **刷题列表**
 1. [494. 目标和（中等）](#目标和) 
 1. [514. 自由之路（困难）](#自由之路)
-1. [787. K站中转内最便宜的航班（中等）](#K站中转内最便宜的航班) 
+1. [787. K站中转内最便宜的航班（中等）](#K站中转内最便宜的航班)
 1. [10. 正则表达式匹配（困难）](#正则表达式匹配) 
 1. [44. 通配符匹配（困难）](#通配符匹配) 
 1. [72. 编辑距离](#编辑距离)
-1. [107 单词拆分]() https://www.lintcode.com/problem/107/
-1. [683 单词拆分 III]() https://www.lintcode.com/problem/683/
+1. [领扣107 单词拆分]() https://www.lintcode.com/problem/107/
+1. [领扣683 单词拆分 III]() https://www.lintcode.com/problem/683/
+1. [领扣305 矩阵中的最长递增路径](#矩阵中的最长递增路径) 
 
 ##### 目标和
 [494. 目标和（中等）](https://leetcode.com/problems/target-sum/) 
@@ -427,5 +428,61 @@ const dp = (s1, i, s2, j) => {
     }
     memo[i][j] = res;
     return res;
+}
+```
+### 矩阵中的最长递增路径
+[领扣305 矩阵中的最长递增路径](https://www.lintcode.com/problem/305/)
+> **思路** 这题如果你要是硬是想用自底而上的dp数组写法，我几乎肯定你写不出来。但是通过审题，你应该很容易发现这是一道动规题，题目中说`路径可以以矩阵中任何一个坐标作为起点`，所以如果你想自定而上写，那base case初始化的条件是啥？你是否想到了LIS那题？[最长递增子序](./coding/dp/subsequence?id=#最长递增子序)，那题的好处就是可以初始base case，但是每次都还是要回头看某个元素的所有之前的元素。这题有点类似，比较无脑的想法就是，
+
+```java
+public class Solution {
+    /**
+     * @param matrix: A matrix
+     * @return: An integer.
+     */
+    private static int[][] MOVES = {{-1,0},{1,0},{0,-1},{0,1}};
+    private int[][] memo;
+    public int longestIncreasingPath(int[][] matrix) {
+        // Write your code here.
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return 0;
+        }
+        
+        int m = matrix.length, n=matrix[0].length;
+        memo = new int[m][n];
+        int res = 0;
+        for(int i=0; i<m; i++){
+           for(int j=0; j<n; j++) {
+               int interim = longestIncreasingPath(matrix, i, j);
+               res = Math.max(res, interim);
+           }
+        }
+
+        return res;
+    }
+
+    private int longestIncreasingPath(int[][] matrix, int i, int j) {
+       int m = matrix.length, n=matrix[0].length;
+
+       if(memo[i][j]>0) return memo[i][j];
+
+       memo[i][j] = 1;
+       //DFS进行到底
+       for(int[] move : MOVES){
+           int x = i+move[0];
+           int y = j+move[1];
+
+           if(x<0 || y<0 || x>=m || y>=n){
+               continue;
+           }
+
+           if(matrix[i][j]>=matrix[x][y]) continue;
+
+           memo[i][j] = Math.max(memo[i][j], 1+longestIncreasingPath(matrix, x, y));
+
+       }
+
+       return memo[i][j];
+    }
 }
 ```
