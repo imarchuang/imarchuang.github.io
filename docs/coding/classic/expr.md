@@ -72,7 +72,38 @@ private int getPriority(String str) {
 1. [领扣367. 表达树构造](#表达树构造)
 
 ### 逆波兰表达式求值
-[领扣424. 逆波兰表达式求值](https://www.lintcode.com/problem/424) 
+[领扣424. 逆波兰表达式求值](https://www.lintcode.com/problem/424)
+> 简单粗暴的从左往右遍历 
+```java
+public int evalRPN(String[] tokens) {
+        // 一个栈足以
+        Stack<Integer> stack = new Stack<>();
+        for(String token : tokens){
+            if(Character.isDigit(token.charAt(0)) || token.length()>1)
+                stack.push(Integer.parseInt(token));
+            else {
+                int second = stack.pop();
+                int first = stack.pop();
+                switch (token){
+                    case "+":
+                        stack.push(first+second);
+                        break;
+                    case "-":
+                        stack.push(first-second);
+                        break;
+                    case "*":
+                        stack.push(first*second);
+                        break;
+                    case "/":
+                        stack.push((int) first/second);
+                        break;
+                }
+            }
+        }
+        
+        return stack.pop();
+    }
+```
 
 ### 将表达式转换为逆波兰表达式
 [领扣370. 将表达式转换为逆波兰表达式](https://www.lintcode.com/problem/370) 
@@ -426,6 +457,70 @@ public class Solution {
     }
 }
 ```
+> 递归解法：递归解法需要维护一个global的index参数
+```java
+//解法3：
+public class Solution {
+    /**
+     * @param expression: a list of strings
+     * @return: an integer
+     */
+    private int index=0;
+    public int evaluateExpression(String[] expression) {
+        // write your code here
+        
+        return helper(expression);
+    }
+
+    private int helper(String[] expression){
+        Stack<Integer> stack = new Stack<>();
+        Character sign = '+';
+        int num = 0;
+        while(index<expression.length){
+            String expr = expression[index];
+            index++;
+            if(Character.isDigit(expr.charAt(0)))
+                //stack.push(Integer.parseInt(expr));
+                num = Integer.parseInt(expr);
+            
+            if("(".equals(expr))
+                num = helper(expression);
+            
+            if(!Character.isDigit(expr.charAt(0)) || index==expression.length){
+
+                int pre = 0;
+                switch(sign){
+                    case '+':
+                        stack.push(num);
+                        break;
+                    case '-':
+                        stack.push(-num);
+                        break;
+                    case '*':
+                        pre = stack.pop();
+                        stack.push(pre*num);
+                        break;
+                    case '/':
+                        pre = stack.pop();
+                        stack.push((int) pre/num);
+                        break;
+
+                }
+                sign = expr.charAt(0);
+                num = 0;
+            }
+
+            if(")".equals(expr)) break;
+        }
+
+        int res = 0;
+        while(!stack.isEmpty()){
+            res += stack.pop();
+        }
+        return res;
+    }
+}
+```
 
 ### 字符串解码
 [领扣575. 字符串解码](https://www.lintcode.com/problem/575)
@@ -480,7 +575,7 @@ public class Solution {
 }
 ```
 
-> 递归解法
+> 递归解法：递归解法需要维护一个global的index参数
 ```java
 public class Solution {
     /**
@@ -526,7 +621,7 @@ public class Solution {
 
 ### 原子的数量
 1. [领扣1289. 原子的数量](https://www.lintcode.com/problem/1289)
-
+> 还是来个递归解法吧：维护一个global参数i
 ```java
 public class Solution {
     /**
@@ -564,6 +659,7 @@ public class Solution {
                 }
 
             } else {
+                //i++放在了getElement和getNum的函数里
                 TreeMap<String, Integer> top = stack.peek();
                 String elem = getElement();
                 Integer num = getNum();
