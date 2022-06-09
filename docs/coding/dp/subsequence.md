@@ -4,27 +4,32 @@
 
 ?> 借着本文希望能体将子序型的动规问题扒扒皮，找出共性和解题套路来。
 
+?> 其实锁定一个问题是动规问题其实是不算难的，如果你确定了一个问题是个类似子序类动规问题，又是两个字符串作为输入，你几乎可以**无脑的相信**其解法`肯定是两个指针i,j分别遍历两个子串`，而且通常都是**从左往右**遍历，然后判断**s1[i]==s2[j]**时的逻辑，以及判断**s1[i]!=s2[j]**时的逻辑。
+
 !> **敲黑板** 子序和子串的区别提到好几次了，子序可以是不连续的元素组合，但是原序是要保持的，所以说像半个组合类问题；子串是连续的元素，通常子串数都是O(n^2)这个级别。
 
 ### **刷题列表**
 1. [53 最大子数组](#最大子数组)
-1. [72 编辑距离](#编辑距离)
 1. [300 最长递增子序](#最长递增子序)
 1. [354 套娃问题](#套娃问题)
 1. [1143 最长公共子序](#最长公共子序) 
 1. [712 两字符串的删除和](#两字符串的删除和)
 1. [583 两字符串的删除](#两字符串的删除)
+1. [72 编辑距离](#编辑距离)
 1. [516 最长回文子序](#最长回文子序)
 1. [1312 构造回文的最小插入次数](#构造回文的最小插入次数)
 1. [651. 四键键盘（中等）](#四键键盘) 
 1. [857. 领扣-最小的窗口子序列](https://www.lintcode.com/problem/857)
+
+1. https://leetcode.com/problems/min-cost-climbing-stairs/
+
 
 ### 最大子数组
 [53 最大子数组](https://leetcode.com/problems/maximum-subarray/)
 
 ![](../pictures/dp/sub1.png)
 
-?> **[思路]** 这题严格说不是子序问题，因为是连续子数组。但是这题不能用`滑动窗口`，因为你并不能保证增加或者减少窗口长度会让你的值变大，因为数组里存在负数。暴力解法的话，就是两个for循环嘛(i: 0...n --> j: i..n)，然后打擂台找最大值。但是这题其实是O(n)就能解决的。解决子串问题吧，就要谨记连续这个词，所以整着遍历数组，看看以这个数结尾的子串最大和是多少？这是不是就好找多了？就是看看这个nums[i]和上一个dp[i-1]的正负关系嘛。
+?> **[思路]** 这题严格说不是子序问题，而是连续子数组，但是子数组在概念上其实是子序列的一个子集。因为是连续子数组。但是这题不能用`滑动窗口`，因为你并不能保证增加或者减少窗口长度会让你的值变大，因为数组里存在负数。暴力解法的话，就是两个for循环嘛(i: 0...n-1 --> j: i..n-1)，然后打擂台找最大值。但是这题其实是O(n)就能解决的。解决子串问题吧，就要谨记**连续**这个词，所以整着遍历数组，看看以这个数结尾的子串最大和是多少？这是不是就好找多了？就是看看这个nums[i]和上一个dp[i-1]的正负关系嘛。
 
 ```js
 var maxSubArray = function(nums) {
@@ -45,50 +50,34 @@ var maxSubArray = function(nums) {
     return res;
 };
 ```
-
-### 编辑距离
-[72 编辑距离](https://leetcode.com/problems/edit-distance/)
-
-![](../pictures/dp/sub2.png)
-
-?> **[思路]** 这题是子序动规里很经典的问题，但是也是让人看了就蒙的hard题。这题的思路和自顶向下的解法在[**这里**](./coding/memo/index?id=编辑距离)已经给出，这里给出自底向上的写法。但是说实话，我个人能写出这个自底而上的解法完全是因为能先写出这个记忆化搜索的解法。
-
-```js
-var minDistance = function(word1, word2) {
-    let m = word1.length, n = word2.length;
-    let dp = [...Array(m+1)].map(x=>Array(n+1).fill(0));
-
-    //base case
-    for(let j=0; j<n+1; j++) {
-        dp[0][j] = j;
-    }
-    for(let i=0; i<m+1; i++) {
-        dp[i][0] = i;
-    }
-
-    //状态转化
-    for(let i=1; i<m+1; i++) {
-        for(let j=1; j<n+1; j++) {
-            //注意索引偏移
-            if(word1.charAt(i-1) == word2.charAt(j-1)){
-                dp[i][j] = dp[i-1][j-1];
-            } else {
-                dp[i][j] = Math.min(dp[i][j-1], dp[i-1][j], dp[i-1][j-1])+1;
-            }
+```java
+class Solution {
+    //这题不能用滑动窗口，因为扩大或者缩小窗口并不能保证子窗口和增大（因为有负数）
+    public int maxSubArray(int[] nums) {
+        //用暴力法，i--> 0...n-1; j-->i...n-1 => O(n^3)
+        //暴力法的一个小优化，可以用一个presum前缀和组，加快两个点[i...j]之间的和计算
+        
+        //优化解法是动规。subArray的特性是元素必须是连续的
+        int n = nums.length;
+        if(n==0) return 0;
+        int[] dp = new int[n];
+        dp[0] = nums[0];
+        int res = dp[0];
+        for(int i=1; i<n; i++){
+            dp[i] = Math.max(dp[i-1]+nums[i], nums[i]);
+            res = Math.max(dp[i], res);
         }
+        return res;
     }
-    
-    return dp[m][n];
-};
+}
 ```
 
 
 ### 最长递增子序
 [300 最长递增子序](https://leetcode.com/problems/longest-increasing-subsequence/)
-
 ![](../pictures/dp/sub3.png)
 
-?> **[思路]** 这题是子序动规里最经典的问题了(LIS)，而且这题的衍生题目也很多。最长增子序LIS咋整？先理解子序。就是说子序可以是不连续子序的组合，但是原序（前后序）还是要维持。所以要计算第i个位置的最长LIS，如果已经知道前i-1个元素每个的LIS，能否计算出来？答案是能的，因为只要遍历[0...i-1]区间里比nums[i]值小的元素，并把他们的LIS值加1（因为这个nums[i]比它大），再然后就是从这些值里找最大值, 这就是高中学的数学归纳法(mathmatical induction)。所以两个坐标指针i和j，用j指针遍历dp[0...i-1]。
+?> **[思路]** 这题是子序动规里最经典的问题了(LIS)，而且这题的衍生题目也很多。最长增子序LIS咋整？先理解子序。就是说子序可以是不连续元素的组合，但是元素之间的原序（前后序）还是要维持的。所以要计算第i个位置的最长LIS，如果已经知道前i-1个元素每个的LIS，能否计算出来？答案是能的，因为只要遍历[0...i-1]区间里比nums[i]值小的元素，并把他们的LIS值加1（因为这个nums[i]比它大），再然后就是从这些值里找最大值, 这就是高中学的数学归纳法(mathmatical induction)。所以两个坐标指针i和j，用j指针遍历dp[0...i-1]。
 
 ```js
 var lengthOfLIS = function(nums) {
@@ -111,12 +100,108 @@ var lengthOfLIS = function(nums) {
 };
 ```
 
+?> **[思路]** 上边的解法的时间复杂度是O(n^2)，还不是最佳解法，最佳解法实际上是O(n*logn)，用二分法。核心思想就是维护一个subSeq的数组，这个数组维护的最长的可能LIS，subSeq的最后被更新的元素就应该是LIS的答案。例如说，`[10, 11, 1,2,3]`，subSeq是最起初是`[10]`,遇到11，因为11是最大的，那就增加一个元素变成`[10, 11]`，然后遇到1，因为1不是最大，那就用二分法在subSeq数组中`去找比1大的最小元素`然后用1去replace那个元素。一样的逻辑去遍历元素2，元素3 ...
+```java
+class Solution {
+    private int[] subSeq;
+    private int lastPos = 0;
+    public int lengthOfLIS(int[] nums) {
+        subSeq = new int[nums.length];
+        subSeq[0] = nums[0];
+        int res = 1;
+        for(int i=1; i<nums.length; i++){
+            replaceElement(nums[i]);
+            res = Math.max(res, lastPos+1);
+        }
+        
+        return res;
+    }
+    
+    //二分法找到比target大于等于的最小值
+    private void replaceElement(int target){
+        if(target>this.subSeq[lastPos]) {
+            this.subSeq[++lastPos] = target;
+            return;
+        }
+        
+        int left=0, right=this.lastPos;
+        while(left<right){
+            int mid = left +(right-left)/2;
+            if(this.subSeq[mid]==target){
+                return;
+            } else if(this.subSeq[mid]>target){
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        
+        this.subSeq[left] = target;
+    }
+}
+```
+
 ### 套娃问题
 [354 套娃问题](https://leetcode.com/problems/russian-doll-envelopes/)
+?> **[思路]** 这题就是是最长增子序(LIS)问题外加一层皮。
+```java
+class Solution {
+    public int maxEnvelopes(int[][] envelopes) {
+        //套娃问题，是LIS的一个升级版
+        Arrays.sort(envelopes, (a,b)-> {
+            if(a[0]==b[0]) return b[1]-a[1];
+            return a[0]-b[0];
+        });
+        
+        int[] nums = new int[envelopes.length];
+        for(int i=0; i<envelopes.length; i++){
+            nums[i] = envelopes[i][1];
+        }
+        
+        return getLIS(nums);
+    }
+    
+    private int[] subSeq;
+    private int lastPos = 0;
+    public int getLIS(int[] nums) {
+        subSeq = new int[nums.length];
+        subSeq[0] = nums[0];
+        int res = 1;
+        for(int i=1; i<nums.length; i++){
+            replaceElement(nums[i]);
+            res = Math.max(res, lastPos+1);
+        }
+        
+        return res;
+    }
+    
+    //二分法找到比target大于等于的最小值
+    private void replaceElement(int target){
+        if(target>this.subSeq[lastPos]) {
+            this.subSeq[++lastPos] = target;
+            return;
+        }
+        
+        int left=0, right=this.lastPos;
+        while(left<right){
+            int mid = left +(right-left)/2;
+            if(this.subSeq[mid]==target){
+                return;
+            } else if(this.subSeq[mid]>target){
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        
+        this.subSeq[left] = target;
+    }
+    
+}
+```
 
 ### 最长公共子序
 [1143 最长公共子序](https://leetcode.com/problems/longest-common-subsequence/)
-
 ![](../pictures/dp/sub5.png)
 
 ?> **[思路]** 这题是子序动规里经典的问题了(LCS)，而且这题的衍生题目也很多，这篇文章会展示两个。。
@@ -147,6 +232,44 @@ const dp = (s1, i, s2, j) => {
     }
     memo[i][j] = res;
     return memo[i][j];
+}
+```
+```java
+//记忆化搜索
+class Solution {
+    private int[][] memo;
+    public int longestCommonSubsequence(String text1, String text2) {
+        //又是两个字符串作为输入，你几乎可以**无脑的相信**其解法`肯定是两个指针i,j分别遍历两个子串`，而且通常都是**从左往右**遍历，然后判断**s1[i]==s2[j]**时的逻辑，以及判断**s1[i]!=s2[j]**时的逻辑。
+        memo = new int[text1.length()][text2.length()];
+        for(int[] row : memo){
+            Arrays.fill(row, -1);
+        }
+        return dp(text1, text1.length()-1, text2, text2.length()-1);
+    }
+    
+    //返回s1[i...]和s2[j...]直接长的LCS
+    private int dp(String s1, int i, String s2, int j){
+        
+        //base case
+        if(i<0 || j<0) return 0;
+        
+        if(memo[i][j] != -1) return memo[i][j];
+        
+        int res = 0 ;
+        if(s1.charAt(i)==s2.charAt(j)){
+            res = 1+dp(s1, i-1, s2, j-1);
+        } 
+        else{
+            //取最优
+            res = Math.max(
+                dp(s1, i-1, s2, j),
+                dp(s1, i, s2, j-1)
+            );
+        }
+        
+        memo[i][j] = res;
+        return res;
+    }
 }
 ```
 
@@ -234,6 +357,43 @@ var minDistance = function(word1, word2) {
     
     return (m-dp[m][n]) + (n-dp[m][n]);
     
+};
+```
+
+
+### 编辑距离
+[72 编辑距离](https://leetcode.com/problems/edit-distance/)
+
+![](../pictures/dp/sub2.png)
+
+?> **[思路]** 这题是子序动规里很经典的问题，但是也是让人看了就蒙的hard题。这题的思路和自顶向下的解法在[**这里**](./coding/memo/index?id=编辑距离)已经给出，这里给出自底向上的写法。但是说实话，我个人能写出这个自底而上的解法完全是因为能先写出这个记忆化搜索的解法。
+
+```js
+var minDistance = function(word1, word2) {
+    let m = word1.length, n = word2.length;
+    let dp = [...Array(m+1)].map(x=>Array(n+1).fill(0));
+
+    //base case
+    for(let j=0; j<n+1; j++) {
+        dp[0][j] = j;
+    }
+    for(let i=0; i<m+1; i++) {
+        dp[i][0] = i;
+    }
+
+    //状态转化
+    for(let i=1; i<m+1; i++) {
+        for(let j=1; j<n+1; j++) {
+            //注意索引偏移
+            if(word1.charAt(i-1) == word2.charAt(j-1)){
+                dp[i][j] = dp[i-1][j-1];
+            } else {
+                dp[i][j] = Math.min(dp[i][j-1], dp[i-1][j], dp[i-1][j-1])+1;
+            }
+        }
+    }
+    
+    return dp[m][n];
 };
 ```
 

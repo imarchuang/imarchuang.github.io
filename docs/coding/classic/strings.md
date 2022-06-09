@@ -16,7 +16,7 @@
 1. [1143. 最长公共子序列](https://leetcode.com/problems/longest-common-subsequence/) 
 >   **思路** 这题是子序动规里经典的问题了(LCS)。一共4种情况吧，情况1：如果`s1[i]==s2[j]`，说明此字符一定存在于公共子序中，所以就直接递归到下一层`1+dp(s1, i+1, s2, j+1);`。情况2：s1[i]不在最长公共子序中；情况3：s2[j]不在最长公共子序中；情况4：s1[i]和s2[j]都不在最长公共子序中；因为是求最长公共子序嘛，所以情况4已经被情况2和情况3涵盖了，所以当`s1[i]!=s2[j]`时，我们要取最优`Math.max(dp(s1, i+1, s2, j),dp(s1, i, s2, j+1));`。这题的详解可以[看这里](./coding/dp/sebusequence?id=最长公共子序列)。
 >
-1. [79. 最长公共子串](https://www.lintcode.com/problem/79/) 
+1. [领扣79. 最长公共子串](https://www.lintcode.com/problem/79/) 
 >   **思路** 这题核心是个数学归纳法。解决子串问题吧，就要谨记连续这个词，所以整着遍历字符串，看看以这个数结尾的子串最长公共子序是多少是多少？这是不是就好找多了？所以思路变得很简单，如果`s1[i]==s2[j]`，那就看dp[i-1][j-1]的值，直接是`dp[i][j] = 1+dp[i-1][j-1];`，因为前一个字母结尾的最长公共子串再加1才是当前的最长公共子串。同理，如果`s1[i]!=s2[j]`，那就`dp[i][j] = 0`。这题的详解可以[看这里](./coding/dp/indices?id=最长公共子串)。
 >
 1. [516 最长回文子序](https://leetcode.com/problems/longest-palindromic-subsequence/)

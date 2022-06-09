@@ -6,8 +6,7 @@
 1. [队列和数组相关](#队列和数组相关)
 1. [常用集合](#常用集合)
 1. [字符串相关](#字符串相关)
-
-
+1. [Random随机数](#Random随机数)
 
 ### 队列和数组相关
 > **Java里的队列和数组** 
@@ -39,7 +38,7 @@ public class MyClass {
       //List of chars转string
       System.out.println(Arrays.asList(chars).stream().map(String::valueOf).collect(Collectors.joining(""))); //abc1
       
-      //int array 转string
+      //int array 转string 打印数组
       int[] ints = new int[]{1,2,3,4};
       
       System.out.println(Arrays.toString(ints)); //[1, 2, 3, 4]
@@ -99,10 +98,13 @@ public class MyClass {
         // slice array
         int[] ints4 = new int[]{3,2,5,8,1};
         int[] sliced = Arrays.copyOfRange(ints4, 1, 3);
-        System.out.println(Arrays.toString(sliced)); //[2, 5]
+        System.out.println(Arrays.toString(sliced)); //[2, 5]，不包括end index
         
         int[] sliced2 = IntStream.range(1, 3).map(i->ints4[i]).toArray(); 
-        System.out.println(Arrays.toString(sliced2)); //[2, 5]
+        System.out.println(Arrays.toString(sliced2)); //[2, 5]，不包括end index
+
+        //List相关操作
+        //java.util.ArrayList provides O(1) time performance for replacement, get by index, insert at last index(aka, add()), however, deleting last element from ArrayList is O(n) though.
 
     }
 }
@@ -143,53 +145,125 @@ public class MyClass {
         System.out.println(map); //{key1=value1, key2=value2}
         System.out.println(map.keySet()); //[key1, key2]
 
-        
+        // 如果遍历过程中需要delete map里的东西，就一定用iterator了
+        while(map.keySet().iterator().hasNext()){
+            String key = map.keySet().iterator().next();
+            map.remove(key);
+        }
 
+        //init treemap
+        TreeMap<Integer, String> tm = new TreeMap<>(Map.of(11,"value22", 10, "value20"));
+        System.out.println(tm); //{10=value20, 11=value22}
+        System.out.println(tm.keySet()); //[10, 11]
+        
+        //higherKey(), lowerKey(), higherEntry(), lowerEntry()
+        System.out.println(tm.higherKey(10)); //11
+        System.out.println(tm.higherKey(11)); //null
+        System.out.println(tm.lowerKey(11)); //10
+        System.out.println(tm.lowerKey(10)); //null
+        System.out.println(tm.higherEntry(10)); //11=value22
+        System.out.println(tm.higherEntry(11)); //null
+        System.out.println(tm.lowerEntry(11)); //10=value20
+        System.out.println(tm.lowerEntry(10)); //null
+        
+        //firstKey(), lastKey(),firstEntry(), lastEntry()
+        System.out.println(tm.firstKey()); //10
+        System.out.println(tm.lastKey()); //11
+        System.out.println(tm.firstEntry()); //10=value20
+        System.out.println(tm.lastEntry()); //11=value22
+        
+        //pollFirstEntry(), pollLastEntry()
+        System.out.println(tm.pollFirstEntry()); //10=value20
+        System.out.println(tm.pollLastEntry()); //11=value22
+        System.out.println(tm.pollLastEntry()); //null
+        
+        
         
     }
 }
 ```
-### json相关
-> **JS里的Object完全可以当做一个map用**
-```js
-let map = {};
+### 字符串相关
+> ***
+```java
+String str = new String("marc666");
+String str = new String(new char[]{'m','a','r','c','6','6','6'});
 
-//检查key是否存在
-if('key1' in map){...} //有个问题!!!就是即使对应的value为underfined，这个判定也会是true
+StringBuilder sb = new StringBuilder();
+for(char c='a'; c<='z'; c++)
+    sb.append(c);
 
-if(map['key1']){...} //这个写法要注意！！！：如果map['key1']==0，这里会认定为false
+System.out.println(sb.toString()); //abcdefghijklmnopqrstuvwxyz
+System.out.println(sb.length()); //26
 
-if(map.hasOwnProperty('key1')){...} //这种写法会保证key的value不是undefined
+//回溯框架里的path，如果是单纯地字符的路径，用string builder会好过List<String>
+sb = new StringBuilder("oath");
+sb.append('s');
+System.out.println(sb.toString()); // oaths
+sb.deleteCharAt(sb.length()-1); 
+System.out.println(sb.toString()); //oath
 
-if(map['key1']===undefined){...} //这样确保是存在{'key1':'val1'}键值对的
+//ascii与字符转换
+int ascii = (int) 'a'; //返回97
+char c = (char) 97; //返回'a'
+System.out.println(ascii + "|" + c);//97|a
 
-//遍历
-for(const [k,v] of Object.entries(map)){...}
-for(const k of Object.keys(map)){...}
-for(const v of Object.values(map)){...}
+//检测字符是否为数
+System.out.println(Character.isDigit('2')); //true
+System.out.println(Character.isDigit('b')); //false
 
-for(const prop in map){...} //这样写的大问题！！！就是继承来的property也会被遍历
+//检测字符串是否为数
+System.out.println("321".chars().allMatch(Character::isDigit)); //true
+System.out.println("abc".chars().allMatch(Character::isDigit)); //false
+System.out.println("234".matches("[0-9]+"));//true
+System.out.println("abc".matches("[0-9]+"));//false
+
+//检测字符大小写
+System.out.println("abc".chars().allMatch(Character::isLowerCase)); //true
+System.out.println("143".chars().allMatch(Character::isLowerCase)); //false
+System.out.println("234".contains("[a-zA-Z]+"));//false
+
+System.out.println("abc".chars().mapToObj(Integer::toString).collect(Collectors.joining(""))); //979899
+System.out.println("abc".chars().mapToObj(Character::toString).collect(Collectors.joining(""))); //abc
+
+//替换
+String p = "monkeys love bananas";
+System.out.println(p.replace('monkey', 'dog')); //这里会返回'dogs love bananas'，原来p不变
+
+//查找
+System.out.println(p.indexOf("love"));//8
+System.out.println(p.startsWith("monkey"));//true
+System.out.println(p.endsWith("bananas"));//true
+
+
+//拆分 左闭右开区间[i,j), substring 和数组的copyOfRange都是左闭右开区间
+System.out.println("234".substring(0)); //234
+System.out.println("234".substring(1)); //34
+System.out.println("234".substring(1,2)); //3
+System.out.println("234".substring(1,3)); //34
+System.out.println("234".substring(1,5)); // Exception in thread "main" java.lang.StringIndexOutOfBoundsException: begin 1, end 5, length 3
+
+String[] sArr = "10.110.0.245".split(".");
+System.out.println(sArr.length); //0
+sArr = "10.110.0.245".split("\\.");
+System.out.println(String.join(" ",sArr)); //10 110 0 245
+
+
 
 
 ```
 
-### 字符串相关
-> **JS里string是primitive type，并非object** 
-```js
-//ascii与字符转换
-let c = String.fromCharCode(97); //返回‘a'
-let k='abc'.charCodeAt(0); //返回97
+### Random随机数
+>
+```java
+//用java.util.Random类
+Random rand = new Random();
+// Obtain a number between [0 - 49].
+int n = rand.nextInt(50);
 
-//替换
-const p = 'monkeys love bananas';
-let rp = p.replace('monkey', 'dog'); //这里会返回'dogs love bananas'，原来p不变
+//用Math.random()
+double random = Math.random() * 49 + 1;
+int random = (int)(Math.random() * 50 + 1);
 
-let regexP = p.replace(/love/i, 'like'); //这里会返回'monkeys like bananas'，原来p不变
-
-//检测字符是否为数组
-let c = '23';
-if(!isNaN(c)){...}
-if(/^\d+$/.test(c)){...}
-if(/^-?\d*\.?\d*$/.test(c)){...} //这个也会检查负数
-
+int max = 50, min = 10;
+int random = (int )(Math.random() * (max-min+1) + min);
 ```

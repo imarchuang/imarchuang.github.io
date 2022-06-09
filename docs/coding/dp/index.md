@@ -28,9 +28,9 @@
 这题吧，好的不得了，因为这不是纯找数列规律题嘛。文学上来说这题属于子序类动规。先别管那么高大上的词汇，先来温习一下高中数学吧。我们先定义两个函数：
 1. **`dp(n)`**: 是说给一数列[1...n]，能得到多少个二叉搜索树；
 1. **`f(i,n) & 1<=i<=n`** ：以数字i为根，能得到多少个二叉搜索树；
-1. 通过以上两个函数，我们不难发现其实主要是对f(i,n)中的i和n进行合理的遍历，这两变量就是所谓的`状态`；
+1. 通过以上两个函数，我们不难发现其实主要是对`f(i,n)`中的i和n进行合理的遍历，这两变量就是所谓的`状态`；
 1. 动规的问题中，其实还有一块要注意，就是所谓的`选择`。这里选择比较明确，就是将(i,n)两变量按照每步为1的节奏遍历，以穷举完 **`1<=i<=n`** ；
-1. 上边两个函数的关系就是：dp(n) = f(1, n) + f(2, n) + ... + f(n, n);这就是所谓的`状态转移方程`；
+1. 上边两个函数的关系就是：`dp(n) = f(1, n) + f(2, n) + ... + f(n, n)`;这就是所谓的`状态转移方程`；
 1. 动规问题都是穷举嘛，但是穷举必须有出口啊。这就是所谓的`base case`，这里的base case是dp(0)=1，dp(1)=1；
 
 ```js
@@ -59,6 +59,15 @@ var numTrees = function(n) {
 1. 所谓的`选择`嘛，这里很容易理解：就是让遍历完所有i和j，以穷举 **`0<=i<=n` && `0<=j<=n`** n为字符串长度；
 1. 所谓`状态转移方程`吧，很巧妙，就是：`当s.charAt(i)==s.charAt(j)时，dp(i，j)= dp(i+1，j-1)`，否则就一定不是回文串；
 1. 最后说是`base case`：当i==j时候，dp（i，j）== true这个好理解，因为单个字符一定是回文串，当i>j时候，dp（i，j）== true这个怎么理解呢？i>j时，说明子串是个空字串，空字串也是回文串！
+
+> **敲黑板** 这里展示一下怎么以动规的方式写一个字符串里回文子串的位置：
+  a b a b d
+a T F T F F
+b T T T F F
+a T T T F F
+b T T T T F
+d T T T T T  
+
 ```js
 const getIsPalindrom = (s) => {
     let n = s.length;
@@ -125,3 +134,9 @@ public boolean[][] getIsPalindrom(String s) {
 > 复杂度
 > 1. 时间复杂度: `O(状态总数 * 每个状态的处理耗费)`，等于`O(状态总数 * 决策数)`
 > 1. 空间复杂度: `O(状态总数)` 如果不适应滚动数组；如果使用滚动数组优化, n 是被滚动掉的那一个维度，就是`O(状态总数 / n)`
+
+
+
+https://www.zhihu.com/question/291280715/answer/1007691283
+https://leetcode.com/discuss/general-discussion/491522/dynamic-programming-questions-thread
+https://leetcode.com/discuss/general-discussion/458695/dynamic-programming-patterns

@@ -1,5 +1,10 @@
 # 单调栈问题
 
+**单调栈三步走**
+1. 维护一个递增或者递减的stack；
+1. 遍历原数组，正着遍历还是倒着遍历也根据递减还是递增的情况，已经求得是最大值还是最小值，如果stack非空，就比较当前元素值和栈顶元素值，根据维持的是递增还是递减单调栈，来判定要不要pop出栈顶元素；
+1. 把当前元素push进栈；
+
 **单调栈应用模板**
 ```java
 int[] getNextElement(int[] nums){
@@ -132,6 +137,8 @@ class Solution {
     }
 }
 ```
+
+1. [496. 下一个更大元素]() https://leetcode.com/problems/next-greater-element-i/
 1. [503. 下一个更大元素II]() https://leetcode.com/problems/next-greater-element-ii/
 1. []()
 1. []()

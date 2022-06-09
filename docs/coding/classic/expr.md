@@ -1,415 +1,659 @@
 # 表达式相关的几个问题
 
-### 第一类：表达式拆分
-!> **敲黑板** 这里穷举问题多数都是子串切割问题，
-1. [领扣424. 逆波兰表达式求值](#逆波兰表达式求值) https://www.lintcode.com/problem/424
+### 表达式的一些总结
+> 关于表达式，其实这类问题特别统一，基本上都是借助一个`单调栈`的概念。比如说，给你一个`中缀表达式`如`(5 - 6) * 7`让你求值。咋做呢？答案很直接，就是将这个表达式先转成所谓的`后缀表达式`(即`逆波兰表达式`, RPN)，然后再去基于这个RPN算出最终值来。重点就是怎么让这个字符串`(5 - 6) * 7`转成RPN。这里就有一个核心概念就是所谓的`计算优先级`，用这个计算优先级来维护一个递增的`运算符单调栈`，也就是说把运算优先级底的压在栈底，这样容易理解吧？运算优先级高的先放到RPN的队列里，因为RPN的核心就是从头外后算。得到了RPN后，再从头到尾遍历RPN队列，这个计算就简单直白了，遇到数字直接压栈，遇到符号从栈里pop()前两个元素，然后计算完并将结果压回栈里。
+```java
+private int getPriority(String str) {
+    if (str.equals("*") || str.equals("/")) {
+        return 3;
+    }
+    if (str.equals("+") || str.equals("-")) {
+        return 2;
+    }
+    if (str.equals(")")) {  // 遇到数字弹栈的过程只可能遇到右括号
+        return 1;
+    }
+    return 0;
+}
+```
+>
+> 这里说说怎么处理括号配对的。`中缀表达式`嘛，可以想想怎么从洋葱里**掏心**。所以在每次遇到了一个左括号`(`就入栈，遇到右括号`)`，那就将“栈顶”的左括号pop掉。
+>
+> 另外一种转化思路就是将表达式转成一颗`表达二叉树`。这个转成表达二叉树的解法，技巧性就在于遇到左括号`(`就增加一个大的底数base，遇到右括号`)`就减去那个大的底数base，以此来模拟递归进栈出栈。比如说表达式`2*6-(23+7)/(1+2)`可以转化成以下`表达二叉树`：
+```
+	                 [ - ]
+	             /          \
+	        [ * ]              [ / ]
+	      /     \           /         \
+	    [ 2 ]  [ 6 ]      [ + ]        [ + ]
+	                     /    \       /      \
+	                   [ 23 ][ 7 ] [ 1 ]   [ 2 ]
+```
+> 有了这个`表达二叉树`，你会不会后序遍历求结果呢？注意是左儿子除以、或减去右儿子哟。
 
 
-
-### 第二类：动规类，通常是两个字符串作为输入
-!> **敲黑板** 这类动规问题里通常会用到一种状态转化思想，那就是答案里不含有s1[i]，或者答案里不含有s2[j]，或者答案里不含有s1[i]和s2[j]，最后一种情况就当`s1[i]==s2[j]`时怎么处理。
->
-1. [72. 编辑距离](https://leetcode.com/problems/edit-distance/) 
->   **思路** 这题看着就让人懵啊，不过还是按照套路来嘛，又是两个字符串的问题，凭经验也应该快速写出对应的dp函数`dp(s1, i, s2, j)`，然后顺着语义把这个dp函数定义清楚，`dp函数代表s1[0...i]和s2[0...j]之间的最小编辑距离`，然后接下来就是套我们记忆化搜索模板。这题需要**注意**的是，其实选择列表有四个选项，增删替，还有就是啥都不做，当`s1[i]==s2[j]`时，其实啥都不做就是最优的选择。这题的详解可以[看这里](./coding/dp/sebusequence?id=编辑距离)，而且这题的记忆化搜索解法可以[看这里](./coding/memo/index?id=编辑距离)。
->
-1. [1143. 最长公共子序列](https://leetcode.com/problems/longest-common-subsequence/) 
->   **思路** 这题是子序动规里经典的问题了(LCS)。一共4种情况吧，情况1：如果`s1[i]==s2[j]`，说明此字符一定存在于公共子序中，所以就直接递归到下一层`1+dp(s1, i+1, s2, j+1);`。情况2：s1[i]不在最长公共子序中；情况3：s2[j]不在最长公共子序中；情况4：s1[i]和s2[j]都不在最长公共子序中；因为是求最长公共子序嘛，所以情况4已经被情况2和情况3涵盖了，所以当`s1[i]!=s2[j]`时，我们要取最优`Math.max(dp(s1, i+1, s2, j),dp(s1, i, s2, j+1));`。这题的详解可以[看这里](./coding/dp/sebusequence?id=最长公共子序列)。
->
-1. [79. 最长公共子串](https://www.lintcode.com/problem/79/) 
->   **思路** 这题核心是个数学归纳法。解决子串问题吧，就要谨记连续这个词，所以整着遍历字符串，看看以这个数结尾的子串最长公共子序是多少是多少？这是不是就好找多了？所以思路变得很简单，如果`s1[i]==s2[j]`，那就看dp[i-1][j-1]的值，直接是`dp[i][j] = 1+dp[i-1][j-1];`，因为前一个字母结尾的最长公共子串再加1才是当前的最长公共子串。同理，如果`s1[i]!=s2[j]`，那就`dp[i][j] = 0`。这题的详解可以[看这里](./coding/dp/indices?id=最长公共子串)。
->
-1. [516 最长回文子序](https://leetcode.com/problems/longest-palindromic-subsequence/)
->   **思路** 这题是为数不多的单个字符串但需要二维dp数组的问题。当`s[i]==s[j]`时, 简单啊，答案就是`2 + dp(s, i+1, j-1)`。当`s[i]!=s[j]`时, 就三种情况了，分别是
->   1. 最长子回文序列里含有s[i];
->   1. 最长子回文序列里含有s[j];
->   1. 最长子回文序列里既不含有s[i]也不含有s[j];
-> 第三种情况可以不考虑，因为我们再找最长回文子序，情况1和2其实已经涵盖了情况3了。你仔细体会一下，这个思路是不是跟[最长公共子序列]()一模一样的？
->
-> 这题的详解可以[看这里](./coding/dp/sebusequence?id=最长回文子序)。
->
-1. [1312. 构造回文的最小插入次数](https://leetcode.com/problems/minimum-insertion-steps-to-make-a-string-palindrome/) 
->   **思路** 这题和上一题[最长回文子序]()其实本质上是镜面操作题。你琢磨琢磨，`把一个字符串变成回文串的最少操作次数`是不是可以先找`这个字符串的最长回文子序`。这题的详解可以[看这里](./coding/dp/sebusequence?id=构造回文的最小插入次数)。
->
-
-### 第三类：单纯子串类，通常是要介入滑动窗口老猛男
-> 这类相关问题请阅读[这篇帖子](./coding/twopointer/sliding)。
-
-### 第IV类：单调栈类
-1. [316. 去重重复字母](#去重重复字母) 
-
-### 第V类：子序列类
-1. [面试真题. 找字符串中符合word的子序列](#找字符串中符合word的子序列)
+### 刷题列表
+1. [领扣424. 逆波兰表达式求值](#逆波兰表达式求值)
+1. [领扣370. 将表达式转换为逆波兰表达式](#将表达式转换为逆波兰表达式) 
+1. [领扣368. 表达式求值](#表达式求值) 
+1. [领扣575. 字符串解码](#字符串解码)
+1. [领扣1289. 原子的数量](#原子的数量) 
+1. [领扣367. 表达树构造](#表达树构造)
 
 ### 逆波兰表达式求值
 [领扣424. 逆波兰表达式求值](https://www.lintcode.com/problem/424) 
 
-> **思路** 经典题目，逆波兰的好处就是用一个stack从前往后遍历即可。
+### 将表达式转换为逆波兰表达式
+[领扣370. 将表达式转换为逆波兰表达式](https://www.lintcode.com/problem/370) 
+>
+> 借助`栈`我们可以实现中缀表达式到后缀表达式(即逆波兰表达式, RPN)的转换.
+>
+> 从左到右遍历中缀表达式:
+>
+> 1. 如果碰到`数字`, 直接追加到 RPN 末尾.
+> 1. 如果碰到`左括号`, 入栈
+> 1. 如果碰到`右括号`, 弹栈, 并将弹出的元素依次追加到 RPN 末尾, 直至左括号弹出(左括号不追加至PN)
+> 1. 如果碰到`运算符`, 弹栈直至栈顶元素优先级 小于 当前运算符, 所有弹出的元素依次追加到 RPN 末尾, 最后再将该运算符入栈
+>
+> 出于方便, 我们设定所有元素的优先级: */ 最高, +- 次之, 然后是数字, 最后是括号. (把括号设为最低是因为, 碰到运算符弹栈时, 遇到括号也要停止, 所以可以直接设为最低)
+>
+> 最后, 如果栈还有剩余, 弹栈, 依次追加到 RPN 末尾, 然后我们就得到了正确结果 RPN.
+>
+>
+```java
+//解法1
+public class Solution {
+    /**
+     * @param expression: A string array
+     * @return: The Reverse Polish notation of this expression
+     */
+    public List<String> convertToRPN(String[] expression) {
+        // write your code here
+        List<String> res = new ArrayList<>();
+        Stack<String> stack = new Stack<>();
 
+        for(String str : expression){
+            if(str.equals("(")){
+                stack.push(str);
+            }
+            else if(str.equals(")")){
+                while(!stack.isEmpty() && !stack.peek().equals("(")) {
+                    res.add(stack.pop());
+                }
+                stack.pop();
+            }
+            else if(Character.isDigit(str.charAt(0))){
+                res.add(str);
+            }
+            else { //运算符
+                while(!stack.isEmpty() && getPriority(str)<=getPriority(stack.peek())) {
+                    res.add(stack.pop());
+                }
+                stack.push(str);
+            }
+        }
+        while (!stack.empty()) {
+            res.add(stack.pop());
+        }
+        return res;
+        
+    }
+
+    private int getPriority(String str){
+        if(str.equals("*") || str.equals("/")){
+            return 3;
+        }
+
+        if(str.equals("+") || str.equals("-")){
+            return 2;
+        }
+
+        if(str.equals("(")){
+            return 1;
+        }
+
+        return 0;
+    }
+}
+```
+```java
+//解法2
+class TreeNode {
+    public int val;
+    public String s;
+    public TreeNode left, right;
+
+    public TreeNode(int val, String ss) {
+        this.val = val;
+        this.s = ss;
+        this.left = this.right = null;
+    }
+
+}
+
+public class Solution {
+
+    int getPriority(String a, Integer base) {
+        if (a.equals("+") || a.equals("-"))
+            return 1 + base;
+        if (a.equals("*") || a.equals("/"))
+            return 2 + base;
+
+        return Integer.MAX_VALUE;
+    }
+
+    void dfs(TreeNode root, ArrayList<String> as) {
+        if (root == null)
+            return;
+        if (root.left != null)
+            dfs(root.left, as);
+
+        if (root.right != null)
+            dfs(root.right, as);
+        as.add(root.s);
+    }
+
+    /**
+     * @param expression: A string array
+     * @return: The Reverse Polish notation of this expression
+     */
+    public List<String> convertToRPN(String[] expression) {
+        // write your code here
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        TreeNode root = null;
+        int val = 0;
+        Integer base = 0;
+        for (int i = 0; i < expression.length; i++){
+            if (expression[i].equals("(")) {
+                base += 10;
+                continue;
+            }
+            if (expression[i].equals(")")) {
+                base -= 10;
+                continue;
+            }
+       
+            val = getPriority(expression[i], base);
+            TreeNode node = new TreeNode(val, expression[i]);
+            while (!stack.isEmpty() && node.val <= stack.peek().val) {
+                node.left = stack.pop();
+            }
+            if (!stack.isEmpty()) {
+                stack.peek().right = node;
+            }
+            stack.push(node);
+        }
+
+        ArrayList<String> reversepolish = new ArrayList<String>();
+        if (stack.isEmpty()) {
+            return reversepolish;
+        }
+        TreeNode rst = stack.pop();
+        while (!stack.isEmpty()) {
+            rst = stack.pop();
+        }
+        dfs(rst, reversepolish);
+
+        return reversepolish;
+    }
+}
+```
+
+### 表达式求值
+[领扣368. 表达式求值](https://www.lintcode.com/problem/368)
 ```java
 public class Solution {
     /**
-     * @param tokens: The Reverse Polish Notation
-     * @return: the value
+     * @param expression: a list of strings
+     * @return: an integer
      */
-    public int evalRPN(String[] tokens) {
-        // 表达式拆解，肯定是用stack的
+    public int evaluateExpression(String[] expression) {
+        // write your code here
+        if(expression.length<=0) return 0;
+        List<String> rpn = convertToRPN(expression);
+        if(rpn.size()<=0) return 0;
+        return evalRPN(rpn);
+    }
+
+    private int evalRPN(List<String> tokens) {
+        // write your code here
         Stack<Integer> stack = new Stack<>();
-
-        for(String c : tokens){
-            if("+".equals(c)){
-                int second = stack.pop();
-                int first = stack.pop();
-                stack.push(first+second);
-
-            } else if("-".equals(c)){
-                int second = stack.pop();
-                int first = stack.pop();
-                stack.push(first-second);
-            } else if("*".equals(c)){
-                int second = stack.pop();
-                int first = stack.pop();
-                stack.push(first*second);
-            } else if("/".equals(c)){
-                int second = stack.pop();
-                int first = stack.pop();
-                stack.push((int) first/second);
-            } else {
-                stack.push(Integer.valueOf(c));
+        for(String token : tokens){
+            if(token.equals("+")){
+                Integer first = stack.pop();
+                Integer second = stack.pop();
+                stack.push(second + first);
+            }
+            else if(token.equals("-")){
+                Integer first = stack.pop();
+                Integer second = stack.pop();
+                stack.push(second - first);
+            }
+            else if(token.equals("*")){
+                Integer first = stack.pop();
+                Integer second = stack.pop();
+                stack.push(second * first);
+            }
+            else if(token.equals("/")){
+                Integer first = stack.pop();
+                Integer second = stack.pop();
+                stack.push((int) second/first);
+            }
+            else {
+                stack.push(Integer.parseInt(token));
             }
         }
 
         return stack.pop();
     }
-}
-```
 
-### 单词拆分II
-[140. 单词拆分II](https://leetcode.com/problems/word-break-ii/) 
-
-> **思路** 这题本质上是用分治法处理子串组合问题。想象s是一个字符串，子串问题的连续性决定了可以不把这个子串一切为二，头部是`s.substring(0, i+1)`和尾部`s.substring(i+1)`。这样就可以这么判断，如果头部是一个word，那么只要判断尾部是不是一个可切分的字符串就可以了，这样这个问题的思路就很容易转化到递归思维。
->
-> 最后说一下，这题是可以用memo来进行剪枝的，见下面解法2.
-
-```js
-var wordBreak = function(s, wordDict) {
-    if(!s) return [];
-    
-    let res = [];
-    
-    if(wordDict.includes(s)) res.push(s);
-    
-    for(let i=0; i<s.length; i++){
-        let word = s.substring(0, i+1);
-        if(!wordDict.includes(word)) continue;
-        
-        let suffix = s.substring(i+1);
-        let remainings = wordBreak(suffix, wordDict);
-        
-        if(remainings.length>0){
-            for(const rem of remainings){
-                res.push(word+" "+rem);
+    private List<String> convertToRPN(String[] expression) {
+        List<String> RPN = new ArrayList<String>();
+        Stack<String> stack = new Stack<String>();
+        for (String str : expression) {
+            if (str.equals("(")) {
+                stack.push(str);
             }
-        }
-    }
-    
-    return res;
-};
-```
-
-> 用memo剪枝
-```js
-var memo = {};
-var wordBreak = function(s, wordDict) {
-    memo = {};
-    
-    return dfs(s, wordDict);
-}
-
-const dfs = (s, wordDict) => {
-    if(memo[s]) return memo[s];
-    if(!s) return [];
-    
-    let res = [];
-    
-    if(wordDict.includes(s)) res.push(s);
-    
-    for(let i=0; i<s.length; i++){
-        let word = s.substring(0, i+1);
-        if(!wordDict.includes(word)) continue;
-        
-        let suffix = s.substring(i+1);
-        let remainings = dfs(suffix, wordDict);
-        
-        if(remainings.length>0){
-            for(const rem of remainings){
-                res.push(word+" "+rem);
-            }
-        }
-    }
-    
-    memo[s] = res;
-    return res;
-};
-```
-### 回文串切割
-[131. 回文串切割](https://leetcode.com/problems/palindrome-partitioning/) 
-> **思路** 这题跟上一题[单词拆分II]()有异曲同工之妙，只不过这里，用memo剪枝作用几乎微乎其微。另外，这题是个非常典型的回溯问题，就连函数签名`const backtrack = (s, startIndex, partition, res)`都非常像极了[子集](./coding/dfs/subset?id=子集)这题，唯一的不同就是在递归进入下一层之前的剪枝`if (!isPalindrome[startIndex][i]) continue;`，因为这里剪枝条件是看是否为回文串。
->
-> **敲黑板** 有个小技巧这里：判断一个一个字符串所有回文串的位置[i,j]的类似动规的写法，请看code里那个`getIsPalindrom`的函数。
-
-```js
-var isPalindrome = [];
-var partition = function(s) {
-    let n = s.length;
-    isPalindrome = getIsPalindrom(s);
-    let res = [];
-    backtrack(s, 0, [], res);
-    return res;
-};
-
-const backtrack = (s, startIndex, partition, res) => {
-    if (startIndex == s.length){
-        formResultPath(s, partition, res);
-        return;
-    }
-
-    for (let i = startIndex; i < s.length; i++) {
-        if (!isPalindrome[startIndex][i]) continue;
-    
-        partition.push(i);
-        backtrack(s, i + 1, partition, res);
-        partition.pop();
-    }
-}
-
-const formResultPath = (s, partition, res) => {
-    let idx = 0;
-    let path = [];
-    for(let i=0; i<partition.length;i++){
-        path.push(s.substring(idx, partition[i] + 1));
-        idx = partition[i] + 1;
-    }
-    res.push([...path]);
-}
-
-const getIsPalindrom = (s) => {
-    let n = s.length;
-    let dp = [...Array(n)].map(x=>Array(n).fill(true));
-    for(let i=n-2; i>=0; i--){
-        for(let j=i+1; j<n; j++){
-            if(i<j){
-                if(s.charAt(i)==s.charAt(j)){
-                    dp[i][j] = dp[i+1][j-1]; 
-                } else {
-                    dp[i][j] = false;
+            else if (str.equals(")")) {
+                while (!stack.peek().equals("(")) {
+                    RPN.add(stack.pop());
                 }
-                    
+                stack.pop();
+            }
+            else if (Character.isDigit(str.charAt(0))) {
+                RPN.add(str);
+            }
+            else {
+                int priority = getPriority(str);
+                while (!stack.empty() && getPriority(stack.peek()) >= priority) {
+                    RPN.add(stack.pop());
+                }
+                stack.push(str);
+            }
+        }
+        while (!stack.empty()) {
+            RPN.add(stack.pop());
+        }
+        return RPN;
+    }
+    
+    private int getPriority(String str) {
+        if (str.equals("*") || str.equals("/")) {
+            return 3;
+        }
+        if (str.equals("+") || str.equals("-")) {
+            return 2;
+        }
+        if (str.equals(")")) {  // 遇到数字弹栈的过程只可能遇到右括号
+            return 1;
+        }
+        return 0;
+    }
+}
+```
+
+```java
+//解法2
+public class Solution {
+    class TreeNode {
+        public int val;
+        public String s;
+        public TreeNode left, right;
+
+        public TreeNode(int val, String ss) {
+            this.val = val;
+            this.s = ss;
+            this.left = this.right = null;
+        }
+
+    }
+    /**
+     * @param expression: a list of strings
+     * @return: an integer
+     */
+    public int evaluateExpression(String[] expression) {
+        // write your code here
+        if(expression.length<=0) return 0;
+        TreeNode rpn = convertToRPN(expression);
+        //if(rpn.size()<=0) return 0;
+        return evalRPN(rpn);
+    }
+
+    private int evalRPN(TreeNode root) {
+        // write your code here
+        if(root==null) return 0;
+        if(Character.isDigit(root.s.charAt(0))) return Integer.parseInt(root.s);
+        int left = evalRPN(root.left);
+        int right = evalRPN(root.right);
+
+        int res = 0;
+        if(root.s.equals("+")){
+            res = left + right;
+        }
+        if(root.s.equals("-")){
+            res = left - right;
+        }
+        if(root.s.equals("*")){
+            res = left * right;
+        }
+        if(root.s.equals("/")){
+            res = (int) left/right;
+        }
+
+        //System.out.println(res);
+        return res;
+    }
+
+    int getPriority(String a, Integer base) {
+        if (a.equals("+") || a.equals("-"))
+            return 1 + base;
+        if (a.equals("*") || a.equals("/"))
+            return 2 + base;
+
+        return Integer.MAX_VALUE;
+    }
+
+    /**
+     * @param expression: A string array
+     * @return: The Reverse Polish notation of this expression
+     */
+    public TreeNode convertToRPN(String[] expression) {
+        // write your code here
+        Stack<TreeNode> stack = new Stack<TreeNode>();
+        TreeNode root = null;
+        int val = 0;
+        Integer base = 0;
+        for (int i = 0; i < expression.length; i++){
+
+            if (expression[i].equals("(")) {
+                base += 10;
+                continue;
+            }
+            if (expression[i].equals(")")) {
+                base -= 10;
+                continue;
+            }
+            val = getPriority(expression[i], base);
+            TreeNode node = new TreeNode(val, expression[i]);
+            while (!stack.isEmpty() && node.val <= stack.peek().val) {
+                node.left = stack.pop();
+            }
+            if (!stack.isEmpty()) {
+                stack.peek().right = node;
+            }
+            stack.push(node);
+        }
+        
+        if (stack.isEmpty()) {
+            return null;
+        }
+        TreeNode rst = stack.pop();
+        while (!stack.isEmpty()) {
+            rst = stack.pop();
+        }
+        return rst;
+    }
+}
+```
+
+### 字符串解码
+[领扣575. 字符串解码](https://www.lintcode.com/problem/575)
+```java
+public class Solution {
+    /**
+     * @param s: an expression includes numbers, letters and brackets
+     * @return: a string
+     */
+    public String expressionExpand(String s) {
+        // write your code here
+        Stack<Object> stk = new Stack<>();
+        Integer rem = 0;
+        for(char c : s.toCharArray()){
+            if(Character.isDigit(c)){
+                rem = rem*10 + Integer.parseInt(String.valueOf(c));
+            }
+            else if(c=='['){
+                stk.push(rem);
+                rem=0;
+            }
+            else if(c==']'){
+                String base = popStack(stk);
+                Integer cnt = (Integer) stk.pop();
+                String interim = "";
+                for(int i=0; i<cnt; i++){
+                    interim += base;
+                }
+                stk.push(interim);
+            }
+            else {
+                stk.push(String.valueOf(c));
+            }
+        }
+
+        return popStack(stk);
+    }
+
+    private String popStack(Stack<Object> stk){
+        Stack<String> buffer = new Stack<>();
+        // pop until a number
+        while(!stk.isEmpty() && stk.peek() instanceof String){
+            buffer.push((String) stk.pop());
+        }
+        StringBuilder sb = new StringBuilder();
+        while(!buffer.isEmpty()){
+            sb.append(buffer.pop());
+        }
+        
+        return sb.toString();   
+    }
+}
+```
+
+> 递归解法
+```java
+public class Solution {
+    /**
+     * @param s: an expression includes numbers, letters and brackets
+     * @return: a string
+     */
+    int index = 0;
+    public String expressionExpand(String s) {
+        // write your code here
+        if (s.length() == 0) {
+            return "";
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        
+        int repeat = 0;
+        
+        while (index < s.length()) {
+            char c = s.charAt(index);
+            if (c == '[') {
+                index++;
+                String sub = expressionExpand(s);
+                for (int i = 0; i < repeat; i++) {
+                    sb.append(sub);
+                }
+                repeat = 0;
+                index++;
+            } else if (c == ']') {
+                return sb.toString();
+            } else if (Character.isDigit(c)) {
+                repeat = repeat * 10 + c - '0';
+                index++;
+            } else {
+                sb.append(c);
+                index++;
+            }
+        }
+        
+        return sb.toString();
+    }
+}
+```
+
+### 原子的数量
+1. [领扣1289. 原子的数量](https://www.lintcode.com/problem/1289)
+
+```java
+public class Solution {
+    /**
+     * @param formula: a string
+     * @return: return a string
+     */
+    private int i, n;
+    private String formula;
+    public String countOfAtoms(String formula) {
+        // write your code here
+        this.i = 0; this.n=formula.length();
+        this.formula=formula;
+        Stack<TreeMap<String, Integer>> stack = new Stack<>();
+
+        TreeMap<String, Integer> resMap = new TreeMap<>();
+        stack.push(resMap);
+
+        while(i<n){
+            char c = formula.charAt(i);
+            if(c=='('){
+                i++;
+                TreeMap<String, Integer> newMap = new TreeMap<>();
+                stack.push(newMap);
             } 
+            else if(c==')'){
+                i++;
+                Integer num = getNum();
+                TreeMap<String, Integer> cur = stack.pop();
+                TreeMap<String, Integer> top = stack.peek();
+
+                for(Map.Entry<String, Integer> entry : cur.entrySet()){
+                    String k = entry.getKey();
+                    Integer v = entry.getValue();
+                    top.put(k, top.getOrDefault(k, 0) + v*num);
+                }
+
+            } else {
+                TreeMap<String, Integer> top = stack.peek();
+                String elem = getElement();
+                Integer num = getNum();
+                top.put(elem, top.getOrDefault(elem, 0) + num);
+            }
         }
-    }
-    
-    return dp;
-    
-}
-```
-### 单词模式II
-[829. 单词模式II](https://www.lintcode.com/problem/829/) 
 
-> **思路** 函数签名是`wordPatternMatch(pattern, str)`。这题算是hard题了，主要是这里用到了`双指针的技巧`，但是`双指针`的第二个指针j不是那么容易理解。
-> 按照惯例，两个字符串，第一眼看上去得用`dp(s1, i, s2, j)`的函数签名技巧来解题了，但是仔细一像这里的第二个strinng s2不是那么容易判断怎么走去下一个j。但是回过头来想想在[单词拆分II]()和[回文串切割]()这两个题中，有一个重要的递归思想就是把一个字符串进行`str.substring(0,i+1)`和`str.substring(i+1)`的两段字符串切割，使得递归思想能运用进来。具体到这题呢，思想是这样的：pattern的输入能，只能单个字符单个字符的往右移动i指针，那么核心问题变成了用什么样的步骤让j指针有节奏的右移呢？没什么好方法对吧？那就穷举呗。怎么个穷举法呢？这就需要用到把str切成`str.substring(0,i+1)`和`str.substring(i+1)`的两段字符串，先假设头部字符串`str.substring(0,i+1)`是match到`pattern[0]`的，然后再想办法证明尾部字符串`str.substring(i+1)`是可以基于这个假设成立的。如果最后证明假设的头部字符串match的事实是不成立，那么就再试下一个头部字符串（将i++就等于扩展了头部字符串的长度)。
->
-> 这题还有一个难点是怎样证明尾部字符串`str.substring(i+1)`是可以基于头部match这个假设成立的。这里需要维护两个路径参数，一个叫map，一个叫set。
-> 1. 举个例子，patter是'aabb'，str是'blueblueredred'；map很容易理解，就是记录目前已知的假设，比如说map里有`map['a']='blue'`，所以当遇到第二个a的时候，就直接让j指针右移四位，因为已经假设a对应的子串是blue了。
-> 1. 举另个例子，patter是'aabc'，str是'blueblueredred'；set有点难理解，这里就说明一下。如果你的假设成立，就是说当i指针穷举到第四个时候，map里应该已经有`map['b']='red'`了；这样的话，在穷举遍历str时候，发现同一个词`red`又出现了，这说明同一个词`red`需要对应两个不同的pattern里的字符，所以此路不通应该直接跳过。
->
-
-```js
-export class Solution {
-  /**
-   * @param pattern: a string,denote pattern string
-   * @param str: a string, denote matching string
-   * @return: a boolean
-   */
-  wordPatternMatch(pattern, str) {
-    // write your code here
-    let map = {}, set=new Set();
-    return this.backtrack(pattern, str, map, set);
-  }
-
-  backtrack(pattern, str, map, set) {
-
-    //base case:
-    if(pattern.length == 0) return str.length == 0;
-
-    let p = pattern[0];
-    if(map[p]) {
-      let word = map[p];
-      if(!str || !str.startsWith(word)){
-            return false;
+        //form the result
+        StringBuilder sb = new StringBuilder();
+        for(Map.Entry<String, Integer> entry : resMap.entrySet()){
+            String k = entry.getKey();
+            Integer v = entry.getValue();
+            sb.append(k);
+            if(v>1) sb.append(v.toString());
         }
-      return this.backtrack(pattern.substring(1), str.substring(word.length), map, set);
+
+        return sb.toString();
+
     }
 
-    for(let i=0; i<str.length; i++) {
-      let prefix = str.substring(0, i+1);
-      //说明出现了相同的word，却对应着不同的character pattern
-      if(set.has(prefix)) continue;
+    private String getElement(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(formula.charAt(i++)));
+        while(i<n && Character.isLowerCase(formula.charAt(i))){
+            sb.append(String.valueOf(formula.charAt(i++)));
+        }
 
-      //做选择
-      map[p] = prefix;
-      set.add(prefix);
-
-      let suffix = str.substring(i+1);
-      //剪枝，遇到一个可以，立即退出
-      if(this.backtrack(pattern.substring(1), suffix, map, set)) return true;
-
-      //撤销选择
-      delete map[p];
-      set.delete(prefix);
+        return sb.toString();
     }
 
-    return false;
-  }
+    private Integer getNum(){
+        if(i>=n || !Character.isDigit(formula.charAt(i))) return 1;
+        Integer res = 0;
+        while(i<n && Character.isDigit(formula.charAt(i))){
+            res = res*10+Integer.parseInt(String.valueOf(formula.charAt(i++)));
+        }
+
+        return res;
+    }
 }
 ```
 
+### 表达树构造
+[领扣367. 表达树构造](https://www.lintcode.com/problem/367)
+```java
+/**
+ * Definition of ExpressionTreeNode:
+ * public class ExpressionTreeNode {
+ *     public String symbol;
+ *     public ExpressionTreeNode left, right;
+ *     public ExpressionTreeNode(String symbol) {
+ *         this.symbol = symbol;
+ *         this.left = this.right = null;
+ *     }
+ * }
+ */
 
-### 去重重复字母
-[316. 去重重复字母](https://leetcode.com/problems/remove-duplicate-letters/) 
-
-> **思路** 字符串去重能多难？就直接用hashmap或者trie呗；但是这个lexicographical order还真是把人难住了，单单hashmap不好使啊。子串需要保持原序嘛，看到lexi order直接去单调栈上想吧。
-
-```js
-var removeDuplicateLetters = function(s) {
-    let asciiA = Array(256).fill(0);
-    
-    //先给每个字符做个count
-    for(const c of s){
-        let ascii = c.charCodeAt(0);
-        asciiA[ascii]++;
+public class Solution {
+    class TreeNode {
+        int val;
+        ExpressionTreeNode eNode;
+        public TreeNode(int val, String s) {
+            this.val = val;
+            eNode = new ExpressionTreeNode(s);
+        }
     }
-    
-    let stk = [];
-    for(const c of s){
-        let asciiC = c.charCodeAt(0);
-        asciiA[asciiC]--;
+
+    /**
+     * @param expression: A string array
+     * @return: The root of expression tree
+     */
+    public ExpressionTreeNode build(String[] expression) {
+        // write your code here
+        if (expression == null || expression.length == 0) {
+            return null;
+        }
         
-        //去重
-        if(stk.includes(c)) continue;
-        
-        while(stk.length>0 && stk[stk.length-1]>c){
-            let e = stk[stk.length-1];
-            let asciiE = e.charCodeAt(0);
-            if(asciiA[asciiE]==0) break; //只剩一个e了,不能再pop了
-            
-            stk.pop();
+        Stack<TreeNode> stack = new Stack<>();
+        int base = 0, val=0;
+        for(int i=0; i< expression.length; i++){
+            if (expression[i].equals("(")) {
+                base += 10;
+                continue;
+            }
+            if (expression[i].equals(")")) {
+                base -= 10;
+                continue;
+            }
+
+            val = getWeight(base, expression[i]);
+            TreeNode node = new TreeNode(val, expression[i]);
+            while (!stack.isEmpty() && node.val <= stack.peek().val) {
+                node.eNode.left = stack.pop().eNode;
+            }
+            if (!stack.isEmpty()) {
+                stack.peek().eNode.right = node.eNode;
+            }
+            stack.push(node);
         }
-        stk.push(c);
+
+        if (stack.isEmpty()) {
+            return null;
+        }
+        TreeNode rst = stack.pop();
+        while (!stack.isEmpty()) {
+            rst = stack.pop();
+        }
+        return rst.eNode;
     }
-    
-    return stk.join('');
-};
+
+    private int getWeight(int base, String str){
+        if(str.equals("+") || str.equals("-")){
+            return base + 1;
+        } else if(str.equals("*") || str.equals("/")){
+            return base + 2;
+        }
+
+        return Integer.MAX_VALUE;
+    }
+}
 ```
 
-### 找字符串中符合word的子序列
-[找字符串中符合word的子序列](#找字符串中符合word的子序列)
-[领扣样题](https://www.lintcode.com/problem/1024/)
-
-> **题目描述**
-> 给出一个字典words，例如[cat, tax, baby, bird, sky]，判断一个字符串str中是否含有一个子序能够形成字典中的任意word。**注意**：这个子序的异构词能形成word即可。
->
-> **思路** 拿到这题，我的第一反应是用类似滑动窗口处理子串问题的思想，即：给出一个window，这个window里记录某个word的所有字符的出现次数，比如说cat这个词，就可以形成`{'c':1, 'a':1, 't':1}`。然后遍历str的每个字符，如果遍历过程中能让cat所对应的window里的键值对都满足，那就说明这个word就是答案。因为给出的是一个多个word的字典，那么就字典里的每个word都建立各自的window就好了。我说这个思路的原因是因为这样解题是错误的，因为严格意义上子序列是要遵循原序的，所以这样解题会输出错误答案。之后会给出正确的答案。
->
-```js
-const find_embedded_word = (words, str) => {
-   let wordMap = [];
-   //先把每个word建成字母和occurance的键值对map
-   for(const word of words) {
-     let window = {};
-     for(const c of word){
-       if(window[c]){
-         window[c]++;
-       } else {
-         window[c] = 1;
-       }
-     }
-     wordMap.push(window);
-   }
-
-   //console.log(wordMap);
-
-   for(const c of str) {
-     for(let i=0; i<wordMap.length; i++){
-       let word = wordMap[i];
-       if(word[c]){
-         word[c]--;
-       }
-
-       if(word[c]==0) delete word[c];
-       //console.log(wordMap);
-
-       //如果json object中的键值对都被删除了，说明这个对应的word就是答案
-       if(Object.keys(word)==null || Object.keys(word).length==0) return words[i];
-     } 
-   }
-
-   return null;
-}
-
-// console.log(find_embedded_word(words, string1));
-// console.log(find_embedded_word(words, string2));
-// console.log(find_embedded_word(words, string3));
-// console.log(find_embedded_word(words, string4));
-// console.log(find_embedded_word(words, string5));
-// console.log(find_embedded_word(words, string6));
-```
->
-> **正确答案** 
-```js
-
-const find_embedded_word = (words, str) => {
-    //先建一个二维数组把每个字符的ascii存起来，
-    let n = str.length;
-
-    定义 memo[n][26], 其中 memo[i][j] 表示串str的第i个位置起, 下标最靠前的字符 str[j] (ascii代码-97) 的位置.
-    let memo = [...Array(n)].map(x=>Array(26));
-    //init
-    for(let j=0; i<26; j++){
-        memo[n-1][j]=-1;
-    }
-
-    //遍历每个字符，让每个字符str[i]都填入相应的位置
-    for(let i=n-1; i>=0; i++){
-        memo[i][str[i].charCodeAt(0)-97] = i;
-        if(i==0) break;
-        
-        for(let j=0; i<26; j++){
-            memo[i-i][j] = memo[i][j];
-        }
-    }
-
-    let res = 0;
-    for(const word of words){
-        if(isSubseq(word, memo)){
-            res++;
-        }
-    }
-
-    return res;
-}
-
-const isSubseq = (word, memo) => {
-    let lenw = word.length;
-    let lens = memo.length;
-    let i,j;
-    for(i=0, j=0; i < lenw && j < lens; i++, j++){
-        j = memo[j][word[i].charCodeAt(0) - 97];
-        if (j < 0) {
-            return false;
-        }
-    }
-    return i == lenw;
-}
-
-```
-
+### 字符串的最短长度编码
+[领扣885. 字符串的最短长度编码](https://www.lintcode.com/problem/885)
