@@ -486,3 +486,50 @@ public class Solution {
     }
 }
 ```
+> 当然你也可以这样写，唯一区别就是是否要提前看后一位是否是'*'：
+```java
+class Solution {
+    public boolean isMatch(String s, String p) {
+        int m=s.length(), n=p.length();
+        boolean dp[][] = new boolean[m+1][n+1];
+
+        for(int i=0; i<=m; i++) 
+            for(int j=0; j<=n; j++){
+                if(i==0 && j==0){
+                    dp[i][j] = true; //空字符串可以匹配空字符串；
+                    continue;
+                }
+                if(j==0){
+                    dp[i][j] = false; //空字符串的pattern，不肯能匹配任何s；
+                    continue;
+                }
+                if(p.charAt(j-1) == '*') {
+                    dp[i][j] = dp[i][j-1]; 
+                    continue;
+                }
+                
+                if(i>0 && (p.charAt(j-1) == '.' || s.charAt(i-1) == p.charAt(j-1))){
+                    //看下一位字符是否是‘*’
+                    if(j<n && p.charAt(j) == '*'){
+                         //匹配0个字符或者多个
+                        dp[i][j] |= dp[i][j-1] || dp[i-1][j];
+                    }
+                    else {
+                        //匹配单字符
+                        dp[i][j] |= dp[i-1][j-1];
+                    }
+                }
+                else {
+                    //看下一位字符是否是‘*’
+                    if(j<n && p.charAt(j) == '*'){
+                        //匹配0个字符
+                        dp[i][j] |= dp[i][j-1];
+                    } else {
+                        dp[i][j] = false;
+                    }
+                }
+            }
+        return dp[m][n];
+    }
+}
+```

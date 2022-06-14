@@ -2,7 +2,8 @@
 
 ### 第一类：数字为距离
 !> **敲黑板** 这里穷举问题多数都是子串切割问题，
-1. [Facebook真题. 匹配两个字符串](#匹配两个字符串) 
+1. [Facebook真题. 有效单词缩写](#有效单词缩写) 
+> 力扣的408题，需要plus会员。简单说就是看是否为一个单词的有效单词缩写，比如说substitution可以缩写为s10n, sub4u4,12, su3ilu2on等，而s010n或者s55n就不是有效缩写。
 ```java
   public boolean matchTwoStrings(String s, String p){
     int i=0, j=0, rem=0;
@@ -55,6 +56,31 @@ private boolean matchTwoStrings(String s, int i, int rem, String p, int j){
     }
 }
 ```
+> 现在看看这种两个指针更巧妙地思路：i和j分别指向s和p，然后根据条件跳跃着往后移；
+```java
+public boolean validWordAbbreviation(String s, String p){
+  int i=0, j=0;
+  while(i<s.length() && j<p.length()){
+    if(s.charAt(i)==p.charAt(j)){
+      i++;
+      j++;
+      continue;
+    }
+
+    //这里处理s010n不是substitution缩写
+    if(p.charAt(j)<='0' || p.charAt(j)>'9') return false;
+
+    int start = j;
+    while(j<p.length() && p.charAt(j) >= '0' && p.charAt(j) <= '9')
+      ++j;
+    int num = Integer.valueOf(p.substring(start, j));
+    i += num;
+  }
+
+  return i==s.length() && j==p.length();
+}
+``
+
 1. [领扣575. 字符串解码](#字符串解码) https://www.lintcode.com/problem/575
 
 ### 匹配两个字符串 
