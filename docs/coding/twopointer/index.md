@@ -1,3 +1,3 @@
 # 不能称之为算法的双指针
 
-Learn about all these great technologies:
+双指针思维不能称之为算法，但是这个思维的应用确实无处不在。

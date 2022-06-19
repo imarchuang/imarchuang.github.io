@@ -32,7 +32,6 @@
 1. [97. 交错字符串](#交错字符串)  
 1. [10. 正则表达式匹配（困难）](#正则表达式匹配) 
 1. [44. 通配符匹配（困难）](#通配符匹配) 
-1. [44. 通配符匹配（困难）](#通配符匹配) 
 1. [857. 领扣-最小的窗口子序列](https://www.lintcode.com/problem/857)
 
 1. https://leetcode.com/problems/min-cost-climbing-stairs/
@@ -114,7 +113,7 @@ var lengthOfLIS = function(nums) {
 };
 ```
 
-?> **[思路]** 上边的解法的时间复杂度是O(n^2)，还不是最佳解法，最佳解法实际上是O(n*logn)，用二分法。核心思想就是维护一个subSeq的数组，这个数组维护的最长的可能LIS，subSeq的最后被更新的元素就应该是LIS的答案。例如说，`[10, 11, 1,2,3]`，subSeq是最起初是`[10]`,遇到11，因为11是最大的，那就增加一个元素变成`[10, 11]`，然后遇到1，因为1不是最大，那就用二分法在subSeq数组中`去找比1大的最小元素`然后用1去replace那个元素。一样的逻辑去遍历元素2，元素3 ...
+?> **[思路]** 上边的解法的时间复杂度是O(n^2)，还不是最佳解法，最佳解法实际上是O(n*logn)，用二分法。我在面Snowflake电面时候被问蒙了。二分法思路的一个核心思想就是维护一个subSeq的数组，这个subSeq数组思想上非常像单调递增栈，只不过这个“栈”只有在比最大元素大的时候才增长，当第i个元素值不大于“栈”里目前最大元素的时候，这时候的思想就是，找到**比这个第i个元素值大的最小值**。这里的思路你可以这么想：你想每次都能腾出点更多的空间，好使下一个i+1个元素可以被插入到这个subSeq的数组。最后这个subSeq数组实际上就是维护了最长的可能LIS，subSeq数组就应该是LIS的答案。举个例子，`[10, 11, 1,2,3]`，subSeq是最起初是`[10]`,遇到11，因为11是最大的，那就增加一个元素变成`[10, 11]`，然后遇到1，因为1不是最大，那就用二分法在subSeq数组中`去找比1大的最小元素`然后用1去replace那个元素，数组就变成了`[1, 11]`，类似的遇到2这个元素时候，数组就变成了`[1, 2]`，遇到3这个元素时候，数组就变成了`[1, 2，3]`。
 ```java
 class Solution {
     private int[] subSeq;
@@ -151,6 +150,54 @@ class Solution {
         }
         
         this.subSeq[left] = target;
+    }
+}
+```
+
+> **补充** 需要二分法时候，java里是有现成的API可以用的，而且不止数组有，集合也有；分别是，Arrays.binarySearch(arr1, targetNum)和Collections.binarySearch(list1, targetNum)；这里有一点要注意：前提是数组或者集合是有序的。
+```java
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        //类似于递增单调栈的概念
+        int n = nums.length;
+        int[] resultArray = new int[n];
+        resultArray[0] = nums[0];
+        int lastPos = 0;
+        
+        for(int i=1; i<n; i++){
+            if(resultArray[lastPos]<nums[i]){
+                lastPos++;
+                resultArray[lastPos]=nums[i];
+            } else {
+                int pos = Arrays.binarySearch(resultArray, 0, lastPos+1, nums[i]);
+                //System.out.println(pos+"|"+nums[i]);
+                if(pos<0) pos = -(pos+1);
+                resultArray[pos]=nums[i];
+            }
+        }
+            
+        return lastPos+1;
+    }
+}
+
+//version 2: 用list
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        //类似于递增单调栈的概念
+        int n = nums.length;
+        List<Integer> resultList = new ArrayList<>();
+        
+        for(int num : nums){
+            if(resultList.isEmpty() || resultList.get(resultList.size()-1)<num){
+                resultList.add(num);
+            } else {
+                int pos = Collections.binarySearch(resultList, num);
+                if(pos<0) pos = -(pos+1);
+                resultList.set(pos,num);
+            }
+        }
+            
+        return resultList.size();
     }
 }
 ```
@@ -606,6 +653,7 @@ public class Solution {
     }
 }
 ```
+
 ### 不同的子序列
 [115. 不同的子序列](https://leetcode.com/problems/distinct-subsequences/) 
 ?> **[思路]** 又是两个字符串，原题有要求出个数，这个时候就要往动态规划上的思路来看问题了。俩字符串该咋整？先直接想无脑的写出`dp(s1, i, s2, j)`吧。到这儿，我们继续模板思路，dp的定义是啥呢？试一下这个`dp[i][j]`**表示s2的前j个字符s2[0...j-1] (连续的)**在s1前i个字符`s1[0...i-1]`以子序的形式出现多少次，aka就是原题要求的结果，我们根据子序型动规的套路把它子问题化了，状态就是i，j。到这儿了，该思考思考动规的状态转化方程了，还是模板思路，两个字符串的子序类动规，要考虑的就是两个字符**相等和不相等**的情况，**不相等时候**通常考虑包不包含s1[i]和包不包含s2[j]的两种情况。不过这题呢不需要考虑**包不包含s2[j]的情况了**，因为原题的定义式一定得包含(子串)。那你是否能套路的得出这个状态转化方程呢？s1[i]==s2[j]时`dp[i][j]=dp[i-1][j-1]+dp[i-1][j]`，s1[i]！=s2[j]时`dp[i][j]=dp[i-1][j]`。这个怎么理解呢？就是说任何字符，我们都**最多**有两种选择。假设s1[i]！=s2[j]，那没办法，只能让s1移到下一位，因为字符s1[i]肯定不能用嘛，用了就没法让s2是s1的子序了；s1[i]==s2[j]时`，那我们就有两种选择了，选择1就像俩字符不match时候选择不用字符s1[i]对吧？选择2呢就是选择用这个s1[i]字符，那么i和j就有同时右移一位。最后呢，按照动规的模板思路，思考一下base case。其实很简单，那就是dp[i][0]=1，因为s2为空字符串，就是一种s1的子序列。相应的，dp[0][j]=0，因为s1为空字符串，那么s2的长度大于s1肯定不是子序列。
@@ -659,6 +707,7 @@ class Solution {
     }
 }
 ```
+
 ### 交错字符串
 [97. 交错字符串](https://leetcode.com/problems/interleaving-string/) 
 > **[思路]** 这题不是两个字符串，而是三个，懵逼了吧？不过呢，思路是和两个字符串是一模一样的。原题要求出个数，往动态规划上的思路看问题了是第一步，不过子序类动规题刷多了，其实看个并不难。题目说看看`s3`是否是由`s1`和`s2`**交错**组成的。该咋整？先直接想无脑的写出`dp(s1, i, s2, j)`吧。到这儿，我们继续模板思路，dp的定义是啥呢？我们先无脑的试试照着原题语义来：`dp[i][j]`表示s3的前i+j个字符是否是由`s1[0...i-1]`和`s2[0...j-1]`交错组成的。那你是否能思考一下这题的状态转化方程呢？dp[i][j]是不是true，应该由两种情况来决定？
@@ -703,6 +752,70 @@ class Solution {
     }
 }
 ```
+```java
+//你可以这么写：检查i>0 && (p.charAt(j-1) == '.' || s.charAt(i-1) == p.charAt(j-1))
+class Solution {
+    public boolean isMatch(String s, String p) {
+        int m=s.length(), n=p.length();
+        boolean dp[][] = new boolean[m+1][n+1];
+
+        for(int i=0; i<=m; i++) 
+            for(int j=0; j<=n; j++){
+                if(i==0 && j==0){
+                    dp[i][j] = true; //空字符串可以匹配空字符串；
+                    continue;
+                }
+                if(j==0){
+                    dp[i][j] = false; //空字符串的pattern，不肯能匹配任何s；
+                    continue;
+                }
+                if(p.charAt(j-1) == '*') {
+                    dp[i][j] = dp[i][j-1]; 
+                    continue;
+                }
+                
+                if(i>0 && (p.charAt(j-1) == '.' || s.charAt(i-1) == p.charAt(j-1))){
+                    //看下一位字符是否是‘*’
+                    if(j<n && p.charAt(j) == '*'){
+                         //匹配0个字符或者多个
+                        dp[i][j] |= dp[i][j-1] || dp[i-1][j];
+                    }
+                    else {
+                        //匹配单字符
+                        dp[i][j] |= dp[i-1][j-1];
+                    }
+                }
+                else {
+                    //看下一位字符是否是‘*’
+                    if(j<n && p.charAt(j) == '*'){
+                        //匹配0个字符
+                        dp[i][j] |= dp[i][j-1];
+                    } else {
+                        dp[i][j] = false;
+                    }
+                }
+
+                /*
+                if(p.charAt(j-1) != '*'){
+                    //要看s[i]是否p[j]理论上相等
+                    if(i>0 && (p.charAt(j-1) == '.' || s.charAt(i-1) == p.charAt(j-1)))
+                        dp[i][j] = dp[i-1][j-1];
+                } 
+                else {
+                    //要看匹配0个字符还是多个字符
+                    //1. 相当于匹配0个字符
+                    if(j-2>=0) dp[i][j] |= dp[i][j-2]; 
+                    //2. 根据s[i]和p[j]是否理论上相等来决定是否可以匹配多个字符
+                    if(i>0 && j>=2) dp[i][j] |= dp[i-1][j] && (p.charAt(j-2) == '.' || s.charAt(i-1) == p.charAt(j-2)); 
+                }
+                */
+
+            }
+        return dp[m][n];
+    }
+}
+```
+
 ### 正则表达式匹配
 [10. 正则表达式匹配（困难）](https://leetcode.com/problems/regular-expression-matching/) 
 > **[思路]** 这是一道经典的不能经典的子序类问题了，比起[编辑距离]()这种经典题，这题不止经典而且实用。为啥这是个子序类问题呢？如果你有点儿懵逼，也不要太计较，听我娓娓道来。如果你还记得[双子序类问题模板](#双子序类问题模板)的经典状态转移方法，那里说状态转移方程需要看`s1[i]`和`s2[j]`是否相等而分别处理。正则表达式的核心概念就是有万能匹配符，所以这里`s1[i]`和`s2[j]`**是否相等**就需要一些特殊操作了。`s1[i]`和`s2[j]`**是否相等**在有通配符的情况下改如何处理呢？
@@ -752,5 +865,46 @@ class Solution {
 
 ### 通配符匹配
 [44. 通配符匹配（困难）](https://leetcode.com/problems/wildcard-matching/) 
-> **[思路]** 又是一道经典题，跟[正则表达式匹配](#正则表达式匹配)几乎是一模一样的思路，请见上题加深理解。
+> **[思路]** 又是一道经典题，跟[正则表达式匹配](#正则表达式匹配)几乎是一模一样的思路，请见上题加深理解。还是理论上的相等：1. `s1[i]==s2[j]`；2. s2[j]字符是`'？'`；不过这题会出现连续`'*'`的情况，要预处理连续的`'*'`成一个`'*'`，要不放在状态转化时候处理起来很麻烦。
 ```java
+class Solution {
+    public boolean isMatch(String s, String p) {
+        // remove consecutive * 
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<p.length(); i++){
+            if(i>0 && p.charAt(i)=='*' && p.charAt(i-1)=='*')
+                continue;
+            sb.append(p.charAt(i));
+        }
+
+        p = sb.toString();
+        //System.out.println(p);
+
+        int m=s.length(), n=p.length();
+        boolean[][] dp = new boolean[m+1][n+1];
+        dp[0][0] = true;
+        for(int j=1; j<=n; j++)
+            dp[0][j] = dp[0][j-1] && p.charAt(j-1)=='*';
+        
+        for(int i=1; i<=m; i++)
+            for(int j=1; j<=n; j++){
+                if(p.charAt(j-1) == '?' || s.charAt(i-1) == p.charAt(j-1)){
+                    dp[i][j] = dp[i-1][j-1];
+                } else {
+                    if(p.charAt(j-1)=='*'){
+                        //匹配0个或者多个
+                        // j-1：as if ths '*' doesn't exist --> match 0 char
+                        // i-1：as if ths s.charAt(i-1) doesn't exist --> match 1+1+1+1... char
+                        dp[i][j] = dp[i][j-1] || dp[i-1][j]; 
+                    } else {
+                        dp[i][j] = false;
+                    }
+                    
+                }
+            }
+        
+
+        return dp[m][n];
+    }
+}
+```
