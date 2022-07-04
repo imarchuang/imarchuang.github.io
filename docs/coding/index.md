@@ -12,7 +12,7 @@
     * 第二次面的是AWS的CloudFront，电面还挺正常，但是onsite兼职糟糕极了！不好算法，只考OODesign；
 1. **Google**: 电面1过了，电面2挂了；
 1. **Slack**: 这个公司给一个code review的PR，说实话不是很喜欢这种面试方式！
-1. **Wayfair**: 电面给了个滑动窗口题，很顺利；然后是跟Hiring Manager，叫`Peter Kapner`，这哥们儿纯傻逼一个，给我的提示就是不要跟这种人谈的太高屋建瓴。
+1. **Wayfair**: 电面给了个滑动窗口题，很顺利；然后是跟Hiring Manager，叫`Peter Kapner`，这哥们儿**纯傻逼**一个，给我的提示就是不要跟这种人谈的太高屋建瓴。
 1. **Instacart**: 电面就挂了，着实有点意外。
 1. **Microsoft**: 
     * 第一次是Viva的一个职位，说实话面的很不错，只不过他们可能是本来对外招也就是走走流程，最后内部调人了；
