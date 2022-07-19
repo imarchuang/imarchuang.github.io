@@ -7,7 +7,9 @@
 > 滑动窗口的框架很直接，就是两个while loop，但是唯一的难点在于把`更新逻辑`和`计算结果逻辑`放在哪里的问题，这篇帖子就好好扒一扒这层皮。`计算结果逻辑`其实只有三个地方可放，一是放在窗口扩展`更新逻辑`后的位置，二是放在窗口缩小`更新逻辑`前的位置，三是放在窗口扩展过程中`更新逻辑`的逻辑内部。
 
 ### 刷题列表
-1. [wayfair面试真题](#]wayfair面试真题)
+1. [wayfair面试真题](#wayfair面试真题)
+1. [Uber面试真题](#Uber面试真题)
+1. [Square面试真题](#Square面试真题)
 1. [76 最小覆盖子串](#最小覆盖子串) 
 1. [567 字符串的排列](#字符串的排列)
 1. [438 字符串中异位词](#字符串中异位词) 
@@ -175,6 +177,33 @@ console.log('original', logs3);
 console.log('final Result::', getHighestUsedResrouce(logs3));
 console.log('after', logs3);
 ```
+### Uber面试真题
+**原题** Given input array [4,2,1,3,2,3,2,6,1], T=1, returnt the longest strict subarray. **strict subarray**: any two element in the subarray, the absolute value of their difference <= T.
+**思考** 这题算是吃大亏了，主要问题在于对sliding问题的思路不够及时。给暴力算法的时候呢，我其实已经意识到是需要在遍历j的过程中维护一个min和max，只要min和max只差小于T就行，但问题就在于没有及时的意识到我其实可以缩小这个窗口，只要保证缩小的过程中依旧能知道窗口里所有元素的min和max就行。
+```java
+public static getLongestStrictSubarray(int[] array, int T){
+    int n= array.length;
+    TreeMap<Integer, Integer> window = new TreeMap<>();
+    int left=0, right=0;
+    int res = 1;
+    while(right<n){
+        window.put(array[right], right);
+        while(window.lastKey() - window.firstKey() > T){
+            res =  Math.max(res, right-left);
+            int cur = array[left];
+            int lastIdx = window.get(array[left]);
+            if(array[left]==window.lastKey() || array[left]==window.firstKey()){
+                if(window.get(array[++left]) < lastIdx)
+                    window.remove(array[left]);
+            }
+
+            window.remove(cur);
+        }
+        right++;
+    }
+}
+```
+
 ### 最小覆盖子串
 [76 最小覆盖子串](https://leetcode.com/problems/minimum-window-substring/) 
 
@@ -231,6 +260,72 @@ var minWindow = function(s, t) {
     return minLen == Number.MAX_VALUE? '' : res;
 };
 ```
+### Square面试真题
+> 这题的第一问是leetcode[这道题](https://leetcode.com/problems/maximum-average-subarray-i/)的变种，给你一个数组比如说`nums = [1.0,12.0,-5.0,-6.0,50.0,3.0]`，再给你一个窗口值`k = 2`，让你找moving average，比如说例子中的数字就会返回这个result数组：`[1.0,6.5,3.5,-5.5,22.0,26.5]`。
+> 这题是典型的的**滑动窗口老猛男**题，套模板就好了。
+```java
+class Solution{
+    public int getMovingAverages(double[] array, int k){
+        int n = array.length;
+        int right=0;
+        int[] res = new int[n];
+        int sum = 0;
+        while(right<n){
+            if(right>=k){
+                sum -= array[right-k];
+            }
+            sum += array[right];
+
+            int size = right>=k?k:right+1;
+            res[right] = (double) Math.round(sum/size * 100) / 100;
+        }
+
+        return res;
+    }
+}
+```
+> 这题第二问followup是这样子的，现在再给你一个输入参数叫pct=0.05，比如说如果你新加入一个元素之后的moving average于之前的moving average的绝对值差超过了这个pct，那说明你直接跳过这个元素。这次你就不能单纯的靠一个right指针打天下了，而是需要清楚地知道目前选的元素是啥，这就需要一个list来维护一个window。
+```java
+class Solution{
+    public int getMovingAverages(double[] array, int k, double pct){
+        int n = array.length;
+        int right=1;
+        int[] res = new int[n];
+        res[0] = array[0];
+        List<Double> window = new ArrayList<>();
+        window.add(array[0]);
+        int sum = 0;
+        while(right<n){
+            if(right>=k){
+                sum -= array[right-k];
+            }
+            sum += array[right];
+
+            int size = window.size()>=k?k:window.size()+1;
+            double potentialAvg = (double) Math.round(sum/size * 100) / 100;
+            double preAvg = res[right-1];
+
+            if(Math.abs(potentialAvg-preAvg)/preAvg <= pct){
+                //maintain window
+                window.add(array[right]);
+                if(window.size()>k)
+                    window.remove(0);
+                res[right++] = potentialAvg;
+            }
+            else {
+                //reset sum
+                sum = preAvg*window.size();
+                res[right++] = preAvg;
+            }
+        }
+
+        return res;
+    }
+}
+```
+
+> 这题第三问followup是bonus，很可惜我面试时候没做到。不过我猜应该是这样的：**这次你不要通过pct判断是否要加入，而是把window里比当前要加入的元素最接近的值踢走**，这样来算moving average。这里的思路也很直白，就是要用TreeSet来维护这个window了，用PQ不好使，因为要踢走/删除元素。
+
 ### 字符串的排列
 [567 字符串的排列](https://leetcode.com/problems/permutation-in-string/) 
 

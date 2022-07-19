@@ -12,6 +12,10 @@
 * [Narvar - 设计一个多租户Saas平台的core](#设计一个多租户Saas平台的core)
 * [Amazon - 设计一个产品页面点击量的analytics产品](#设计一个产品页面点击量的analytics产品)
 * [Slack - 设计@Mentions](#设计@Mentions)
+* [Microsoft - 设计一个茶轴两个大log文件的交集的方案](#设计一个茶轴两个大log文件的交集的方案)
+* [Ripple - 设计银行支票账户](#设计银行支票账户)
+* [Uber - 设计Driver的heatmap](#设计Driver的heatmap)
+* [Wish - 设计给商家的账单生成系统](#设计给商家的账单生成系统)
 
 
 按套路来讲吧，先看看怎么回问面试官问题。

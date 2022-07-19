@@ -76,6 +76,7 @@ private int getPriority(String str) {
 1. [领扣575. 字符串解码](#字符串解码)
 1. [领扣1289. 原子的数量](#原子的数量) 
 1. [领扣367. 表达树构造](#表达树构造)
+1. [Uber面试真题](#Uber面试真题) 
 
 ### 逆波兰表达式求值
 [领扣424. 逆波兰表达式求值](https://www.lintcode.com/problem/424)
@@ -790,3 +791,74 @@ public class Solution {
 
 ### 字符串的最短长度编码
 [领扣885. 字符串的最短长度编码](https://www.lintcode.com/problem/885)
+
+
+### Uber面试真题
+> **原题**：给你一个csv的内容，让你parse成key-value的集合，例如：
+```js
+//input
+column1,column2
+"Hilary",7
+"Tonna,Marc","java"
+"Bryce,Beverly","kid\"s"
+
+//output
+{
+    {
+        "column1": "Hilary",
+        "column2": "7"
+    },
+    {
+        "column1": "Tonna,Marc",
+        "column2": "java"
+    },
+    {
+        "column1": "Hilary",
+        "Bryce,Beverly": "kid"s"
+    }
+}
+```
+> **思路** 典型的字符串分治法，那就是找每一层的开头和结尾。
+>
+>
+```java
+class Parser {
+    public static List<Map<String, String>> parse(String[] csv){
+        List<String> headers = new ArrayList<>();
+        parseOneLine(headers, csv[0]);
+
+        List<Map<String, String>> results = new ArrayList<>();
+        for(int i=1; i<csv.length; i++){
+            List<String> parsed = new ArrayList<>();
+            parseOneLine(parsed, csv[0]);
+            Map<String, String> parsedMap = new HashMap<>();
+            for(int j=0; j<headers.size(); j++){
+                parsedMap.put(headers.get(j), parsed.get(j));
+            }
+            results.add(parsedMap);
+        }
+
+        return results;
+    }
+
+    private static void parseOneLine(List<String> result, String line){
+        if(line==null || line.isEmpty()) return;
+        
+        char target = line[0]=='"'?'"':',';
+        //int begin = line[0]=='"'?1:0;
+        int i=1;
+        for(; i<line.length(); i++){
+            if(line.charAt(i)==target && line.charAt(i-1) != '\\'){
+                result.add(line.substring(0, i));
+                break;
+            }
+        }
+
+        int end = line[0]=='"'?i+2:i+1;
+        String suffix = line.substring(end);
+        parseOneLine(result, suffix);
+    }
+
+}
+
+```

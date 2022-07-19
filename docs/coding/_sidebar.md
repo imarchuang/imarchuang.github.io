@@ -17,6 +17,7 @@
 ** [岛屿](./coding/classic/islands)
 ** [扫描线](./coding/classic/sweep)
 ** [递归的思路解链表题](./coding/linkedlist/kgroupreverse)
+** [n^2的优化](./coding/classic/n2_tolower)
 * [二叉树](./coding/tree/index)
 ** [二叉树遍历与分治](./coding/tree/traversal)
 ** [后序遍历位置分治](./coding/tree/postorder)

@@ -40,13 +40,12 @@ public class MyClass {
       
       //int array 转string 打印数组
       int[] ints = new int[]{1,2,3,4};
-      
       System.out.println(Arrays.toString(ints)); //[1, 2, 3, 4]
       System.out.println(IntStream.of(ints).mapToObj(Integer::toString).collect(Collectors.joining(""))); //1234
-      
-      //List of ints转string
       System.out.println(Arrays.stream(ints).mapToObj(Integer::toString).collect(Collectors.joining(""))); //1234
       
+      //List of ints转string
+
       //String array 转string
       String[] strs = new String[]{"ab", "cd", "ef"};
       System.out.println(String.join("", strs)); //abcdef
@@ -59,7 +58,7 @@ public class MyClass {
       System.out.println(Arrays.stream(ints).mapToObj(Integer::toString).collect(Collectors.joining(""))); //1234
       
       
-      //int array 里找最大最小，已经算sum
+      //int array 里找最大最小，算sum
       int[] ints2 = new int[]{1,2,3,4,5,6};
       System.out.println(IntStream.of(ints2).min().getAsInt()); //1
       System.out.println(Arrays.stream(ints2).min().getAsInt()); //1
@@ -72,7 +71,7 @@ public class MyClass {
       System.out.println(Arrays.stream(ints2).sum()); //21
       
       //int List 里找最大最小，已经算sum
-      List<Integer> intsL2 = Arrays.stream(ints2).boxed().collect(Collectors.toList());
+      List<Integer> intsL2 = Arrays.stream(ints2).boxed().collect(Collectors.toList());//1->2->3->4->5->6
       System.out.println(Collections.min(intsL2)); //1
       System.out.println(Collections.max(intsL2)); //6
       System.out.println(intsL2.stream().reduce(0, (a, b) -> a + b)); //21
