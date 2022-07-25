@@ -28,6 +28,7 @@
 >刷题列表：
 >1. [Twilio面试真题](#Twilio面试真题)
 >1. [Rippling面试真题](#Rippling面试真题)
+>1. [Flexport面试真题](#Flexport面试真题)
 >1. [380. O(1)时间插入、删除和获取随机元素](#获取随机元素) https://leetcode.cn/problems/insert-delete-getrandom-o1/
 >1. [710. 黑名单中的随机数](#黑名单中的随机数) https://leetcode.cn/problems/random-pick-with-blacklist/
 >1. [528. 按权重随机选择](#按权重随机选择) https://leetcode.cn/problems/random-pick-with-weight/
@@ -144,6 +145,52 @@ class MetricsCounter {
 
         return res;
     }
+}
+```
+
+### Flexport面试真题
+> **原题** 题目给的特别清晰，说给你一个Shipment，shipment里包含不同的dimensions，比如说`{{"kgs": 4},{"cm": 6},{"crew": 2}}`，再给你一个叫做RateScheduler的东西，里面有各个dimension的单价，比如说`{{"kgs": 6},{"cm": 4},{"crew": 100}}`，让你写一个函数来就是一个shipment的总价。
+>
+> **思路** 当然原题其实写的比较含蓄，但是核心意思呢也就那样。主要就是考你Map的用法把这两个abstraction给包起来。
+>
+> **Followup** followup也很直白，说如果现在RateScheduler的规则变了，说RateScheduler里变复杂了，现在给出的规则是这样的：包裹的kgs那项呢，不是一个单价了，而是变成了这样：包裹小于6kgs就按4收费，包裹大于6kgs小于9kgs就按6收费，包裹大于9kgs就按13收费。
+>
+> 这里为了简化，就直接把followup的代码一起展示了。
+```java
+class Shipment{
+    int id;
+    Map<String, Integer> dimensions = new HashMap<>();
+}
+
+class RateScheduler{
+    Map<String, Integer> costs = new HashMap<>();
+    Map<String, TreeMap<Integer, Integer>> breakCosts = new HashMap<>();
+}
+
+class CostCalculator{
+
+    int getCosts(Shipment shipment, RateScheduler rateScheduler){
+        int res = 0;
+        for(String key : shipment.dimensions.keySet()){
+            if(breakCosts.containsKey(key)){
+                int units = shipment.dimensions.get(key);
+                TreeMap<Integer, Integer> breakCost = breakCosts.get(key);
+                int unitCost = breakCost.higherEntry(units-1);
+                res += unitCost*units;
+                continue;
+            }
+
+            if(costs.containsKey(key)){
+                int unitCost = costs.get(key);
+                int units = shipment.dimensions.get(key);
+                res += unitCost*units;
+                //continue;
+            }
+
+        }
+        return res;
+    }
+
 }
 ```
 
