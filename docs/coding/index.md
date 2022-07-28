@@ -17,12 +17,15 @@
 1. **Microsoft**: 
     * 第一次是Viva的一个职位，说实话面的很不错，只不过他们可能是本来对外招也就是走走流程，最后内部调人了；
     * 第二次面的是Teams的职位，电面挂了；总的感觉Microsoft的面试很不规则，也不系统；
-1. **Ripple**:
+    * 第二次面的是Azure CSA的职位，感觉有点扯，基本上就没费劲儿就拿到offer了，tc包还算不错，中规中矩，base 180k，bonus 0-30%(平均值15%)，股票RSU4年给140k USD，然后signing bonus给75k(第一年40k，第二年35k)；大约28万加币的包，很微软！
+1. **Ripple**: 一切都挺顺利，电面和on-site都不错，很喜欢System Design的那个面试官Ryan，就是设计一个虚拟的bank account；tc包挺不错了，给了Staff，base 265k，bonus 0%，股票Private RSU4年给725k USD(其实依据新的valuation这个应该是到月900k)，然后signing bonus给40k(第一年20k，第二年20k)；大约60万加币的包。
 1. **Snowflake**: 两轮电面都不错，只不过hiring slowdown了；
-1. **Rippling**:
+1. **Rippling**: 一切都挺顺利，电面时候followup题有点难，但是自己也算是磕磕绊绊的回答上来了，on-site就很普通，System Design的题挺有意思，就是设计apple news，跟newsfeed是变了个问法；tc包非常不错，给了L7，base 265k，bonus 0%，股票Private RSU4年给725k USD(其实依据新的valuation这个应该是到月900k)，然后signing bonus给40k(第一年20k，第二年20k)；大约60万加币的包。
 1. **Uber**:
 1. **Oracle**:
 1. **Robinhood**: 没开始面呢，就hiring slowdown了；
+1. **Convoy**:
+1. **Convoy**:
 1. **Convoy**:
 
 ![](./pictures/cover.png)
