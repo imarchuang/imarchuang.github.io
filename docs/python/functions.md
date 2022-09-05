@@ -47,5 +47,12 @@ def modify_global():
 modify_global()
 print(f'x after modified by function: {x}') # hello
 
+# In python, everything is an object (aka, no primitives)
+# In python, arguments is always 'pass-by-reference'
+# Instead, primitives is treated as immutable objects, strings are IMMUTABLE too!
+
+
+# pure function: stateless function, depending only on the inputs (arguments), no side-effect!
+
 ```
 
