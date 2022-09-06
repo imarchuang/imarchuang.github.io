@@ -116,5 +116,48 @@ nums = [] # this will create a new list which is different from the original num
 nums = [2,3,5,7,11,13,17,19]
 numbers[::2] = [100, 100, 100, 100] # [100,3,100,7,100,13,100,19]
 
+nums = [2,3,5,7,11,13,17,19]
+del nums[-1] # [2,3,5,7,11,13,17], delete the last element of original array in nums
+del nums[0:2] # [5,7,11,13,17], delete the first two elements of original array in nums
+del nums[::2] # [7,13], delete the oddly numbered index elements of original array in nums
+del nums[:] # [], delete all the elements in the original list
+del nums # delete the whole variable
+
+# PASS sequence to function (python always pass by reference)
+def modify_elements(items):
+    for i in range(len(items)):
+        items[i] *= 2
+
+nums = [10, 3, 7, 1, 9]
+modify_elements(nums) # nums is now: [20, 6, 14, 2, 18]
+
+modify_elements((10, 20, 30))) # TypeError: 'tuple' object does not support item assignment
+
+# SORTING sequences (list or tuple)
+nums = [10, 3, 7, 1, 9]
+nums.sort() # nums is now: [1,3,7,9,10]
+nums.sort(reverse=True) # nums is now: [10,9,7,3,1]
+
+ascending_nums =  sorted(nums) # this create new sorted list, and original list is not changed 
+
+letters = 'fafaefad' # String is NOT mutable in python
+ascending_letters = sorted(letters) # ['a','a','a',...]
+
+colors = ('red', 'orange', 'yellow', 'green', 'blue') # tuple is NOT mutable in python
+ascending_colors = sorted(colors) # return as LIST: ['blue', 'green', 'orange', 'red', 'yellow']
+descending_colors = sorted(colors, reverse=True) # return as LIST: [...]
+
+# Searching in sequences: list, tuple, string
+nums = [3,7,1,4,2,8,5,6]
+nums.index(5) #6, return the first occurance of the target number 5
+nums *= 2 # concatenate itself: [3,7,1,4,2,8,5,6,3,7,1,4,2,8,5,6]
+nums.index(5,7) #14, return the first occurance of the target number 5 starting from index 7 (inclusive)
+nums.index(7,0,4) #1, return the first occurance of the target number 7 starting from index 0 (inclusive) to ending index 4(exlusive)
+
+1000 in nums # False
+999 not in nums # True
+nums.index(100) # ValueError
+
+
 
 ```
