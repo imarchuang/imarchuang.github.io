@@ -233,7 +233,19 @@ list(map(lambda x: x ** 2, nums)) # map is a LAZY operation, and list() actualiz
 list(map(lambda x: x ** 2, filter(lambda x: x % 2 != 0, nums))) # [9,49,1,81]
 [item ** 2 for item in nums if x % 2 != 0] # [9,49,1,81]
 
+# colors = ['Red', 'orange', 'Yellow', 'green', 'Blue']
+min(colors, key=lambda s: s.lower()) # 'Blue'
+max(colors, key=lambda s: s.lower()) # 'Yellow'
 
+nums = [10, 3, 7, 1, 9, -8, 4]
+reversed_nums = [item ** 2 for item in reversed(nums)] # reversed is a LAZY operation, [16, 64, 81, 1, 49, 9, 100]
 
+# ZIP
+names = ['Marc, 'Bryce', 'Tonna', 'Beverly']
+grades = [3.5, 4.0, 3.75, 3.90]
+
+for name, gpa in zip(names, grades):
+    # zip is a LAZY operator
+    print(f'Name={name}: GPA={gpa}')
 
 ```
