@@ -94,7 +94,27 @@ l1 <= l4 # True
 num1, num2, num3 = [2,3,5] # 
 num1, num2, num3 = range(10, 40, 10) # 
 
+# `shallow` copy of lists subsets via slicing
+nums = [2,3,5,7,11,13,17,19]
+nums[2:6] # [5,7,11,13], contains copies of references to the original value
+nums[:6] # [2,35,7,11,13], contains copies of references to the original value
+nums[6:] # [17,19], contains copies of references to the original value
+nums[:] # shallow copy of the original list
+nums[::2] # [2,5,11,17], step size of 2, contains copies of references to the original value
+nums[::-1] # [19,17,13,11,7,5,3,2], reverse of original list, contains copies of references to the original value
+nums[-1:-9:-1] # [19,17,13,11,7,5,3,2],reverse of original list
+
+nums = [2,3,5,7,11,13,17,19]
+# modify elements from lists
+nums[0:3] = ['first', 'second', 'thrid'] # ['first', 'second', 'thrid', 7,11,13,17,19]
+
 # delete elements from lists
-nums = 
+nums[0:3] = [] # [7,11,13,17,19]
+nums[:] = [] # delete all elements from list
+nums = [] # this will create a new list which is different from the original nums list
+
+nums = [2,3,5,7,11,13,17,19]
+numbers[::2] = [100, 100, 100, 100] # [100,3,100,7,100,13,100,19]
+
 
 ```
