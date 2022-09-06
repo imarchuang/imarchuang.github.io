@@ -201,7 +201,7 @@ stack.pop() # remove and return 'green'
 list2 = [item for item in range(1,6)] # [1,2,3,4,5]
 list3 = [item ** 3 for item in range(1,6)] # [1,8,27,64,125]
 list4 = [item for item in range(1,11) if item%2 == 0] # [2,4,6,8,10]
-list4 = [(item, item ** 3) for item in range(1,6)] # [(1,1),(2,8),(3,27), (4,64), (5,125)]
+list5 = [(item, item ** 3) for item in range(1,6)] # [(1,1),(2,8),(3,27), (4,64), (5,125)]
 
 colors = ['red', 'orange', 'yellow', 'blue']
 colors2 = [item.upper() for item in colors] #['RED', 'ORANGE', 'YELLOW', 'BLUE']
@@ -217,6 +217,23 @@ square_odds = (x**2 for x in nums if x%2!=0) # this is a generator operation
 # <generator object <genexpr> at ....>
 
 # Filter, Map and Reduce
+nums = [10, 3, 7, 1, 9, -8, 4]
+def is_odd(x):
+    return x % 2 != 0
+
+list(filter(is_odd, nums)) # filter is a LAZY operation, and list() actualize it: [3,7,1,9]
+[item for item in nums if is_odd(item)] # [3,7,1,9]
+
+list(filter(lambda x: x % 2 != 0, nums)) # filter is a LAZY operation, and list() actualize it: [3,7,1,9]
+
+list(map(lambda x: x ** 2, nums)) # map is a LAZY operation, and list() actualize it: [100, 9, 49, 1, 81, 64, 16]
+[item ** 2 for item in nums] # [100, 9, 49, 1, 81, 64, 16]
+
+# mix map and filter
+list(map(lambda x: x ** 2, filter(lambda x: x % 2 != 0, nums))) # [9,49,1,81]
+[item ** 2 for item in nums if x % 2 != 0] # [9,49,1,81]
+
+
 
 
 ```
