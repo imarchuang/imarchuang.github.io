@@ -158,6 +158,65 @@ nums.index(7,0,4) #1, return the first occurance of the target number 7 starting
 999 not in nums # True
 nums.index(100) # ValueError
 
+colors = ['orange', 'yellow', 'green']
+colors.insert(0, 'red') # ['red', 'orange', 'yellow', 'green'], insert to any position
+colors.append('blue') # ['red', 'orange', 'yellow', 'green', 'blue']
+
+colors.extend(['indigo','violet']) # ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
+
+# Adding
+sample_list = []
+s = 'abc'
+sample_list.extend(s) # ['a', 'b', 'c']
+
+t = (1,2,3)
+sample_list.extend(t) # ['a', 'b', 'c', 1,2,3]
+
+sample_list.extend((4,5,6)) #['a', 'b', 'c', 1,2,3,4,5,6]
+
+# REMOVING
+colors.remove('green') # ['red', 'orange', 'yellow', 'blue', 'indigo', 'violet'], it removes the first occurance of a element
+colors.clear() # remove all the elements
+
+# Counting
+responses = [1,2,5,4,3,5,2,1,3,3,1,4,3,3,3,2,3,3,2,2]
+for i in range(1,6):
+    print(f'{i} appears {responses.count(i)} times in responses')
+
+# Reversing
+colors = ['red', 'orange', 'yellow', 'green', 'blue']
+colors.reverse() # reverse in place
+
+# Shallow coping
+copied_list = colors.copy() # a shallow copy of the original list
+
+# Stack, pop
+stack = []
+stack.append('red')
+stack.append('green')
+
+stack.pop() # remove and return 'green'
+
+# List Comprehensions, replace your for loops, this is GREEDY operation
+list2 = [item for item in range(1,6)] # [1,2,3,4,5]
+list3 = [item ** 3 for item in range(1,6)] # [1,8,27,64,125]
+list4 = [item for item in range(1,11) if item%2 == 0] # [2,4,6,8,10]
+list4 = [(item, item ** 3) for item in range(1,6)] # [(1,1),(2,8),(3,27), (4,64), (5,125)]
+
+colors = ['red', 'orange', 'yellow', 'blue']
+colors2 = [item.upper() for item in colors] #['RED', 'ORANGE', 'YELLOW', 'BLUE']
+
+
+# Generator Expressions, this is LAZY operation
+nums = [10, 3, 7, 1, 9, -8, 4]
+for value in (x**2 for x in nums if x%2!=0):
+    print(value, end=' ')
+# 9, 49, 1, 81
+
+square_odds = (x**2 for x in nums if x%2!=0) # this is a generator operation
+# <generator object <genexpr> at ....>
+
+# Filter, Map and Reduce
 
 
 ```
