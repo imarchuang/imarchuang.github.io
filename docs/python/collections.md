@@ -249,3 +249,57 @@ for name, gpa in zip(names, grades):
     print(f'Name={name}: GPA={gpa}')
 
 ```
+
+# Dictionary and Set
+```python
+# Dict, key must be immutable
+country_codes = {'Finland':'fi'. 'South Africa':'za', 'Nepal':'np'}
+
+country_codes['Finland'] # 'fi'
+len(country_codes) # 3
+if country_codes # test if the dict is empty
+country_codes.clear() # remove all elements in dict
+len(country_codes) # 0
+
+# iterating dict
+days_per_month = {'Jan':'31', 'Feb':'28', 'Mar':'31'}
+# each key,val pair is a tuple, and unpacking here
+for month, days in days_per_month:
+    print(f'{month} has {days} days')
+months = {'Jan':'1', 'Feb':'2', 'Mar':'3'}
+for month_name in months.keys():
+    print(month_name, ending=' ')
+for month_number in months.values():
+    print(month_number, ending=' ')
+
+month_view = months.keys() # this will contain changes subsequently made
+
+roman_numerals = {'I':'1', 'II':'2', 'II':'3', 'V':'5', 'X':'100'}
+roman_numerals['X']=10 # dict is mutable, can change corresponding value
+roman_numerals['L']=50 # if key does not exist, it will be added at the end
+del roman_numerals['III'] # remove a key,val pair
+roman_numerals.pop('X') # remove by key, and return the value of that key
+roman_numerals.pop('III') # KeyError exception
+
+country_codes={}
+country_codes.update({'South Africa':'za'})
+# any collections with 2 element can use the syntax below
+country_codes.update(Australia='au'}) # {'South Africa':'za', 'Australia':'au'}}
+
+roman_numerals.get('III') # no exception raised, return None
+roman_numerals.get('III', 'DefaultVal') # get with default value
+
+#membership testing, keys are case sensitive
+if 'V' in roman_numerals: # return True
+if 'III' in roman_numerals: # return False
+
+
+
+# dict and set are MUTABLE
+
+# dict comprehension
+
+
+
+
+```
