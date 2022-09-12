@@ -298,6 +298,13 @@ if 'III' in roman_numerals: # return False
 # dict and set are MUTABLE
 
 # dict comprehension
+months = {'Jan':'1', 'Feb':'2', 'Mar':'3'}
+# upon situation of key clashes, the last one wins
+months2 = {number: name for name, number in months.items()} 
+
+grades = {'Sue': [98, 87, 94], 'Bob': [84, 95, 91]}
+grades2 = {k: sum(v)/len(v) for k, v in grades.items()} # {'Sue':93.0, 'Bob':90.0}
+
 
 
 
