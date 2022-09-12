@@ -241,7 +241,7 @@ nums = [10, 3, 7, 1, 9, -8, 4]
 reversed_nums = [item ** 2 for item in reversed(nums)] # reversed is a LAZY operation, [16, 64, 81, 1, 49, 9, 100]
 
 # ZIP
-names = ['Marc, 'Bryce', 'Tonna', 'Beverly']
+names = ['Marc', 'Bryce', 'Tonna', 'Beverly']
 grades = [3.5, 4.0, 3.75, 3.90]
 
 for name, gpa in zip(names, grades):
