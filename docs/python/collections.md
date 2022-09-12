@@ -268,9 +268,9 @@ for month, days in days_per_month:
     print(f'{month} has {days} days')
 months = {'Jan':'1', 'Feb':'2', 'Mar':'3'}
 for month_name in months.keys():
-    print(month_name, ending=' ')
+    print(month_name, end=' ')
 for month_number in months.values():
-    print(month_number, ending=' ')
+    print(month_number, end=' ')
 
 month_view = months.keys() # this will contain changes subsequently made
 
@@ -307,6 +307,57 @@ grades2 = {k: sum(v)/len(v) for k, v in grades.items()} # {'Sue':93.0, 'Bob':90.
 
 
 
+
+
+```
+
+```python
+colors = {'red' ,'orange', 'yellow', 'green', 'red', 'blue', 'green'} # {'red' ,'orange', 'yellow', 'green', 'blue'}
+# !!! the order is not the order inserted!!!
+
+if 'red' in colors: # True
+if 'purple' in colors: # False
+
+for color in colors:
+    print(color.upper(), end=' ')
+
+numbers = list(range(10)) + list(range(5))
+set(numbers) # remove duplicates
+
+#empty set
+s = set()
+
+# set are mutable, but the element in set are IMMUTABLE/Hashable
+
+# frozen set -> IMMUTABLE set
+
+# check if subset
+{1,3} < {3,5,1} # True
+{1,3}.issubset({3,5,1}) # {1,3} is actually a set object
+# check if superset
+{3,5,1} > {1,3} # True
+{3,5,1}.issuperset({1,3}) # {3,5,1} literal is actually a set object
+
+# set union
+{1,3,5} | {2,4,6,3} # {1,2,3,4,5,6}
+{1,3,5}.union({2,4,6,3})
+{1,3,5}.union([2,4,6,3]) # parameter could be sequence: list or tuple
+# set intersect
+{1,3,4} & {2,3,4} # {2,3}
+{1,3,4}.intersection({2,3,4}) # {2,3}
+# set diff
+{1,3,4} - {2,3,4} # {1}
+{1,3,4}.difference({2,3,4})
+# symmetric difference
+{1,3,5}^{2,3,4} # {1,2,4,5}
+{1,3,5}.symmetric_difference({2,3,4}) # {1,2,4,5}
+# is disjoint
+{1,2,5}.isdisjoint({2,4,6}) # True
+
+# augumented assignment
+# |=, &=, -=, ^=
+numbers = {1,3,5}
+numbers |= {2,3,4} # {1,2,3,4,5}
 
 
 ```
