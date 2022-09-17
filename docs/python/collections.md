@@ -1,5 +1,38 @@
 # Python关于集的数据结构
 
+## Strings: A Sequence
+```python
+#format string
+f'{17.489:.2f}' # 17.49
+f'{10:d}' # '10' format as decimal
+f'{65:c} {97:c}' # 'A a'
+f'{"hello":s} {7}' # 'hello 7' # everything is default to be eval as string
+f'{Decimal("1000000"):.3f}' # '10000000.000'
+f'{Decimal("1000000"):.3e}' # '1.000e+6'
+f'{Decimal("1000000"):.3E}' # '1.000E+6'
+
+# field width and alignment
+f'[{27:10d}]' # '[        27]'
+f'[{3.5:10f}]' # '[  3.500000]'
+f'[{"hello":10}]' # '[hello     ]' # default to left alignment
+f'[{27:<10d}]' # '[27        ]'
+f'[{3.5:<10f}]' # '[3.500000  ]'
+f'[{"hello":>10}]' # '[     hello]' # right alignment
+f'[{27:^10d}]' # '[    27    ]' # center alignment
+
+# numeric formatting
+f'{10:+d}' # '+10' format with sign
+f'[{10:+010d}]' # '[+000000010]' format with sign
+print(f'{27:d}\n{27: d}\n{-27: d}')
+#27
+# 27
+#-27
+f'{12345678:,d}' # '12,345,678'
+f'{123456.78:,.2f}' # '123,456.78'
+
+```
+
+## Sequence: Tuple & List
 ```python
 # TUPLE
 dice = ('A', 'B') # pack into a tuple
@@ -63,6 +96,7 @@ for index, value in enumerate(colors):
 
 ```
 
+## List
 ```python
 # LIST
 # Python does NOT have array (fixed length) data structure built in
@@ -250,7 +284,7 @@ for name, gpa in zip(names, grades):
 
 ```
 
-# Dictionary and Set
+## Dictionary and Set
 ```python
 # Dict, key must be immutable
 country_codes = {'Finland':'fi'. 'South Africa':'za', 'Nepal':'np'}
@@ -358,6 +392,20 @@ s = set()
 # |=, &=, -=, ^=
 numbers = {1,3,5}
 numbers |= {2,3,4} # {1,2,3,4,5}
+numbers.update(range(10)) # {0,1,2,3,4,5,6,7,8,9}
+nubmers.add(17) # {0,1,2,3,4,5,6,7,8,9,17}
+
+numbers.remove(3) # {0,1,2,4,5,6,7,8,9,17}
+numbers.remove(18) # KeyError
+
+numbers.disgard(18) # will not raise an exception
+numbers.pop() # remove a random element
+numbers.clear() # remove all elements
+
+# SET comprehension
+numbers = {0,1,2,3,4,5,6,7,8,9,9}
+evens = {item for item in numbers if item%2==0} # {0,2,4,6,8}
+
 
 
 ```
