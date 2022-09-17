@@ -162,38 +162,53 @@ StopIteration
 >
 > 最后再说一个关键点，generator对象是**只能被循环一次**的。
 
->那么如果有参数呢？这就是Closure的用武之地了。
+> 就像iterator一样，实际应用中，你可能很少直接调用这么底层的`__next__()`函数，而是通常你会用for循环来调用generator对象。再说一点，你实践中定义的generator函数通常会有个for循环加终止条件。下面举例说明：
 ```python
-def smart_divide(func):
-    def inner(a, b):
-        print("I am going to divide", a, "and", b)
-        if b == 0:
-            print("Whoops! cannot divide")
-            return
+# for循环调用generator对象
+for item in my_gen():
+    print(item)
 
-        return func(a, b)
-    return inner
+# 定义generator对象
+def rev_str(my_str):
+    length = len(my_str)
+    for i in range(length - 1, -1, -1):
+        yield my_str[i]
 
+# For loop to reverse the string
+for char in rev_str("hello"):
+    print(char)
 
-@smart_divide
-def divide(a, b):
-    print(a/b)
-
-
->>> divide(2,5)
-I am going to divide 2 and 5
-0.4
-
->>> divide(2,0)
-I am going to divide 2 and 0
-Whoops! cannot divide
 ```
-> 那你是不是觉得每次都得知道要decorate的函数的输入参数，这样太局限了吧，没错，但是Python是Dynamic的语言嘛，解决方案就是`function(*args, **kwargs)`，示例如下：
+> 就像用lambda可以定义匿名函数一样，有时候你可能需要定义一个匿名的generator函数，这就需要用到generator expression，示例如下：
 ```python
-def works_for_all(func):
-    def inner(*args, **kwargs):
-        print("I can decorate any function")
-        return func(*args, **kwargs)
-    return inner
+# Initialize the list
+my_list = [1, 3, 6, 10]
+
+# square each term using list comprehension
+list_ = [x**2 for x in my_list]
+
+# 那么怎么用generator expression呢？就是把中括号变成括号就行了
+generator = (x**2 for x in my_list)
+
+print(list_) # [1, 9, 36, 100]
+print(generator) # <generator object <genexpr> at 0x7f5d4eb4bf50>
+
+print(next(a))
+print(next(a))
+print(next(a))
+print(next(a))
 ```
+> 上面Iterator示例中，我们考到了如何自定义一个`PowTwo`的class，那么如果用Generator的话，长什么样呢？
+```python
+def PowTwoGen(max=0):
+    n = 0
+    while n < max:
+        yield 2 ** n
+        n += 1
+```
+
+## Javascript Generator
+>Javascript里呢，Generator基本上跟Python是一样的，只不过呢它的工程化实践可以说跟成熟一点。跟Python里直接用双下划线(`'_'`)函数这么裸的协议来实现，Javascript里有个叫做**Symbol**的概念，这个**Symbol**呢，就把他自己和其他用户定义的property区分开来了。
 >
+```js
+```
