@@ -108,6 +108,29 @@ for(let hobby of person){
 ```
 > 你体会一下，这是不是比Python更巧妙一点？Javascript用一个特殊的property`Symboal.iterator`来标记这个object是否为一个iterable，然后它的iterator本身实现了`next()`函数，这个next函数呢实际上返回item的值，也同时返回done这个flag来标记是否还有下一个item。
 
+> 延伸一下，这个iterator属性，他不知定义了`next()`函数，还有两个函数：
+>1. `throw()`函数
+>1. `return()`函数
+```js
+//定义一个generator函数
+function *myGen(end){
+    for(let i=0; i<end; i++){
+        try{
+            yield i;
+        } catch(e) {
+            console.log(e);
+        }
+    }
+}
+
+let it = myGen(2);
+console.log(it.next());
+console.log(it.throws('An error ocurred'));
+console.log(it.next());
+console.log(it.return('Stop the loop by return'));
+console.log(it.next());
+``
+
 ## Python Generator
 >Python里的Generator是iterator的一个延伸，我们就看看直接看个简单例子吧：
 ```python
@@ -208,7 +231,32 @@ def PowTwoGen(max=0):
 ```
 
 ## Javascript Generator
->Javascript里呢，Generator基本上跟Python是一样的，只不过呢它的工程化实践可以说跟成熟一点。跟Python里直接用双下划线(`'_'`)函数这么裸的协议来实现，Javascript里有个叫做**Symbol**的概念，这个**Symbol**呢，就把他自己和其他用户定义的property区分开来了。
+>Javascript里呢，Generator的作用基本上跟Python是一样的。不过语法上是不同的
 >
 ```js
+function *select() {
+    yield 'House';
+    yield 'Garage';
+}
+
+let it = select(); //这里返回的是一个generator
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+
+
+let obj = {
+    [Symbol.iterator] : gen(2)
+}
+
+function *gen(end) {
+    for(let i=0; i<end; i++){
+        yield i;
+    }
+}
+
+for(let ele of obj){
+    console.log(ele);
+}
 ```
