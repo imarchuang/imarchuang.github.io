@@ -6,6 +6,8 @@
 >1. operator overloading在Python里的操作还是很有趣的；
 >
 
+## 再说说命名空间NameSpace
+
 ## 简单示例
 ```python
 from decimal import Decimal
@@ -74,8 +76,50 @@ class Timer:
 ```
 
 ## 继承
+>
+>
+>
+>
+```python
+class Parent:
+    def __init__(self, p1, p2):
+        ...
+
+    def do_something(self):
+        ...
+
+class Child(Parent):
+    def __init__(self, p1, p2, extra_prop):
+        super().__init(p1, p2)
+        self.extra_prop = extra_prop
+
+    def do_something(self):
+        super().do_something()
+        # do something unique to child
+        ...
+
+issubclass(Child, Parent) # True
+c = Child('p1', 'p2', 'extra')
+isinstance(c, Child) # True
+isinstance(c, Parent) # True
+
+p = Parent('p1.1', 'p2.2')
+
+l = [c, p]
+for item in l:
+    item.do_something()
+
+```
 
 ## 多态
+> 动态语言的一个最大好处就是duck-typing，
 
-## method overloading
+## operator overloading
+>这个东西似乎只有Python支持，其他的dynamic语言比如说Javascript都不support，静态语言比如Java里也没有这玩意儿。
+>
+>举个例子，如果你要overload这个运算符`+`，那么在你的class里你只需要把`def __add__(self, right)`给override就好了，同理你只需要把`def __iadd__(self, right)`给override了就能用`+=`运算符在你的class上了。
+>
 
+## Named Tuple
+
+## Data Class
