@@ -121,5 +121,69 @@ for item in l:
 >
 
 ## Named Tuple
+>Tuple本质上是个array，因为你不可以随意的扩展或者缩小这个sequence。
+>
+>Name Tuple更像是一个纯数据container，本质上是一个Key-Value pairs组合。你应该很容易想到数据库里的Table概念，尤其是如果你是只读模式，不对数据进行修改，这个namedtuple可以说就非常好用了。即使你需要对namedtuple实例内的数据进行修改，那也不是不可以。因为**tuple本身虽然是imutable的**，但是别忘了tuple内的数据item是reference嘛，所以你依然可以对数据进行修改的。
+
+```python
+from collections import namedtuple
+
+# 给一个名字，然后给一个栏位名字的list
+Card = namedtuple('Card', ['face', 'suit'])
+
+# 现在Card基本上就是一个class了，你可以实例对象出来
+card = Card(face='Ace', suit='Spades')
+# 实例card之后，namedtuple定义的栏位都可以直接当做类似property来读了
+card.face # 'Ace' 
+card.suit # 'Spades' 
+
+# 给一个sequence，你可以很容易的转成namedtuple的实例
+values = ['Queen', 'Hearts']
+card._make(values)
+
+# namedtuple实例可以转成OrderedDict
+card._asdict()
+# OrderedDict([('face', 'Queen'), ('suit', 'Hearts)])
+
+```
 
 ## Data Class
+>Python里的dataclass就是类似于Java里的lombok，就是一个code generation的框架。
+>
+>1. 你需要对所有的property指定数据类型
+```python
+from dataclasses import dataclass
+from typing import ClassVar, List
+
+@dataclass(order=True)
+class Card:
+    FACES: ClassVar[List[str]] = ['Ace', '2', '3'...]
+    SUITS: ClassVar[List[str]] = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
+
+    face: str
+    suit: str
+
+    @property
+    def image_name(self):
+        """Return the Card's image file name"""
+        return str(self).replace(' ', '_') + '.png'
+
+    def __str__(self):
+        return f'{self.face} of {self.suit}'
+
+    def __format__(self, format)
+        return f'{str(self):{format}}'
+
+# 看看怎么用这个dataclass
+c1 = Card(Card.FACES[0], Card.SUITS[3])
+c1.face # 'Ace'
+c1.suit # 'Spades'
+c1.image_namme # 'Ace_of_Spades.png'
+
+c1 = Card(face='Ace', suit='Spades')
+c1 == c2 # True
+
+c3 = Card(Card.FACES[0], Card.SUITS[0])
+c1 == c3 # False
+
+```
