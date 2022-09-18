@@ -1,58 +1,81 @@
-# Python的函数是一等公民
+# Python里的面向对象编程
 
+>Python和JS都是是动态语言，所以严格意义上不能完全符合面向对象OOD的语义。
+>1. Python里没有所谓的protect或者private这种玩意，只能从编程规则上进行类似的操作；
+>1. 动态语言嘛，并没有严格的继承inheritance，但是从语法上可以实现类似的操作；但是在实际运行中一定是code generation之类的操作，Javascript也是如此；
+>1. operator overloading在Python里的操作还是很有趣的；
+>
+
+## 简单示例
 ```python
-# DEFAULT parameter values
-def rectangle_area(length=1, width=3):
-    """Return a rectangle's area"""
-    return length*width
+from decimal import Decimal
+# 每个class都有一下两种形式的属性，一种叫做Property，一种叫做method
+class Account:
+    """Account class for maintaining a bank account balance"""
 
-rectangle_area() # 3
-rectangle_area(10) # 30
-rectangle_area(10, 5) # 50
+    # constructor 叫做 __init__
+    # Python里不用this这个关键词，而是叫做self
+    def __init__(self, name, balance):
+        if balance < Decimal('0.00'):
+            raise ValueError('Initial balance must be >= 0.00.')
+        # 这里就是隐式的定义了这个object的property
+        self.name = name
+        self.balance = balance
 
-# KEYWORD argument
-rectangle_area(length=3, width=5) # 15
-rectangle_area(width=5, length=3) # 15
-rectangle_area(width=5) # 5
+    def desposit(self, amount):
+        """Deposit money to the account"""
+        if balance < Decimal('0.00'):
+            raise ValueError('amount must be >= 0.00.')
+        self.balance += amount
 
-# 如果你只想让某些argument有default value，那么你一定要把这些arguments放到没有default value的那些arguments之后
-def rectangle_area(length, width=3):
-    return length*width
+# Python里不用new这个关键词
+account1 = Account('John Green', Decimal('50.00'))
+print(account1.name)
 
-# 只有这样，你才可以无脑的这么叫函数
-rectangle_area(5) # 15
-
-def average(*args):
-    return sum(args) / len(args)
-
-# 这个*args和**kwargs要放到函数签名的最后两个arguments
-
-average(5, 10, 15) #10
-average(5, 10, 15, 20) #12.5
-
-grades = [80, 90, 100, 78, 45]
-#求average, 这时候你要用到所谓的unpacking的技巧了
-# 把iterable前面加个*，意思就是upacking这个list了
-average(*grades)
-
-# SCOPING
-# by default, a function cannot mutate global variable values
-# to do this, you have to apply the `global` keyword
-x = 7
-def modify_global():
-    global x
-    x = 'hello'
-    print(f'x modified inside function: {x}')
-
-modify_global()
-print(f'x after modified by function: {x}') # hello
-
-# In python, everything is an object (aka, no primitives)
-# In python, arguments is always 'pass-by-reference'
-# Instead, primitives is treated as immutable objects, strings are IMMUTABLE too!
-
-
-# pure function: stateless function, depending only on the inputs (arguments), no side-effect!
-
+# 调用class里的method
+account1.deposite(Deciamal('25.53'))
 ```
+## 所谓的Scoping或者封装(encapsulation)应该怎么做
+>答案是Python里没有所谓的access control，就是说不存在public, protect或者private等关键字。
+>
+>那你应该怎么控制谁能access你的attributes呢？答案是你做不到，那就只能按照**约定俗称**的工程法则来进行规范了，最简单的工程法则就是用Naming Convention来进行规范。比如说，如果一个attribute它的名字是underscore“_”开始的话，那说明这个class的作者希望只能这个class来对这个attribute进行读写操作。
+>
+>一个underscore“_”不够，那么我要是用两个underscore“_”命名一个attribute呢？比如说你的class里定义了一个叫做`__private_data`的attribute，那么Python是否做些啥来保护这个attribute呢？答案是肯定的，Python做了一个叫做mangling的动作，乃就是将两个underscore“_”命名的attribute呢进行重命名，咋个重命名规则呢？很粗暴，那就是延长这个attribute的名字，比如说你的class叫做MyClass，那么这个`__private_data`的attribute就会被重命名为`_MyClass__private_data`，这样你就可以直接想起他attribute一样对`_MyClass__private_data`进行读写操作了，但是MyClass的作者确实不想你直接对`_MyClass__private_data`进行读写操作。
+>
+>说实话，Python确实不能够完全实现OOD里的所谓封装的概念，但是这个封装真的有那么重要吗？现在说说自己的感受吧。OOD里一个class很大程度上代表了一个现实里的一种物体，这个object对象呢，通常需要两种属性来描述这个现实世界的物体，也就是说状态(properties)和操作(可以是让外界操作自己状态的接口API，亦可以是跟外界物体交互的接口API)。在比较大的工程里，你会看到OOD里描述的实际物体呢，实际上都是比较复杂的物体，举个例子啊，比如说你的一个class描述的是ASML的光刻机，这个class那应该是复杂的。计算机世界呢，所有的概念都是对于相关物体的抽象，这个抽象呢就类似于一个容器，容器里存了各种一系列**强相关**属性，然后这个容器也提供了各种接口好让你知道容器里的属性状态是长啥样的并进行相关增删查改操作。**当你的脑子把一些强相关的东西封装成一个容器的之后呢**，你总是希望**控制**这个容器，你通常会希望你，你在调用这个容器接口的*之前*和*之后*做点啥，从最简单的记录自己调用过这个容器的接口，到检查自己的数据是否可以调用这个容器的接口，或者到自己希望调用这个容器接口之前呢加上自己的**管理法则**...
+>
+>还有一个工程规范，那就是Python本身并不存在Constant的概念，当你想表达类似Constant的概念的时候你，那你就吧你的变量名字全用大写字母，LoL
+
+## Property的getter和setter
+>
+>
+>
+```python
+class Timer:
+    def __init__(self, hour=0, minute=0, second=0):
+        # 如果你在这个class里没有吧hour定义成@property，那么这个attribute的名字就是hour
+        # 如果你定义了hour是@property，那么Python会自动创建一个叫做_hour的attribute，但你执行self.hour=时，你其实就是调用了@hour.setter
+        self.hour = hour # 0-23
+        self.minute = minute # 0-59
+        self.second = second # 0-59
+        ...
+    
+    @property
+    def hour(self, hour):
+        return self._hour
+
+    @hour.setter
+    def hour(self, hour):
+        if not (0<= hour <24):
+            raise ValueError(f'Hour ({hour}) must be 0-23')
+        self._hour = hour
+
+    ...
+```
+
+## 继承
+
+## 多态
+
+## method overloading
 
