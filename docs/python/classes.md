@@ -6,15 +6,33 @@
 >1. operator overloading在Python里的操作还是很有趣的；
 >
 
-## 再说说命名空间NameSpace
+## 说说命名空间NameSpace
+> 像是Java或者C#里，他们的scope定义层级会更复杂一些，比如说，你在某个MyClass定义一个method，如果你不用public去修饰的话，这个method是只能被class所在的package里的其他class（也包括自己）access的，Java里的package说白了就是folder directory，看你在文件系统的第几级决定你所在的package；另外呢，Java和C#里都提供了public, protected和private这些修饰词来显式的决定谁能access你创建的东西；
+>
+> Python吧对谁能access你创建的东西这事儿呢，相对比较宽松，也是遵循约定缩成法则的。基本上就是一个原则叫做NameSpace，这个NameSpace呢是有层级概念的，也就说你能看到你所在空间里的变量，也能看到比你所在空间更大的空间的*共享*变量。
+>
 >**LEGB**, 也就是说`locals` -->> `enclosing function` -->> `globals` -->> `__builtins__`，这些命名空间也很好理解：
->1. local: 函数本身的namespace，只记录当前函数内的对象；
->1. enclosing function: 当前函数的enclosing函数内所记录的对象；
->1. globals: Python模块(Module)的namespace，每个Module模块都有自己的namespace，记录模块内的class，function等；
+>1. **local**: 这是Python里最小的空间单元，使用于function或者method，你可以想象成村子里的一间房子。它是函数本身的namespace，只记录当前函数内的对象；在这个空间里，你的变量（可以是状态，也可以是内嵌函数）在你执行完函数之后会自动销毁；
+>1. **enclosing function**: 函数可以嵌套函数嘛，这个空间就是当前函数的enclosing函数内所记录的对象或者变量；
+>1. **globals**: Python模块(Module)的namespace，每个Module模块都有自己的namespace，记录模块内的class，function等，这里你可以想象global空间是个村庄；
 >       * global attribute `__name__`包含了这个Module模块的名字，比如说如果你直接run某个*.py的文件，`__main__`就是模块名字；
->1. `__builtins__`: python内置的namespace，在python解释器启动的时候创建，有很多内置函数；比如说input，
+>1. **`__builtins__`**: Python内置的namespace，在Python解释器启动的时候创建，有很多内置函数；比如说input，range，或者数据类型比如说int，float，str等；这就是Python用上帝之手赋予所有村庄的功能；
+>1. **class**: 这个吧，当你从一个class里实例一个对象时候，class里定义的attributes都会被添加到实例对象上，让后当需要accesss这个实例对象的attribute时候，先从他的直属class命名空间里找，然后在从直属class的parent命名空间里找；Python允许你在实例对象上继续添加attributes，所以init完了，并非所有属性就都有了；
 >
 ```python
+z = 'global z'
+def print_vars():
+    y = 'local y in print_vars'
+    print(y)
+    print(z)
+
+# print 来自于`__builtins__`命名空间
+print_vars()
+# 1. print_vars会在global命名空间里被找到
+# 2. 然后遇到print函数，这会从`__builtins__`命名空间找到
+# 3. 然后发现print函数需要y，这会从`local`命名空间找到
+# 4. 然后又遇到print函数，这会从`__builtins__`命名空间找到
+# 5. 然后发现print函数需要z，这会从`global`命名空间找到
 
 ```
 
