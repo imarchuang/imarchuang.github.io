@@ -7,6 +7,16 @@
 >
 
 ## 再说说命名空间NameSpace
+>**LEGB**, 也就是说`locals` -->> `enclosing function` -->> `globals` -->> `__builtins__`，这些命名空间也很好理解：
+>1. local: 函数本身的namespace，只记录当前函数内的对象；
+>1. enclosing function: 当前函数的enclosing函数内所记录的对象；
+>1. globals: Python模块(Module)的namespace，每个Module模块都有自己的namespace，记录模块内的class，function等；
+>       * global attribute `__name__`包含了这个Module模块的名字，比如说如果你直接run某个*.py的文件，`__main__`就是模块名字；
+>1. `__builtins__`: python内置的namespace，在python解释器启动的时候创建，有很多内置函数；比如说input，
+>
+```python
+
+```
 
 ## 简单示例
 ```python
