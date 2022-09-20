@@ -1,143 +1,74 @@
-# 你懂python的function吗
+# Descriptor Protocol
 
-> 我先告诉你，nested function和high order function不是一回事！nested function是说你在一个function里嵌套在另一个function里，而high order function是说这个function里的某一个或者多个paramter是function类型。这两种风格在Python里各有用途：
->1. **nested function**可以让你实现closure，其实这个说法不太对，应该说nested function就是closure，是Python自带的功能；
->1. **high order function**可以让你实现decorator模式，这也是Python原生提供的一种便利；
+## Python食物链:: Attribute Lookup Chain
+> **敲黑板** 这部分内容非常重要，也是能深入理解并合理使用Descriptor的前提！
+>1. 王者中的王者, 当你习惯性的用dot operator去access实例上的某个attribute时候，而且attribute本身是**Data Descriptor**，最最最先被调用的方法就是attribute本身的 __get__ 方法，这个被调用的前提这个attribute本身是**Data Descriptor**，简单来说就是如果某个class你实现了**descriptor protocol**中的.__set__() or .__delete__()方法，那这个class的实例被用作别的对象上的attribute时候呢，这个attribute就可以称之为**Data Descriptor**；
+>1. 如果上一步没找到呢，那就去实例object本身的 __dict__ property上去检索这个以attribute名字为key的值，__dict__ property本身是个dictionary；
+>1. 如果上一步没找到呢，而且attribute本身是**Non-Data Descriptor**，then 那就去调用descriptor上的 __get__ 方法以返回结果。这步能被调用的前提这个attribute本身是**Non-Data Descriptor**，简单来说就是如果某个class你实现且只实现了**descriptor protocol**中的.__get__()方法；
+>1. 如果上一步没找到呢，那就去实例object本身的class也就是type上的 __dict__ property上去检索这个以attribute名字为key的值，class也或者type上的__dict__ property本身是个dictionary；
+>1. 如果上一步没找到呢，那就去实例object本身class的**母parent class**上的 __dict__ property上去检索这个以attribute名字为key的值；
+>1. 如果上一步没找到呢，那就递归式的去实例object本身class的**母母母... grand grand grand parent class**上的 __dict__ property上去检索这个以attribute名字为key的值；
+>1. 如果最后就是没找到呢，对不起，只能返回AttributeError exception了；
+>
 >
 
-## Nested Function
->举个最简单例子，然后顺便说明一下Python里的**命名空间**(NameSpace)：
+## Python Descriptor
+> Python有个东东叫做Descriptor，就是说如果你的class/object实现了**descriptor protocol**里的任意一个方法，那就可以称之为Descriptor了。**descriptor protocol**有四个methods的签名，分别是`__get__(self, obj, type=None)`, `__set__(self, obj, value)`, `__delete__(self, obj)`, 和`__set_name__(self, owner, name)`.
+>1. 如果你创建了一个Descriptor，并把这个Descriptor用作其他对象object的attribute，那么当你的对象object access这个`descriptor attribute`的时候呢，他的行为准则是比较特殊的。下面就看看有哪些特殊之处：
+>       * **`__get__(self, obj, type=None)`**: 这个函数签名里，`self`指的是descriptor本身实例instance，obj是指这个Descriptor所附着的对象object实例，type指的是descriptor所附着的object实例的type；
+>       * **`__set__(self, obj)`**: 这个函数签名里，`self`指的是descriptor本身实例instance，obj是指这个Descriptor所附着的对象object实例。这里你不能access附着对象object的type了，所以你只能在某个具体实例上调用`.__set__()`，实例的cls是不具备这功能的；
+>
+> 你品出来了没？这个Descriptor附着到某个object上之后呢，它本身呢就**bind**到对象上了，当你你用dot operator`obj1.descriptor_attribute`access它的时候呢，恭喜你，你有了所谓的hook点了，这个hook点呢对descriptor所**bind**的object也是有上帝视角的。
+>1. `@property`是一个典型的实现了descriptor protocol的函数，它实际的签名是长这样的：`property(fget=None, fset=None, fdel=None, doc=None) -> object`
+>
+
+>举个最简单例子，来说说Descriptor的规则：
 ```python
-def print_enclosing(msg):
-    # This is the outer enclosing function
-    def printer():
-        # This is the nested function
-        print(msg)
-    
-    printer()
+class VerboseAttribute():
+    def __get__(self, obj, type=None) -> object:
+        print('accessing the attribute to get the value')
+        return 42
+        
+    def __set__(self, obj, value) -> None:
+        print('accessing the attribute to set the value')
+        raise AttributeError('Cannot change the value')
+
+
+class Foo():
+    attribute1 = VerboseAttribute()
 
 # 演示一下怎么使用
-print_enclosing("Hello")
-# Output: Hello
+my_foo_obj = Foo()
+x = my_foo_obj.attribute1
+print(x)
+#accessing the attribute to get the value
+#42
 ```
->这里的`print_enclosing`就是所谓的enclosing函数，然后这个enclosing函数里定义了一个`printer()`函数，并直接执行这个函数。这里你看到，在这个nested`printer()`函数可以直接access它的enclosing函数的输入参数，当然这里只是一个读操作，如果你需要修改这个变量，你就需要用到`nonlocal`这个keyword了。
->
->这么说吧，对于变量（指向object，当然包括function型）的读操作，Python是按照这个顺序来检索的：**LEGB**，也就是说`locals` -->> `enclosing function` -->> `globals` -->> `__builtins__`，这些命名空间也很好理解：
->1. local: 函数本身的namespace，只记录当前函数内的对象；
->1. enclosing function: 当前函数的enclosing函数内所记录的对象；
->1. globals: python模块的namespace，每个模块都有自己的namespace，记录模块内的class，function等；
->1. `__builtins__`: python内置的namespace，在python解释器启动的时候创建，有很多内置函数；
 
->现在我们修改一下上面的例子，看看**closure**是怎么实现的：
+
+> **敲黑板** Python里的descriptors是**只实例一次**的！意思就是说某个class的所有实例对象都share一个共享的descriptor实例！
 ```python
-def print_enclosing(msg):
-    # This is the outer enclosing function
-    def printer():
-        # This is the nested function
-        print(msg)
-    
-    return printer
+# descriptors2.py
+class OneDigitNumericValue():
+    def __init__(self):
+        self.value = 0
+    def __get__(self, obj, type=None) -> object:
+        return self.value
+    def __set__(self, obj, value) -> None:
+        if value > 9 or value < 0 or int(value) != value:
+            raise AttributeError("The value is invalid")
+        self.value = value
 
-# 演示一下怎么使用
-another = print_enclosing("Hello")
-another()
-# Output: Hello
+class Foo():
+    number = OneDigitNumericValue()
+
+my_foo_object = Foo()
+my_second_foo_object = Foo()
+
+my_foo_object.number = 3
+print(my_foo_object.number)
+print(my_second_foo_object.number)
+
+my_third_foo_object = Foo()
+print(my_third_foo_object.number)
 ```
-> 你细品一下，这次这个`print_enclosing`enclosing函数没有直接执行这个`printer`函数，而且返回这个`printer`函数，这就是python里原生的一个功能了 -> 这个返回printer函数是带state的，这就是实现closure的关键，当你执行`another = print_enclosing("Hello")`，这个“Hello”就会以state的形式存在返回的printer函数里，所以但你执行`anoteher()`时，这个state是存在函数里的。
-
->? 那么啥时候用Closure这么好的概念呢？其实本质上还是**复用性**的工程实践，因为从pure function (stateless function)角度说，有state其实是不利于可读性的，但是当这些state并不难理解的时候，**复用性**可能就更重要了。比如说下面这个例子，会让某个函数更具有可复制性且语义更加清晰：
-```python
-def make_multiplier_of(n):
-    def multiplier(x):
-        return x * n
-    return multiplier
-
-
-# Multiplier of 3
-times3 = make_multiplier_of(3)
-
-# Multiplier of 5
-times5 = make_multiplier_of(5)
-
-# Output: 27
-print(times3(9))
-
-# Output: 15
-print(times5(3))
-
-# Output: 30
-print(times5(times3(2)))
-```
->
->
->
->
-
-## High Order Function
->说完了Closure，我们就看看Python里它的最常见的应用场景**Decorator**吧：
-```python
-def prettify(func):
-    def inner():
-        print('I got decorated!')
-        func()
-    return inner
-
-def ordinary():
-    print('I am ordinary')
-
->>> ordinary()
-I am ordinary
-
->>> # let's decorate this ordinary function
->>> pretty = prettify(ordinary)
->>> pretty()
-I got decorated
-I am ordinary
-
-#下面两种写法是一模一样的：
-def ordinary():
-    print("I am ordinary")
-ordinary = make_pretty(ordinary)
-
-@make_pretty
-def ordinary():
-    print("I am ordinary")
-
-```
->说白了，Decorator就是在不改变原来Function代码的前提下在Pre和Post两个切点上进行逻辑上的装饰。
-
->那么如果有参数呢？这就是Closure的用武之地了。
-```python
-def smart_divide(func):
-    def inner(a, b):
-        print("I am going to divide", a, "and", b)
-        if b == 0:
-            print("Whoops! cannot divide")
-            return
-
-        return func(a, b)
-    return inner
-
-
-@smart_divide
-def divide(a, b):
-    print(a/b)
-
-
->>> divide(2,5)
-I am going to divide 2 and 5
-0.4
-
->>> divide(2,0)
-I am going to divide 2 and 0
-Whoops! cannot divide
-```
-> 那你是不是觉得每次都得知道要decorate的函数的输入参数，这样太局限了吧，没错，但是Python是Dynamic的语言嘛，解决方案就是`function(*args, **kwargs)`，示例如下：
-```python
-def works_for_all(func):
-    def inner(*args, **kwargs):
-        print("I can decorate any function")
-        return func(*args, **kwargs)
-    return inner
-```
->
