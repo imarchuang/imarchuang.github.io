@@ -2,15 +2,39 @@
 
 ## Python食物链:: Attribute Lookup Chain
 > **敲黑板** 这部分内容非常重要，也是能深入理解并合理使用Descriptor的前提！
->1. 王者中的王者, 当你习惯性的用dot operator去access实例上的某个attribute时候，而且attribute本身是**Data Descriptor**，最最最先被调用的方法就是attribute本身的 __get__ 方法，这个被调用的前提这个attribute本身是**Data Descriptor**，简单来说就是如果某个class你实现了**descriptor protocol**中的.__set__() or .__delete__()方法，那这个class的实例被用作别的对象上的attribute时候呢，这个attribute就可以称之为**Data Descriptor**；
->1. 如果上一步没找到呢，那就去实例object本身的 __dict__ property上去检索这个以attribute名字为key的值，__dict__ property本身是个dictionary；
->1. 如果上一步没找到呢，而且attribute本身是**Non-Data Descriptor**，then 那就去调用descriptor上的 __get__ 方法以返回结果。这步能被调用的前提这个attribute本身是**Non-Data Descriptor**，简单来说就是如果某个class你实现且只实现了**descriptor protocol**中的.__get__()方法；
->1. 如果上一步没找到呢，那就去实例object本身的class也就是type上的 __dict__ property上去检索这个以attribute名字为key的值，class也或者type上的__dict__ property本身是个dictionary；
->1. 如果上一步没找到呢，那就去实例object本身class的**母parent class**上的 __dict__ property上去检索这个以attribute名字为key的值；
->1. 如果上一步没找到呢，那就递归式的去实例object本身class的**母母母... grand grand grand parent class**上的 __dict__ property上去检索这个以attribute名字为key的值；
+>1. 王者中的王者, 当你习惯性的用dot operator去access实例上的某个attribute时候，而且attribute本身是**Data Descriptor**，最最最先被调用的方法就是attribute本身的 `__get__` 方法，这个被调用的前提这个attribute本身是**Data Descriptor**，简单来说就是如果某个class你实现了**descriptor protocol**中的`.__set__()` or .`__delete__()`方法，那这个class的实例被用作别的对象上的attribute时候呢，这个attribute就可以称之为**Data Descriptor**；
+>1. 如果上一步没找到呢，那就去实例object本身的 `__dict__` property上去检索这个以attribute名字为key的值，`__dict__` property本身是个dictionary；
+>1. 如果上一步没找到呢，而且attribute本身是**Non-Data Descriptor**，then 那就去调用descriptor上的 `__get__` 方法以返回结果。这步能被调用的前提这个attribute本身是**Non-Data Descriptor**，简单来说就是如果某个class你**实现且只实现了descriptor protocol**中的`.__get__()`方法；
+>1. 如果上一步没找到呢，那就去实例object本身的class也就是type上的 `__dict__` property上去检索这个以attribute名字为key的值，class也或者type上的__dict__ property本身是个dictionary；
+>1. 如果上一步没找到呢，那就去实例object本身class的**母parent class**上的 `__dict__` property上去检索这个以attribute名字为key的值；
+>1. 如果上一步没找到呢，那就递归式的去实例object本身class的**母母母... grand grand grand parent class**上的 `__dict__` property上去检索这个以attribute名字为key的值；
 >1. 如果最后就是没找到呢，对不起，只能返回AttributeError exception了；
 >
->
+> 下面的例子主要展示每个层级上的 `__dict__` property
+```python
+class Vehicle():
+    can_fly = False
+    number_of_weels = 0
+
+class Car(Vehicle):
+    number_of_weels = 4
+
+    def __init__(self, color):
+        self.color = color
+
+my_car = Car("red")
+print(my_car.__dict__) # {'color': 'red'}
+print(type(my_car).__dict__) # {'__module__': '__main__', 'number_of_weels': 4, '__init__': <function Car.__init__ at 0x10fdeaea0>, '__doc__': None}
+
+print(my_car.color) # red
+print(my_car.number_of_weels) # 4
+print(my_car.can_fly) # False
+
+print(my_car.__dict__['color'])  # red
+print(type(my_car).__dict__['number_of_weels']) # 4
+print(type(my_car).__base__.__dict__['can_fly']) # False
+
+```
 
 ## Python Descriptor
 > Python有个东东叫做Descriptor，就是说如果你的class/object实现了**descriptor protocol**里的任意一个方法，那就可以称之为Descriptor了。**descriptor protocol**有四个methods的签名，分别是`__get__(self, obj, type=None)`, `__set__(self, obj, value)`, `__delete__(self, obj)`, 和`__set_name__(self, owner, name)`.
