@@ -9,7 +9,7 @@
 >1. 如果上一步没找到呢，那就去实例object本身class的**母parent class**上的 `__dict__` property上去检索这个以attribute名字为key的值；
 >1. 如果上一步没找到呢，那就递归式的去实例object本身class的**母母母... grand grand grand parent class**上的 `__dict__` property上去检索这个以attribute名字为key的值；
 >1. 如果最后就是没找到呢，对不起，只能返回AttributeError exception了；
->
+
 > 下面的例子主要展示每个层级上的 `__dict__` property
 ```python
 class Vehicle():
