@@ -12,3 +12,4 @@
 ** [函数的灵活应用](./python/function_adv)
 ** [Descriptor协议](./python/descriptors)
 ** [Iterator & Generator](./python/iterator_generator)
+** [Lazy Loading](./python/laziness)
