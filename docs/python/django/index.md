@@ -35,9 +35,9 @@ sys.getrefcount(a)
 >
 >Java里有个concurrency包，比如说`java.util.concurrency.BlockingQueue`，说白了就是为了Thread安全，几乎都强加了一个安全锁。那是不是把Python里的`sys.getrefcount`这个函数写成thread safe就好了呢？这么说也没毛病，这样做就会有产生Deadlock的可能，而且一直不停的acquire和releaselock也会耗能太大。Python（还有Ruby）这种动态语言就简单粗暴的选择了GIL这种解法，因为GIL只有一个锁，就不可能产生Deadlock的状况。
 >
->**思考** 多线程是为了啥？说白了就是**物尽其用**原则，你恨不得CPU一直不闲着才最好，累死它！就单核的时候，这种多线程其实没有显现出很大优势来，当时一台多核的物理机，多线程就真的很好用了。但我们说的**物尽其用**的时候，意思是说你有足够的东西要用cpu，也就是说计算量大，也叫做cpu-bound。如果你的一个任务本身就足够的让cpu不闲着，其实多线程就可以用**多进程multiprocessing**来实现了，比如说你物理机上有4核，那比较粗暴的做法就是同样的Python codebase，你直接启动4个process独立运行，我直白的告诉你，OS会很聪明的让你的每个python process大部分时间分别泡在不同的core里。如果你的逻辑更复杂一点，那么你可以用python里的`multiprocessing`包来实现。
+>**思考** 多线程是为了啥？说白了就是**物尽其用**原则，你恨不得CPU一直不闲着才最好，累死它！就单核的时候，这种多线程其实没有显现出很大优势来，当时一台多核的物理机，多线程就真的很好用了。但我们说的**物尽其用**的时候，意思是说你有足够的东西要用cpu，也就是说计算量大，也叫做cpu-bound，几个几点的例子就是**matrix multiplications, searching, image processing等**。如果你的一个任务本身就足够的让cpu不闲着，其实多线程就可以用**多进程multiprocessing**来实现了，比如说你物理机上有4核，那比较粗暴的做法就是同样的Python codebase，你直接启动4个process独立运行，我直白的告诉你，OS会很聪明的让你的每个python process大部分时间分别泡在不同的core里。如果你的逻辑更复杂一点，那么你可以用python里的`multiprocessing`包来实现。
 >
->
+>cpu-bound是对cpu**物尽其用**，但是现实世界里的每个程序/服务都不是本身就完成一切的，几乎所有的app都需要从物理机的文件系统里读数据，也几乎都需要从部署在另一台物理机的数据库里拉数据，甚至几乎都需要从网络里的另一个服务里调数据，你说对吧？你开发的微服务里，有几个是单纯做计算用的？当你调用数据的时候，你的CPU几乎是闲着的，如果你的服务就是单出的从几个不同的数据库里拉数据然后一起返回给前端，这时候你的cpu几乎就是没用的，这种程序叫做I/O-bound。
 >
 >
 >Gunicorn is based on the pre-fork worker model. This means that there is a central master process that manages a set of worker processes. The master never knows anything about individual clients. All requests and responses are handled completely by worker processes.
