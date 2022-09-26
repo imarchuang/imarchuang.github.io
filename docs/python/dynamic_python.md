@@ -92,6 +92,38 @@ random.shuffle(deck)
 >
 >! 这里我想延伸一下，Go作为静态语言，它其实“半”实现了类似这种duck-typing的编程风格，你知道go里是怎么做到的吗？
 
+## Python几个常用的duck
+> 都写到这儿了，那不妨再深入一下吧
+>
+>跟其他语言不一样，Python里好多的**约定俗成**，其中最明显的一个规则就是用**Double Under (Underscores)**开始的函数签名，比如说，上面提到的`__iter__` 和 `__next__`，还有`__init__`, `__add__`, `__len__`, `__repr__` 等等，每个都是针对某种protoco进行的**约定俗成**，这里我们说说`__init__`和`__call__`吧，而且这个`__call__`函数能使你的实力instances实现了callable协议，Python里的函数function或者方法method都是原生的callable，你执行callable可以用`my_func()`，当然这其实是执行了`my_func.__call__()`。
+>1. `__init__`比较类似于其他语言里的**constructor**，其他语言里，constructor通常是个跟class名字一模一样的特殊函数，就是当你用`new`实例一个class对象的时候，这个constructor函数会被自动执行。在Python里呢，这个`new`关键字是不存在的，因为你可以直接这么`new`一个某class的实例对象：`my_obj = MyClass()`，发现了没？这个class是被当做了类似**函数**的方式实例出来的，这个`my_obj = MyClass(...)`其实就是执行了MyClass里的`__init__`函数。当然了，这里省略了MetaClass被执行的部分，这个MetaClass的部分等以后有时间再分别讲解。`__init__`实际上也创建了一个叫做**cls**的东西，这个**cls**也是object对象，跟Python里其他对象没什么区别。
+>1. `__call__`函数：类似于`__init__`函数能使我们把一个class像function一样用`my_obj = MyClass()`，`__call__`函数能使我们把一个实力对象object像函数一样用，比如说`abc = my_obj()`，`my_obj()`实际上是执行了`my_obj.__call__()`。就是说这些实例instances从行为上来说已经具备了和function一样的能力了。
+>       * 啥时候需要让你的实例instances变成callable呢？用法当然很多，但是一个比较容易想到的案例就是**decorator**：
+```python
+class Cloud:
+    def __init__(self, func):
+        self.func = func
+        
+    def __call__(self):
+        print("Connected to cloud")
+        self.func()
+        print("Connection to cloud Closed")
+
+# 这里你想直接用你的Cloud class来修饰你的函数
+# 当你定义这个def upload_file函数的时候呢，你其实想把函数传入了Cloud里的__init__函数，定义的upload_file函数本身被当做了func 这个argument传入了__init__函数
+@Cloud
+def upload_file():
+    print("Uploading File....")
+
+# 当你执行upload_file函数的时候呢，你其实想把函数传入了Cloud里的__call__函数
+upload_file()
+
+### 输出：
+Connected to cloud
+Uploading File….
+Connection to cloud Closed
+```
+>
 
 ## 猴子打补丁
 >说完鸭子，我们来说说猴子吧。
