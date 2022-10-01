@@ -30,6 +30,91 @@ print(f'{27:d}\n{27: d}\n{-27: d}')
 f'{12345678:,d}' # '12,345,678'
 f'{123456.78:,.2f}' # '123,456.78'
 
+# Regex
+import re
+pattern = '02215'
+'Match' if re.fullmatch(pattern, '02215') else 'No match' # Match
+
+# [] {} () \ * ? + ^ $ .
+# \d digit, \D not a digit, \s whitespace char, \S not a whitespace
+# \w word, \W not a word
+
+'Valid' if re.fullmatch(r'\d{5}', '02215') else 'Invalid' # Valid
+# r stands for raw string, \d means single digit, {5} is a quantifier,
+# means 5 consecutive of \d
+'Valid' if re.fullmatch(r'\d{5}', '0221') else 'Invalid' # Invalid
+
+'Match' if re.fullmatch('[A-Z][a-z]*', 'Wally') else 'No match' #Match
+# starts with a cap char, and follow by 0 or more lower case char
+'Match' if re.fullmatch('[A-Z][a-z]+', 'E') else 'No match' #No match
+# starts with a cap char, and follow by ONE or more lower case char
+
+'Valid' if re.fullmatch('[^a-z]', 'Wally') else 'Invalid' #Valid
+# ^ means NOT
+
+'Match' if re.fullmatch('[$*+]', 'Wally') else 'No match'
+# special chars turn into literal chars by putting in []
+
+'Match' if re.fullmatch('labell?ed', 'labeled') else 'No match' # Match
+'Match' if re.fullmatch('labell?ed', 'labellled') else 'No match' # No match
+# ? matches 0 or 1 chars
+
+'Match' if re.fullmatch(r'\d{3,', '1234567890') else 'No match' # Match
+'Match' if re.fullmatch(r'\d{3,', '123') else 'No match' # No match
+# {lower, upper} matches at least lower number to upper (inclusive)
+
+# replacing with regex
+re.sub(r'\t', ', ', '1\t2\t3\t4) #1, 2, 3, 4
+re.sub(r'\t', ', ', '1\t2\t3\t4, count=2) #1, 2, 3\t4
+
+# split with regex
+re.split(r',\s*', '1,  2,  3,4,    5,6, 7,8')
+# ['1', '2', '3', '4', '5', '6', '7', '8']
+re.split(r',\s*', '1,  2,  3,4,    5,6, 7,8', maxsplit=3)
+# ['1', '2', '3', '4,    5,6, 7,8']
+
+# search with regex
+result = re.search('Python', 'Python is fun') 
+result.group() if result else 'not found' # 'Python'
+
+result = re.search('Sam', 'SAM WHITE', flags=re.IGNORECASE)
+result.group() if result else 'not found' # 'SAM'
+
+result = re.search('^Python', 'Python is fun') 
+result.group() if result else 'not found' # 'Python'
+# ^ karrot char: means from the begining
+result = re.search('Python$', 'Python is fun') 
+result.group() if result else 'not found' # 'not found'
+# $: means at the end
+
+contact = 'Wally White, Home: 555-555-1234, Work: 555-555-4321'
+re.findall(r'\d{3}-\d{3}-\d{4}', contact)
+# ['555-555-1234', '555-555-4321'] 
+
+for phone in re.finditer(r'\d{3}-\d{3}-\d{4}', contact):
+    print(phone.group)
+# '555-555-1234'
+# '555-555-4321'
+
+# capture substrings
+text = 'Charlie Cyan, email: demo1@marc.com'
+pattern = r'([A-Z][a-z]+ [A-Z][a-z]+), email: (\w+@\w+\.\w{3})'
+# () wrapps a sub-expression, 
+# it means the result will be evaluated and capture the result
+# and the result can be accessed later (from index 1!!!)
+result = re.search(pattern, text)
+# this only gets result if the ENTIRE pattern got a match
+# one sub-expression match but others not, will NOT return a result
+
+result.groups() # ('Charlie Cyan', 'demo1@marc.com')
+result.group() # 'Charlie Cyan, email: demo1@marc.com'
+# group() returns the result matches the ENTIRE pattern
+
+#sub-expression INDEX start from ONE
+result.group(1) # 'Charlie Cyan'
+result.group(2) # 'demo1@marc.com'
+
+
 ```
 
 ## Sequence: Tuple & List
