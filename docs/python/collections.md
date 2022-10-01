@@ -50,7 +50,7 @@ pattern = '02215'
 # starts with a cap char, and follow by ONE or more lower case char
 
 'Valid' if re.fullmatch('[^a-z]', 'Wally') else 'Invalid' #Valid
-# ^ means NOT
+# ^ means NOT lower case char
 
 'Match' if re.fullmatch('[$*+]', 'Wally') else 'No match'
 # special chars turn into literal chars by putting in []
@@ -59,8 +59,8 @@ pattern = '02215'
 'Match' if re.fullmatch('labell?ed', 'labellled') else 'No match' # No match
 # ? matches 0 or 1 chars
 
-'Match' if re.fullmatch(r'\d{3,', '1234567890') else 'No match' # Match
-'Match' if re.fullmatch(r'\d{3,', '123') else 'No match' # No match
+'Match' if re.fullmatch(r'\d{3,}', '1234567890') else 'No match' # Match
+'Match' if re.fullmatch(r'\d{3,}', '12') else 'No match' # No match
 # {lower, upper} matches at least lower number to upper (inclusive)
 
 # replacing with regex
