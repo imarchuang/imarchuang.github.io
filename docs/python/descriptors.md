@@ -69,7 +69,6 @@ print(x)
 #42
 ```
 
-
 > **敲黑板** Python里的descriptors是**只实例一次**的！意思就是说某个class的所有实例对象都share一个共享的descriptor实例！
 ```python
 # descriptors2.py
@@ -95,4 +94,86 @@ print(my_second_foo_object.number)
 
 my_third_foo_object = Foo()
 print(my_third_foo_object.number)
+```
+
+## 啥情况下我要用Descriptor
+> 这个问题吧，我在做Djangoli的跟mongodb交互的ORM那一层的时候，我基本上算是重复利用了Descriptor的特性。当时我想做的其实也非常直白，那就是所谓的**lazy properties**，啥意思呢，就是说啊，如果我用pymongo从mongodb里拉回了一些数据，我不想立即把这些数据转换成这个Model的properties，这为这个从原始的dict转成python object的过程是蛮耗时的，我是希望当model里的某个property被调用到的时候再去转python object这个步骤。
+>
+>简化一下，我把这个**lazy properties**的应用场景展示一下：
+>
+```python
+class BaseField:
+    def __init__(self, db_field, name):
+        self.name = name
+        self.db_field = db_field
+    
+    def __get__(self, instance, owner):
+        if instance is None:
+            # Document class being used rather than a document object
+            return self
+        else:
+            name = self.name
+            data = instance._data
+            if not name in data:
+                # 这时候去从_db_data里转换
+                # db_field = instance._db_field_map.get(name, name)
+                # 简化版
+                db_field = self.db_field
+                try:
+                    db_value = instance._db_data[db_field]
+                except (TypeError, KeyError):
+                    value = self.default() if callable(self.default) else self.default
+                else:
+                    value = self.to_python(db_value)
+
+                data[name] = value
+            return data[name]
+    
+    def to_python(self， value):
+        # 简化版
+        return value
+
+    def __set__(self, instance, value):
+        """Descriptor for assigning a value to a field in a document.
+        """
+        name = self.name
+        value = self.from_python(value)
+
+        try:
+            has_changed = name not in instance._data or instance._data[name] != value
+        except: # Values can't be compared eg: naive and tz datetimes
+            has_changed = True
+
+        if has_changed:
+            instance._mark_as_changed(name)
+
+        instance._internal_data[name] = value
+
+    def from_python(self, value):
+        # 简化版
+        return value
+
+class Person:
+    name = BaseField('name', 'name')
+    age = BaseField('age', 'age')
+
+    def __init__(self, _db_data):
+        self._db_data = _db_data
+
+#我们看看怎么用的
+person = Person({'name': 'Marc', 'age': 38})
+# 当你new一个person出来的时候，它只是单纯的把数据存到了_db_data里
+print(person.name)
+print(person.age)
+# 当你第一次accessperson的name和ageproperty的时候，把数据从_db_data转到了_data里，
+# 这个_data缓存里就有了以name和age为key的相关映射值
+print(person.name)
+print(person.name)
+# 当你第二次accessperson的name和ageproperty的时候，
+# 这时候_data缓存里已经有了以name和age为key的相关映射值，那就直接返回吧
+print(person.age)
+print(person.age)
+# 当你第二次accessperson的name和ageproperty的时候，跟第二次一样
+
+
 ```

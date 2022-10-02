@@ -1,5 +1,6 @@
-# Python的函数是一等公民
+# Python里的Lazinesses
 
+>
 ```python
 # DEFAULT parameter values
 def rectangle_area(length=1, width=3):
