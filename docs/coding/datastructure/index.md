@@ -29,6 +29,7 @@
 >1. [Twilio面试真题](#Twilio面试真题)
 >1. [Rippling面试真题](#Rippling面试真题)
 >1. [Flexport面试真题](#Flexport面试真题)
+>1. [Wish面试真题](#Wish面试真题)
 >1. [380. O(1)时间插入、删除和获取随机元素](#获取随机元素) https://leetcode.cn/problems/insert-delete-getrandom-o1/
 >1. [710. 黑名单中的随机数](#黑名单中的随机数) https://leetcode.cn/problems/random-pick-with-blacklist/
 >1. [528. 按权重随机选择](#按权重随机选择) https://leetcode.cn/problems/random-pick-with-weight/
@@ -193,6 +194,13 @@ class CostCalculator{
 
 }
 ```
+
+### Wish面试真题
+>**原题** 给你一个堆Food，让你设计一个Food Rating系统，这个系统要支持
+>1. 能够修改某个Food的rating；
+>1. 能够返回某种cuisine的rating最高的一个Food；
+>
+>
 
 ### 按权重随机选择
 [528. 按权重随机选择]() https://leetcode.cn/problems/random-pick-with-weight/

@@ -1,0 +1,18 @@
+<!-- docs/_sidebar.md -->
+
+* [HOME](./)
+* [副主页](./python/index)
+* [背诵](./python/memorize)
+* [核心技巧](./python/index)
+** [Python函数](./python/functions)
+** [Python常用数据结构](./python/collections)
+** [Python里的OOD](./python/classes)
+** [duck-typing](./python/dynamic_python)
+* [核心技巧](./python/adv/index)
+** [函数的灵活应用](./python/function_adv)
+** [Descriptor协议](./python/descriptors)
+** [Iterator & Generator](./python/iterator_generator)
+** [Lazy Loading](./python/laziness)
+* [Django](./python/django/index)
+* [DRF](./python/DRF/index)
+* [mongo engine](./python/mongoengine/index)

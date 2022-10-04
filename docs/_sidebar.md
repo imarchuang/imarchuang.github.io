@@ -3,6 +3,7 @@
 * [Algo](./coding/index)
 * [System Design](./sysde/index)
 * [Behavorial](./behavorial/index)
+* [Python](./python/index)
 * [Product Pattern](./products/index)
 * [System Pattern](./system/index)
 * [Micro Frontend](./system/frontend/index)
