@@ -1,59 +1,21 @@
 # Python里的Lazinesses
 
+> 个人觉得Python真的是Dynamic的语言，所有好多纯OOD里那些design patterns似乎在Python里就显得不是那么Pythonic，甚至说anti-pattern，因为OOD跟多的像是对一些比较优化的工程实践的一套总结，让人能约定俗成的遵守这些规则。
 >
+> 但是有一个东西Proxy的pattern在Python的工程实践里确实应用很广，主要是这个Proxy pattern可以是Python本身跑的慢的缺点在一定程度上得到缓解，这里就讲几种Python里实现lazy loading的比较常用的方式：
+>1. 借助Descirptor，让转成Python object的时间延后；
+>1. 借助Proxy，让Python的evaluation 延后；
+>1. 借助closure，让Python的evaluation 延后；
+>1. 借助Generator，让Python的evaluation 延后
+
+
+### Python descriptor protocol
+> 关于Python descriptor protocol，我在[这篇帖子]()里详细陈述过，这里就重点说说怎么让descriptor protocol让你的一些object延后eval。
+>
+>
+
 ```python
-# DEFAULT parameter values
-def rectangle_area(length=1, width=3):
-    """Return a rectangle's area"""
-    return length*width
 
-rectangle_area() # 3
-rectangle_area(10) # 30
-rectangle_area(10, 5) # 50
-
-# KEYWORD argument
-rectangle_area(length=3, width=5) # 15
-rectangle_area(width=5, length=3) # 15
-rectangle_area(width=5) # 5
-
-# 如果你只想让某些argument有default value，那么你一定要把这些arguments放到没有default value的那些arguments之后
-def rectangle_area(length, width=3):
-    return length*width
-
-# 只有这样，你才可以无脑的这么叫函数
-rectangle_area(5) # 15
-
-def average(*args):
-    return sum(args) / len(args)
-
-# 这个*args和**kwargs要放到函数签名的最后两个arguments
-
-average(5, 10, 15) #10
-average(5, 10, 15, 20) #12.5
-
-grades = [80, 90, 100, 78, 45]
-#求average, 这时候你要用到所谓的unpacking的技巧了
-# 把iterable前面加个*，意思就是upacking这个list了
-average(*grades)
-
-# SCOPING
-# by default, a function cannot mutate global variable values
-# to do this, you have to apply the `global` keyword
-x = 7
-def modify_global():
-    global x
-    x = 'hello'
-    print(f'x modified inside function: {x}')
-
-modify_global()
-print(f'x after modified by function: {x}') # hello
-
-# In python, everything is an object (aka, no primitives)
-# In python, arguments is always 'pass-by-reference'
-# Instead, primitives is treated as immutable objects, strings are IMMUTABLE too!
-
-
-# pure function: stateless function, depending only on the inputs (arguments), no side-effect!
 
 ```
 
