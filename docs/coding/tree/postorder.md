@@ -12,9 +12,25 @@
 
 > **回溯和分治** 之前提过好几次了，树的**子问题**通常存在于左右子树子树里，因为树就是**一个根节点+一个左子树+一个右子树**。递归的思想在树上的应用核心就是你把一些有效的信息传递到子问题，同时也把子问题中得到的答案可以有效的传回 calling stack，这种**自顶而下**和**自底而上**的思想都是在 DFS 递归过程中保存有消息的思路。
 >
-> **回溯**函数通常是**void**的 return，所以比较直接，那就是你通常要传入一个类似 Context 的参数，且叫它 `results`吧，然后在子问题的计算过程中可以将子问题的计算结果存到`results`里，这样不管你在递归的哪一层，你都可以 refer 这个`results`，这里呢`results`只是一种常用的方法，当然你也可以传入多个参数来传递有效信息，比如说判断是否为 BST 的那道题[98. 验证二叉搜索树（中等）](https://leetcode.com/problems/validate-binary-search-tree/)，你就可以传递`min`和`max`两个参数来框定区间。话说回来，如果你不想通过参数传入，那么你就可以设一个 global variable，然后每层都 refer 它，这样效果是一模一样的。举几个例子：
+> **回溯**函数通常是**void**的 return，所以比较直接，那就是你通常要传入一个类似 Context 的参数，且叫它 `results`吧，然后在子问题的计算过程中可以将子问题的计算结果存到`results`里，这样不管你在递归的哪一层，你都可以 refer 这个`results`，这里呢`results`只是一种常用的方法，当然你也可以传入多个参数来传递有效信息，比如说判断是否为 BST 的那道题[98. 验证二叉搜索树（中等）](https://leetcode.com/problems/validate-binary-search-tree/)，你就可以传递`min`和`max`两个参数来框定区间。话说回来，如果你不想通过参数传入，那么你就可以设一个 global variable，然后每层都 refer 它，这样效果是一模一样的。举几个例子：#TODO
 >
-> 1.  给你一个二叉树 root=[3,1,4,3,null,1,5]，让你找所有的**good** node，good node 就是说从 root 到这个 node 的路径里不存在一个比这个 node 值大的其他 node，上面的例子就是
+> 1.  给你一个二叉树 root=`[3,1,4,3,null,1,5]`，让你找所有的**good**node，所谓`good node`就是说从 root 到这个 node 的路径里不存在一个比这个 node 值大的其他 node，上面的例子就是[3(root), 3(left most), 4, 5]这 4 个 node 是 good node。这里每个节点都需要判断自己是否为 good node，而判断标准就是从 root 到自己的路径上是否有比自己大的值，这个**自顶而下**思路应该是非常直观的，因为你只要保证把到达自己路径上的最大值传递下去就好了，**自顶而下**思路基本上就是一个前序遍历解法，也就是回溯法：
+
+```python
+class Solution:
+    res = 0
+    def goodNodes(self, root: TreeNode) -> int:
+        def isGood(node, max_val):
+            if not node:
+                return
+            if node.val >= max_val:
+                self.res += 1
+            isGood(node.left, max(max_val, node.val))
+            isGood(node.right, max(max_val, node.val))
+
+        isGood(root, float('-inf'))
+        return self.res
+```
 
 #### **刷题列表**
 
@@ -141,6 +157,23 @@ public class Solution {
 }
 ```
 
+```python
+class Solution:
+    res = float('-inf')
+    def maxPathSum(self, root: Optional[TreeNode]) -> int:
+        def max_path_sum(root):
+            if not root:
+                return 0
+            left = max_path_sum(root.left)
+            left = 0 if left<0 else left
+            right = max_path_sum(root.right)
+            right = 0 if right<0 else right
+            self.res = max(self.res, left+right+root.val)
+            return max(left, right)+root.val
+        max_path_sum(root)
+        return self.res
+```
+
 ### 最长重复值路径
 
 [687 最长重复值路径](https://leetcode.com/problems/longest-univalue-path/)
@@ -261,6 +294,28 @@ class Solution {
         return left+right+node.val;
     }
 }
+```
+
+```python
+class Solution:
+    longest_path = 0
+    def longestUnivaluePath(self, root: Optional[TreeNode]) -> int:
+        def extendPath(node, val):
+            if not node:
+                return 0
+
+            left = extendPath(node.left, node.val)
+            right = extendPath(node.right, node.val)
+
+            if node.val != val:
+                self.longest_path = max(self.longest_path, left+right)
+                return 0
+            else:
+                self.longest_path = max(self.longest_path, left+right, max(left,right)+1)
+                return max(left, right)+1
+
+        extendPath(root, None)
+        return self.longest_path
 ```
 
 ### 分割二叉树的最大乘积
@@ -423,7 +478,7 @@ const traverse = (root) => {
 
 [650 领扣 - 二叉树叶子顺序遍历](https://www.lintcode.com/problem/650/description)
 
-> **[思路]** 维护一个 res 的`global`变量，然后分治遍历，类似于二叉树的最大深度, 把自己尽量往最大深度那个层上塞。
+> **[思路]** 维护一个 res 的`global`变量，然后分治遍历，类似于二叉树的最大深度, 把自己尽量往最大深度那个层上塞。分治思量的重点在于你在后序遍历的逻辑是什么？后序遍历位置的好处就是你知道了左右两个子树的信息了，所以跨越左右子树的分析逻辑一定是后序遍历的解法。
 
 ```java
 public class Solution {
@@ -454,6 +509,31 @@ public class Solution {
     }
 
 }
+```
+
+```python
+class Solution:
+    """
+    @param: root: the root of binary tree
+    @return: collect and remove all leaves
+    """
+    def findLeaves(self, root):
+        result = []
+        def traverse(node):
+            if not node:
+                return -1
+            left = traverse(node.left)
+            right = traverse(node.right)
+            level = max(left, right)+1;
+
+            if level >= len(result):
+                result.append([])
+            result[level].append(node.val)
+
+            return level
+
+        traverse(root)
+        return result
 ```
 
 ### 平衡二叉树
@@ -513,4 +593,30 @@ public class Solution {
         return new int[]{1, Math.max(left[1], right[1]) + 1};
     }
 }
+```
+
+```python
+class Solution:
+    """
+    @param root: The root of binary tree.
+    @return: True if this Binary tree is Balanced, or false.
+    """
+    def is_balanced(self, root: TreeNode) -> bool:
+        def tree_depth(node):
+          if not node:
+            return (True, 0)
+
+          left = tree_depth(node.left)
+          if not left[0]:
+            return (False, None)
+          right = tree_depth(node.right)
+          if not right[0]:
+            return (False, None)
+          # print(node.val, left, right)
+          if abs(left[1]-right[1])>1:
+            return (False, None)
+
+          return (True, max(left[1], right[1])+1)
+
+        return tree_depth(root)[0]
 ```
