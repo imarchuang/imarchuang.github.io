@@ -186,58 +186,44 @@ class Solution:
 >
 > 1. 举个例子，pattern 是`'aabb'`，str 是`'blueblueredred'`；**map**很容易理解，就是记录目前已知的假设，比如说 map 里有`map['a']='blue'`，所以当遇到第二个 a 的时候，就直接让`j 指针`右移四位，因为已经假设 a 对应的子串是 blue 了。
 > 1. 举另个例子，pattern 是`'aabc'`，str 是`'blueblueredred'`；**set**有点难理解，这里就说明一下。如果你的假设成立，就是说当`i 指针`穷举到第四个时候，map 里应该已经有`map['b']='red'`了；这样的话，在穷举遍历 str 时候，发现同一个词`red`又出现了，这说明同一个词`red`需要对应两个不同的 pattern 里的字符，所以此路不通应该直接跳过 continue，注意这里有个前提就是**如果新遇到 pattern 还是 b 的话，因为`map['b']='red'`，所以这时候我们直接会让 j 指针跳 3 码(red 单词长度)，这样就意味的 red 这个单词再出现在 set 里肯定是 match 了不同的 pattern**。
+```python
+class Solution:
+    """
+    @param pattern: a string,denote pattern string
+    @param str: a string, denote matching string
+    @return: a boolean
+    """
+    def word_pattern_match(self, pattern: str, str1: str) -> bool:
+        word_map = {}
+        word_set = set()
 
-```js
-export class Solution {
-  /**
-   * @param pattern: a string,denote pattern string
-   * @param str: a string, denote matching string
-   * @return: a boolean
-   */
-  wordPatternMatch(pattern, str) {
-    // write your code here
-    let map = {},
-      set = new Set();
-    return this.backtrack(pattern, str, map, set);
-  }
+        def backtrack(pat, suffix):
+            nonlocal word_map
+            nonlocal word_set
+            # print(f'{pat} {suffix} {word_set} {word_map}')
+            if not pat and not suffix:
+                return True
+            if not pat or not suffix:
+                return False
+            p = pat[0]
+            if p in word_map:
+                word = word_map[p]
+                if not suffix.startswith(word):
+                    return False
+                # move pointer on suffix
+                return backtrack(pat[1:], suffix[len(word):])
 
-  backtrack(pattern, str, map, set) {
-    //base case:
-    if (pattern.length == 0) return str.length == 0;
-
-    let p = pattern[0];
-    if (map[p]) {
-      let word = map[p];
-      if (!str || !str.startsWith(word)) {
-        return false;
-      }
-      return this.backtrack(
-        pattern.substring(1),
-        str.substring(word.length),
-        map,
-        set
-      );
-    }
-
-    for (let i = 0; i < str.length; i++) {
-      let prefix = str.substring(0, i + 1);
-      //说明出现了相同的word，却对应着不同的character pattern
-      if (set.has(prefix)) continue;
-
-      //做选择
-      map[p] = prefix;
-      set.add(prefix);
-
-      let suffix = str.substring(i + 1);
-      //剪枝，遇到一个可以，立即退出
-      if (this.backtrack(pattern.substring(1), suffix, map, set)) return true;
-
-      //撤销选择
-      delete map[p];
-      set.delete(prefix);
-    }
-
-    return false;
-  }
-}
+            for j in range(len(suffix)):
+                head = suffix[0:j+1]
+                #说明出现了相同的word，却对应着不同的character pattern
+                if head in word_set:
+                    continue
+                word_map[p] = head
+                word_set.add(head)
+                if backtrack(pat[1:], suffix[j+1:]):
+                    return True
+                del word_map[p]
+                word_set.remove(head)
+            return False
+        return backtrack(pattern, str1)
 ```
