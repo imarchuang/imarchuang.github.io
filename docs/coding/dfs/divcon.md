@@ -2,7 +2,7 @@
 
 #### **关于分治**
 
-> 关于**暴力美学**，我个人认为有两个框架：回溯和分治。回溯呢我们已经说过难点是在于把*回溯树*画出来（细节请看[回溯这篇](./coding/dfs/backtracking)），相对应分治法，我这篇只想关注那些**暴力美学**类的几道题，比如说单词拆分题 II。
+> 我个人是非常推崇暴力穷举算法的，因为这是其他奇淫异巧类算法如动规和单调栈等的基础。关于**暴力美学**，我个人认为有两个框架：回溯和分治。回溯呢我们已经说过难点是在于把*回溯树*画出来（细节请看[回溯这篇](./coding/dfs/backtracking)），相对应分治法，我这篇只想关注那些**暴力美学**类的几道题，比如说单词拆分题 II。
 >
 > 我觉得深入讨论动规题之前，对分治法的熟悉程度是前提。所以建议看完这篇再去研究**记忆化搜索**。
 >
@@ -19,6 +19,7 @@ const div_con(路径，选择列表，状态1，状态2，...){
     if(memo[状态1][状态2][...] != 特定值) return memo[状态1][状态2][...];
     let res= []；//所求的结果集
     for(const 选择 of 选择列表){
+        // 注意所有状态都是有变化的
         let subproblem = div_con(路径，选择列表，状态1'，状态2'，...)；
         //后序位置处理subproblem跟当前递归层的逻辑关系
         //e.g.,
@@ -80,13 +81,26 @@ var preorderTraversal = function (root) {
 };
 ```
 
-?> 这个解法短小精干，但为什么不常见呢？一个原因是这个算法的复杂度不好把控，比较依赖语言特性。
+?> 这个解法短小精干，但为什么不常见呢？一个原因是这个算法的复杂度不好把控，比较依赖语言特性，不如说如果你先用 Python 写，Python 里的一些语法糖用起来就特别方便：
+
+```python
+class Solution:
+  def preorderTraversal(self, root):
+    def traverse(node):
+      if not node:
+        return []
+      left = traverse(node.left)
+      right = traverse(node.right)
+      return [node.val, *left, *right]
+
+    return traverse(root)
+```
 
 ### 单词拆分 II
 
 [140. 单词拆分 II(困难)](https://leetcode.com/problems/word-break-ii/)
 
-> **思路** 这题吧，从答案要求可以不难得出这不是个动规题。穷举呗，第一想到的是回溯框架，但问题是这题套用穷举框架的话会很难入手，所以这题的正确思路是用分治思想，然后还可以用 memo 来进行剪枝。
+> **思路** 这题吧，从答案要求可以不难得出这不是个动规题，因为要求你给出所有可能的切割方式。那就穷举呗，第一想到的是回溯框架，但问题是这题套用穷举框架的话会很难入手，所以这题的比较容易的思路是用分治思想，然后还可以用 memo 来进行剪枝。这题本质上是用分治法处理子串组合问题。想象 s 是一个字符串，子串问题的连续性决定了可以把这个子串一切为二，头部是`s.substring(0, i+1)`和尾部`s.substring(i+1)`。这样就可以这么判断，如果头部是一个 word，那么只要判断尾部是不是一个可切分的字符串就可以了，这样这个问题的思路就很容易转化到递归思维。
 
 ```js
 var memo = {};
@@ -131,4 +145,30 @@ const divCon = (suffix, wordDict) => {
   memo[suffix] = [...res];
   return res;
 };
+```
+
+```python
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
+        # 把string一切为二
+        def div_con(suffix):
+            results = []
+            if suffix in wordDict:
+                results.append(suffix)
+                # don't return here
+
+            for i in range(len(suffix)):
+                head = suffix[0:i+1]
+                if head not in wordDict:
+                    continue
+
+                tail = suffix[i+1:]
+                # subproblem
+                tail_break = div_con(tail)
+                if tail_break:
+                    for res in tail_break:
+                        results.append(head+" "+res)
+
+            return results
+        return div_con(s)
 ```
