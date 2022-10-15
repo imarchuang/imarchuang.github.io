@@ -43,6 +43,7 @@ const div_con(路径，选择列表，状态1，状态2，...){
 
 > 1. [144. 二叉树的前序遍历](#二叉树的前序遍历)
 > 1. [140. 单词拆分 II(困难)](#单词拆分II)
+> 1. [829. 单词模式 II(困难)](#单词模式II)
 
 ### 二叉树的前序遍历
 
@@ -96,9 +97,9 @@ class Solution:
     return traverse(root)
 ```
 
-### 单词拆分 II
+### 单词拆分II
 
-[140. 单词拆分 II(困难)](https://leetcode.com/problems/word-break-ii/)
+[140. 单词拆分II(困难)](https://leetcode.com/problems/word-break-ii/)
 
 > **思路** 这题吧，从答案要求可以不难得出这不是个动规题，因为要求你给出所有可能的切割方式。那就穷举呗，第一想到的是回溯框架，但问题是这题套用穷举框架的话会很难入手，所以这题的比较容易的思路是用分治思想，然后还可以用 memo 来进行剪枝。这题本质上是用分治法处理子串组合问题。想象 s 是一个字符串，子串问题的连续性决定了可以把这个子串一切为二，头部是`s.substring(0, i+1)`和尾部`s.substring(i+1)`。这样就可以这么判断，如果头部是一个 word，那么只要判断尾部是不是一个可切分的字符串就可以了，这样这个问题的思路就很容易转化到递归思维。
 
@@ -171,4 +172,58 @@ class Solution:
 
             return results
         return div_con(s)
+```
+
+### 单词模式II
+
+[829. 单词模式II](https://www.lintcode.com/problem/829/)
+
+> **思路** 函数签名是`wordPatternMatch(pattern, str)`。这题算是 hard 题了，主要是这里用到了`双字符串各自指针的技巧`，指向pattern的指针很容易理解，那就是每单个字符作为一个模式标记，也就是i指针每次向右移动一位，但是这里的第二个指针 j 不是那么容易理解。
+>
+> 按照思维定势，两个字符串嘛，第一眼看上去得用`dp(s1, i, s2, j)`的函数签名技巧来解题了，但是仔细一想这里的第二个 string`s2`不是那么容易判断怎么走去下一个 j。但是回过头来想想在[单词拆分 II](#单词拆分II)和[回文串切割](#回文串切割)这两个题中，有一个重要的递归思想就是把一个字符串进行`str.substring(0,j+1)`和`str.substring(j+1)`的两段字符串切割，使得递归思想能运用进来。具体到这题呢，思想是这样的：`pattern`的输入能，只能单个字符单个字符的往右移动`i`指针，那么核心问题变成了用什么样的步骤让`j`指针**有节奏的右移**呢？没什么好方法对吧？那就**穷举**呗。怎么个穷举法呢？这时候就需要用到把 str 切成`str.substring(0,j+1)`和`str.substring(j+1)`的两段子串，先假设头部字符串`str.substring(0,j+1)`是 match 到`pattern[0]`的，然后再**想办法证明**尾部字符串`str.substring(j+1)`是可以基于这个假设成立的。如果最后证明假设的头部字符串 match 的事实是不成立，那么就再试下一个头部字符串（将`j++`就等于扩展了头部字符串的长度)。
+>
+> 这题还有一个难点是**怎样证明尾部字符串`str.substring(j+1)`是可以基于头部 match 这个假设成立的**。这里需要维护两个路径参数，一个叫**map**，一个叫**set**。
+>
+> 1. 举个例子，pattern 是`'aabb'`，str 是`'blueblueredred'`；**map**很容易理解，就是记录目前已知的假设，比如说 map 里有`map['a']='blue'`，所以当遇到第二个 a 的时候，就直接让`j 指针`右移四位，因为已经假设 a 对应的子串是 blue 了。
+> 1. 举另个例子，pattern 是`'aabc'`，str 是`'blueblueredred'`；**set**有点难理解，这里就说明一下。如果你的假设成立，就是说当`i 指针`穷举到第四个时候，map 里应该已经有`map['b']='red'`了；这样的话，在穷举遍历 str 时候，发现同一个词`red`又出现了，这说明同一个词`red`需要对应两个不同的 pattern 里的字符，所以此路不通应该直接跳过 continue，注意这里有个前提就是**如果新遇到 pattern 还是 b 的话，因为`map['b']='red'`，所以这时候我们直接会让 j 指针跳 3 码(red 单词长度)，这样就意味的 red 这个单词再出现在 set 里肯定是 match 了不同的 pattern**。
+```python
+class Solution:
+    """
+    @param pattern: a string,denote pattern string
+    @param str: a string, denote matching string
+    @return: a boolean
+    """
+    def word_pattern_match(self, pattern: str, str1: str) -> bool:
+        word_map = {}
+        word_set = set()
+
+        def backtrack(pat, suffix):
+            nonlocal word_map
+            nonlocal word_set
+            # print(f'{pat} {suffix} {word_set} {word_map}')
+            if not pat and not suffix:
+                return True
+            if not pat or not suffix:
+                return False
+            p = pat[0]
+            if p in word_map:
+                word = word_map[p]
+                if not suffix.startswith(word):
+                    return False
+                # move pointer on suffix
+                return backtrack(pat[1:], suffix[len(word):])
+
+            for j in range(len(suffix)):
+                head = suffix[0:j+1]
+                #说明出现了相同的word，却对应着不同的character pattern
+                if head in word_set:
+                    continue
+                word_map[p] = head
+                word_set.add(head)
+                if backtrack(pat[1:], suffix[j+1:]):
+                    return True
+                del word_map[p]
+                word_set.remove(head)
+            return False
+        return backtrack(pattern, str1)
 ```
