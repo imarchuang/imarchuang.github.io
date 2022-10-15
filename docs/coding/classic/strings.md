@@ -92,11 +92,11 @@
 
 ### 第 V 类：子序列类
 
-1. [Karat 面试真题 - 找字符串中符合 word 的子序列](#找字符串中符合word的子序列)
+1. [Karat 面试真题 - 找字符串中符合word的子序列](#找字符串中符合word的子序列)
 
-### 单词查找 II
+### 单词查找II
 
-[212. 单词查找 II](https://leetcode.com/problems/word-search-ii/)
+[212. 单词查找II](https://leetcode.com/problems/word-search-ii/)
 
 > **思路** 这题本质是图（矩阵）的遍历问题，这题矩阵吧不像是 flood-fill 那类的问题，可以直接替换原矩阵的值来标记是否已经 visited 过，所以外加一个 visited 变量，这个变量可以用二维数组也可以用 json object，不过不考虑空间的话，二维数组比较简单易懂。这题要想通过 leetcode 的 online judge 的话，`最关键的是init一个prefixSet变量`。
 >
