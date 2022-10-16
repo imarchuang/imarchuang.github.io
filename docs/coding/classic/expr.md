@@ -60,7 +60,6 @@
 >
 > 现在回头想想，面试官是想提示我不需要维护那个**层**的概念，层不层的问题留给后序处理生成 xml 的时候再处理。也就是说你可以这么想：维护一个栈，你就直接把当前能切的 tag 的 name-value 对加入到栈里，之后再根据栈中元素是否是 key-value pair 来决定在那一层上。比如说下面例子就可以形成这么一个栈：OFX | Transactions | Transaction | Amount:53 | DatePosted:20220721100000 | Transaction | Amount:35 | Amount:35 | DatePosted:20220721100000，基于这个栈，你就可以遍历栈中元素，根据元素是个 String 类型还是 Name-Value 对类型决定如何升一层。具体直接看[代码](#Twilio面试真题)吧。
 
-### 表达式的一些总结
 
 ### **中序表达式转后序**
 

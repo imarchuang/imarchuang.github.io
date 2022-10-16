@@ -1,26 +1,33 @@
 # Python关于集的数据结构
 
+### 目录
+1. [字符串](#strings-a-sequence)
+    - 格式化字符串
+    - 常用字符的检查
+    - 正则表达式的应用 -> [**延伸**](./regex)
+1. [Tuple](#sequence-tuple)
+    - Tuple init
+    - Tuple的修改
+1. [List](#list)
+    - List init
+    - List的增删查改
+1. [Set和Dict](#dictionary-and-set)
+    - Dict/Set init
+    - Dict/Set的增删查改
+
 ## Strings: A Sequence
 ```python
-#format string
+# format string 格式化字符串
+#   用'.'表达字符串类型以及小数点位数
 f'{17.489:.2f}' # 17.49
 f'{10:d}' # '10' format as decimal
-f'{65:c} {97:c}' # 'A a'
 f'{"hello":s} {7}' # 'hello 7' # everything is default to be eval as string
 f'{Decimal("1000000"):.3f}' # '10000000.000'
 f'{Decimal("1000000"):.3e}' # '1.000e+6'
 f'{Decimal("1000000"):.3E}' # '1.000E+6'
 
-# field width and alignment
-f'[{27:10d}]' # '[        27]'
-f'[{3.5:10f}]' # '[  3.500000]'
-f'[{"hello":10}]' # '[hello     ]' # default to left alignment
-f'[{27:<10d}]' # '[27        ]'
-f'[{3.5:<10f}]' # '[3.500000  ]'
-f'[{"hello":>10}]' # '[     hello]' # right alignment
-f'[{27:^10d}]' # '[    27    ]' # center alignment
-
 # numeric formatting
+#   数字的符号和padding
 f'{10:+d}' # '+10' format with sign
 f'[{10:+010d}]' # '[+000000010]' format with sign
 print(f'{27:d}\n{27: d}\n{-27: d}')
@@ -30,15 +37,45 @@ print(f'{27:d}\n{27: d}\n{-27: d}')
 f'{12345678:,d}' # '12,345,678'
 f'{123456.78:,.2f}' # '123,456.78'
 
+# field width and alignment
+#   用数字表达字符串的padding，default是靠左的alignment
+f'[{27:10d}]' # '[        27]'
+f'[{3.5:10f}]' # '[  3.500000]'
+f'[{"hello":10}]' # '[hello     ]' # default to left alignment
+f'[{27:<10d}]' # '[27        ]'
+f'[{3.5:<10f}]' # '[3.500000  ]'
+f'[{"hello":>10}]' # '[     hello]' # right alignment
+f'[{27:^10d}]' # '[    27    ]' # center alignment
+
+# 常用字符的检查
+# 检查字符是否为digit
+# 检查字符是否为lower/upper
+s = 'abCdefG10'
+for c in s:
+    if c.islower():
+        print(f'lower case {c}')
+    if c.isupper():
+        print(f'upper case {c}')
+    if c.isnumeric():
+        print(f'numeric {c}')
+
+# ascii码转字母
+f'{65:c} {97:c}' # 'A a'
+c = chr(97) # 'a'
+# 字符转ascii码
+i = ord('a') # 97
+
 # Regex
+# 正则表达式的应用
 import re
 pattern = '02215'
 'Match' if re.fullmatch(pattern, '02215') else 'No match' # Match
 
-# [] {} () \ * ? + ^ $ .
+# 元字符：[] {} () \ * ? + ^ $ .
 # \d digit, \D not a digit, \s whitespace char, \S not a whitespace
 # \w word, \W not a word
 
+# re.fullmatch相关
 'Valid' if re.fullmatch(r'\d{5}', '02215') else 'Invalid' # Valid
 # r stands for raw string, \d means single digit, {5} is a quantifier,
 # means 5 consecutive of \d
@@ -64,29 +101,52 @@ pattern = '02215'
 # {lower, upper} matches at least lower number to upper (inclusive)
 
 # replacing with regex
+# re.sub进行置换
 re.sub(r'\t', ', ', '1\t2\t3\t4) #1, 2, 3, 4
 re.sub(r'\t', ', ', '1\t2\t3\t4, count=2) #1, 2, 3\t4
 
 # split with regex
+# re.split分割字符串
 re.split(r',\s*', '1,  2,  3,4,    5,6, 7,8')
 # ['1', '2', '3', '4', '5', '6', '7', '8']
 re.split(r',\s*', '1,  2,  3,4,    5,6, 7,8', maxsplit=3)
 # ['1', '2', '3', '4,    5,6, 7,8']
 
 # search with regex
+# re.search搜索字符串
 result = re.search('Python', 'Python is fun') 
 result.group() if result else 'not found' # 'Python'
-
+# 忽略大小写
 result = re.search('Sam', 'SAM WHITE', flags=re.IGNORECASE)
 result.group() if result else 'not found' # 'SAM'
-
+# 用开始元字符`^`，技术元字符`$`
 result = re.search('^Python', 'Python is fun') 
 result.group() if result else 'not found' # 'Python'
-# ^ karrot char: means from the begining
+# ^ caret char: means from the begining
 result = re.search('Python$', 'Python is fun') 
 result.group() if result else 'not found' # 'not found'
 # $: means at the end
 
+# search和match的区别，和findall的区别
+# search和match都是只返回第一occurance，findall返回所有occruances
+s1 ='''We are learning regex with geeksforgeeks
+         regex is very useful for string matching.
+          It is fast too.'''
+s2 ='''string We are learning regex with geeksforgeeks
+         regex is very useful for string matching.
+          It is fast too.'''
+
+print(re.search(Substring, s1, re.IGNORECASE))
+# <re.Match object; span=(75,81), match='string'>
+print(re.match(Substring, s1, re.IGNORECASE))
+# None
+
+print(re.search(Substring, s2, re.IGNORECASE))
+# <re.Match object; span=(0,6), match='string'>
+print(re.match(Substring, s2, re.IGNORECASE))
+# <re.Match object; span=(0,6), match='string'>
+
+# fintiter返回generator，findall返回eval后的结果
 contact = 'Wally White, Home: 555-555-1234, Work: 555-555-4321'
 re.findall(r'\d{3}-\d{3}-\d{4}', contact)
 # ['555-555-1234', '555-555-4321'] 
@@ -96,7 +156,7 @@ for phone in re.finditer(r'\d{3}-\d{3}-\d{4}', contact):
 # '555-555-1234'
 # '555-555-4321'
 
-# capture substrings
+# capture substrings 捕捉子串
 text = 'Charlie Cyan, email: demo1@marc.com'
 pattern = r'([A-Z][a-z]+ [A-Z][a-z]+), email: (\w+@\w+\.\w{3})'
 # () wrapps a sub-expression, 
@@ -113,20 +173,18 @@ result.group() # 'Charlie Cyan, email: demo1@marc.com'
 #sub-expression INDEX start from ONE
 result.group(1) # 'Charlie Cyan'
 result.group(2) # 'demo1@marc.com'
-
-
 ```
 
-## Sequence: Tuple & List
+## Sequence: Tuple
 ```python
-# TUPLE
+# TUPLE：是个iterable，而且是immutatable的
 dice = ('A', 'B') # pack into a tuple
-# tuple destructing, in python, it's called unpack the tuple
+# tuple destructing, in python, it's called **unpack** the tuple
 die1, die2 = dice
 print(die1, die2)
 
 # apply `in` keyword on tuple (as tuple is a iterable)
-x=7
+x = 7
 if x in (7, 10):
     print(f'{x} is in (7, 10)')
 
@@ -135,13 +193,17 @@ tup = (7, 9 ,10)
 sum(tup)
 
 # tuple可以wrap任何类型的数据
+# 如果你的数据不会被改动的话，那就是POJO的class
 student = ('Marc', [99, 97, 100])
 name, grades = student
 print(f'{name}: {grades}')
 
-student_tuple = 'John', 'Green', 3.3 # init a tuple without parentheses
+# init a tuple without parentheses
+student_tuple = 'John', 'Green', 3.3 
 
-first, second = 'hi' # first: 'h', second: 'i'
+# string也会被unpack
+first, second = 'hi'
+# first: 'h', second: 'i'
 
 time_tuple = (9, 16, 1)
 # use index to access tuple element
@@ -153,10 +215,10 @@ tuple2 = tuple1 # reference assignment, tuple2 is pointing to the same object
 tuple1 += (40, 50) # this will create a new tuple, and then assign it to tuple1
 # at this point, tuple2 will still point to original (10, 20, 30)
 
-# appending tuple to list
+# list和tuple可以一起操作
 numbers = [1,2,3,4,5]
 numbers += (6, 7) # [1,2,3,4,5,6,7]
-a_var = [1,2,3,4,5] + (6,7) # type error
+a_var = [1,2,3,4,5] + (6,7) # type error，这样不行
 
 # tuple itself is immutable, but its element could be MUTABLE
 student = ('Marc', [99, 97, 100])
@@ -178,22 +240,23 @@ tuple(enumerate(colors)) # enumerate function will turn element in colors into t
 for index, value in enumerate(colors):
     print(f'{index}: {value}')
 
-
 ```
 
 ## List
 ```python
 # LIST
 # Python does NOT have array (fixed length) data structure built in
+# 所以说所有的list都是链表
 c = [-45, 6 ,0, 73 1543]
 
+# 但是可以像array一样用index进行access
 c[0] # -45
 c[-1] # 1543
 c[-5] # -45
 
 c[100] # IndexError
 
-# List are mutable in python
+# List are **mutable** in python
 c[4] = 17 # [-45, 6 ,0, 73, 17]
 c += [10, 20] # [-45, 6 ,0, 73, 17, 10, 20]
 
@@ -325,14 +388,15 @@ list5 = [(item, item ** 3) for item in range(1,6)] # [(1,1),(2,8),(3,27), (4,64)
 colors = ['red', 'orange', 'yellow', 'blue']
 colors2 = [item.upper() for item in colors] #['RED', 'ORANGE', 'YELLOW', 'BLUE']
 
-
 # Generator Expressions, this is LAZY operation
 nums = [10, 3, 7, 1, 9, -8, 4]
+# 用括号(x**2 for x in nums if x%2!=0)标识generator experssion
 for value in (x**2 for x in nums if x%2!=0):
     print(value, end=' ')
 # 9, 49, 1, 81
 
-square_odds = (x**2 for x in nums if x%2!=0) # this is a generator operation
+# this is a generator operation
+square_odds = (x**2 for x in nums if x%2!=0) 
 # <generator object <genexpr> at ....>
 
 # Filter, Map and Reduce
@@ -340,6 +404,7 @@ nums = [10, 3, 7, 1, 9, -8, 4]
 def is_odd(x):
     return x % 2 != 0
 
+# filter,map,reversed,zip等都是Lazy operation
 list(filter(is_odd, nums)) # filter is a LAZY operation, and list() actualize it: [3,7,1,9]
 [item for item in nums if is_odd(item)] # [3,7,1,9]
 
@@ -353,6 +418,7 @@ list(map(lambda x: x ** 2, filter(lambda x: x % 2 != 0, nums))) # [9,49,1,81]
 [item ** 2 for item in nums if x % 2 != 0] # [9,49,1,81]
 
 # colors = ['Red', 'orange', 'Yellow', 'green', 'Blue']
+# default的__cmp__是用ascii码进行比较的
 min(colors, key=lambda s: s.lower()) # 'Blue'
 max(colors, key=lambda s: s.lower()) # 'Yellow'
 
@@ -371,7 +437,8 @@ for name, gpa in zip(names, grades):
 
 ## Dictionary and Set
 ```python
-# Dict, key must be immutable
+# Dict, key must be immutable and hashable
+# dict and set are MUTABLE
 country_codes = {'Finland':'fi'. 'South Africa':'za', 'Nepal':'np'}
 
 country_codes['Finland'] # 'fi'
@@ -383,7 +450,7 @@ len(country_codes) # 0
 # iterating dict
 days_per_month = {'Jan':'31', 'Feb':'28', 'Mar':'31'}
 # each key,val pair is a tuple, and unpacking here
-for month, days in days_per_month:
+for month, days in days_per_month.items():
     print(f'{month} has {days} days')
 months = {'Jan':'1', 'Feb':'2', 'Mar':'3'}
 for month_name in months.keys():
@@ -412,10 +479,6 @@ roman_numerals.get('III', 'DefaultVal') # get with default value
 if 'V' in roman_numerals: # return True
 if 'III' in roman_numerals: # return False
 
-
-
-# dict and set are MUTABLE
-
 # dict comprehension
 months = {'Jan':'1', 'Feb':'2', 'Mar':'3'}
 # upon situation of key clashes, the last one wins
@@ -425,12 +488,6 @@ grades = {'Sue': [98, 87, 94], 'Bob': [84, 95, 91]}
 grades2 = {k: sum(v)/len(v) for k, v in grades.items()} # {'Sue':93.0, 'Bob':90.0}
 
 
-
-
-
-```
-
-```python
 colors = {'red' ,'orange', 'yellow', 'green', 'red', 'blue', 'green'} # {'red' ,'orange', 'yellow', 'green', 'blue'}
 # !!! the order is not the order inserted!!!
 
@@ -487,10 +544,8 @@ numbers.disgard(18) # will not raise an exception
 numbers.pop() # remove a random element
 numbers.clear() # remove all elements
 
-# SET comprehension
+# SET comprehension，跟ditc一样，也是用{}来标识
 numbers = {0,1,2,3,4,5,6,7,8,9,9}
 evens = {item for item in numbers if item%2==0} # {0,2,4,6,8}
-
-
 
 ```

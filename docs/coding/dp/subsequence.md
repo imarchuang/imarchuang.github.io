@@ -1,8 +1,8 @@
-# 子序型动规
+# 双子序型动规
 
-**子序型动规的最大特点是给定一个数列`[1...n]`，`dp[i]`的值通常需要看前i的元素`[1...i-1]`的选与不选的决策来决定**
+[单子序动规](./coding/dp/subsequence)那篇里我们说：**子序型动规的最大特点是给定一个数列`[1...n]`，`dp[i]`的值通常需要看前i的元素`[1...i-1]`的选与不选的决策来决定**，双子序的动规可以说更加有章可循，其中一个主要原因就是双子序里的选择**就四个**，状态转化方程也是比较直观，就是在这4个选择里取最值。
 
-?> 借着本文希望能体将子序型的动规问题扒扒皮，找出共性和解题套路来。
+?> 借着本文希望能体将双子序型的动规问题扒扒皮，找出共性和解题套路来。
 > 1. **敲黑板** 其实锁定一个问题是动规问题其实是不算难的，如果你确定了一个问题是个类似子序类动规问题，又是两个字符串作为输入，你几乎可以**无脑的相信**其解法`肯定是两个指针i,j分别遍历两个子串`，而且通常都是**从左往右**遍历，然后判断**s1[i]==s2[j]**时的逻辑，以及判断**s1[i]!=s2[j]**时的逻辑。
 > 2. **敲黑板** 子序和子串的区别提到好几次了，子序可以是不连续的元素组合，但是原序（元素之间的位置相对关系）是要保持的，所以说像半个组合类问题；子串是连续的元素，通常子串数都是O(n^2)这个级别。
 
@@ -14,12 +14,27 @@
 >       * 当s1[i]和s2[j]不相等时，选择跳过其中一个，取其优；
 > 1. **状态转移**：
 > 1. **base case**：无他，看两个子串为空的时候的逻辑推理，一个子串为空的时候的逻辑推理
+```python
+# 自顶而下递归的动规
+def dp(状态1, 状态2, 状态3, ...)
+    for 选择 in 所有可能的选择：
+        # 此时的状态已经因为做了选择而改变
+        res = 求最值(res, dp(状态1', 状态2', 状态3', ...))
+    
+# 自底而上迭代的动规
+# 初始化base case
+dp[0][0][...] = base case
+for 状态1 in 状态1的所有取值：
+    for 状态2 in 状态2的所有取值：
+        for ...
+            dp[选择1][选择2][...] = 求最值(选择1, 选择2, ...)
+```
 
->深入思考一下双子序(**2022-07-04**):
+> **更新**： 深入思考一下双子序(**2022-07-04**):
 >
->1. 双子序问题的**重复子问题**是啥？双子序基本上的输入的就是两个字符串(偶尔是两个数组)，让你找**子序**。两个输入的字符串嘛，就是两个”有序“集合，那么可以对这两个”有序“有序集合怎么切小法呢？这里直接给出答案吧，因为特别的套路！那就是你把其中一个字符串缩小，最小可以到空字符串。为了方便，我们把这两个”有序“集合称之为S1和S2吧。**重复子问题***的搜索方式一定是把其中一个字符串的长度缩短，比如说S1有m个字符，那么我们缩短S1成子问题的方式就是`S1[0..i]`且`0<=i<m`，同理我们可以S2成子问题的方式就是`S2[0..j]`且`0<=j<n`(S2有n个字符)，总和这两个维度，这就是你**拆分**成`m*n`个子问题的方式！现在想一下，最极端的**base case**就是S1是个空字符串(`i==-1`)并且S2也是个空字符串(`j==-1`)。
->1. 我们说过，找**最优子结构**的过程其实就是证明你的状态转换方程正确性的过程，所以我们的重点应该是怎么证明用你切小的**子问题**里求局部最优，并且这些局部最优是**互相独立**并能够**roll up**到最终的大问题的最优值的。这里重点说一下**互相独立**的方面：给你的是两个集合S1和S2，让你求的是`子序列`相关的问题，那么就必须要能保证我求解的在两个**子集**(`S1[0..i-1]`和`S2[0..j-1]`)里的`局部最值`是不会影响更大范围的**子集**(`S1[0..i]`和`S2[0..j]`)的，这个怎么做到呢？答案就是**同时单向性**遍历这两个集合，这样你就可以当你站在`S1[i]`和`S2[j]`这两个元素(`所形成的坐标点`)时，你只需要面对四种选择：`选择跳过S1[i]`，`选择跳过S2[j]`，`选择跳过S1[i]和S2[j]`，或者`选择不跳过S1[i]也不跳过S2[j]`，这4种选择就可以让你做到两个**子集**(`S1[0..i]`和`S2[0..j]`)的选择是不会影响后面更大的两个子集的决策。这就是`子序列`类题的优美之处，因为你只要保证一个**单向性**遍历，那么你面对的选择只有`跳`或者`不跳`，这就能使你还是维持原序的。
->1. 上面我们通过找**最优子结构**的解释，我们清楚地知道我们的思路要保证两个基本特性：1. **同时单向性**遍历两个集合`S1[i]`和`S2[j]`；2. 保证只做这四种选择中的一个：`选择跳过S1[i]`，`选择跳过S2[j]`，`选择跳过S1[i]和S2[j]`，或者`选择不跳过S1[i]也不跳过S2[j]`；有了这个基础，我觉得**状态转化方程**就变成背诵默写题了，因为双子序类动规题的状态转化方程真的是非常非常套路。具体答案我们上边也提到过，这里再重复一次：
+>1. 双子序问题的**重复子问题**是啥？双子序基本上的输入的就是两个字符串(偶尔也会是两个数组)，让你找**子序**。两个输入的字符串嘛，就是两个*有序*集合，那么可以对这两个*有序*有序集合怎么切小法呢？这里直接给出答案吧，因为特别的套路！那就是你把其中一个字符串缩小，最小可以到空字符串。为了方便，我们把这两个*有序*集合称之为S1和S2吧。**重复子问题***的搜索方式一定是把其中一个字符串的长度缩短，比如说S1有m个字符，那么我们缩短S1成子问题的方式就是`S1[0..i]`且`0<=i<m`，同理我们可以S2成子问题的方式就是`S2[0..j]`且`0<=j<n`(S2有n个字符)，所以这里天然的具备两个维度，这就是你**拆分**成`m乘以n`个子问题的方式！现在想一下，最极端的**base case**就是S1是个空字符串(`i==-1`)并且S2也是个空字符串(`j==-1`)。
+>1. 我们说过，找**最优子结构**的过程其实就是**证明你的状态转换方程正确性**的过程，所以我们的重点应该是怎么证明用你切小的**子问题**里求局部最优，并且这些局部最优是**互相独立**并能够**roll up**到最终的大问题的最优值的。这里重点说一下**互相独立**的方面：给你的是两个集合S1和S2，让你求的是`子序列`相关的问题，那么就必须要能保证我求解的在两个**子集**(`S1[0..i-1]`和`S2[0..j-1]`)里的`局部最值`是不会影响更大范围的**子集**(`S1[0..i]`和`S2[0..j]`)的，这个怎么做到呢？答案就是**同时单向性(一起从左往右，或者一起从右往左)**遍历这两个集合，这样你就可以当你站在`S1[i]`和`S2[j]`这两个元素(`所形成的坐标点`)时，你只需要面对四种选择：`选择跳过S1[i]`，`选择跳过S2[j]`，`选择跳过S1[i]和S2[j]`，或者`选择不跳过S1[i]也不跳过S2[j]`，这4种选择不管你选那个，都可以让你做到两个**子集**(即`S1[0..i]`和`S2[0..j]`)的选择是不会影响后面更大的两个子集的决策。这就是`子序列`类题的优美之处，因为你只要保证一个**单向性**遍历，那么你面对的选择只有`跳`或者`不跳`，这就能使你还是*维持原序*的。
+>1. 上面通过找**最优子结构**的解释，我们清楚地知道我们的思路要保证两个基本特性：1. **同时单向性**遍历两个集合`S1[i]`和`S2[j]`；2. 保证只做这四种选择中的一个：`选择跳过S1[i]`，`选择跳过S2[j]`，`选择跳过S1[i]和S2[j]`，或者`选择不跳过S1[i]也不跳过S2[j]`；有了这个基础，我觉得**状态转化方程**就变成背诵默写题了，因为双子序类动规题的状态转化方程真的是非常非常套路。具体答案我们上边也提到过，这里再重复一次：
 >       - **状态**：就是`i`和`j`，分别作为指针指向两个字符串s1和s2；与之对应的函数就是`dp(i,j)`，或者用dp数组dp[i][j];
 >       - **选择**：选择也很直白：当前字符是否要被跳过；这里肯定是要两种情况分别处理：
 >           * 当`S1[i]`和`S2[j]`相等时，选择都不跳过；
@@ -35,231 +50,6 @@
 1. [97. 交错字符串](#交错字符串)  
 1. [10. 正则表达式匹配（困难）](#正则表达式匹配) 
 1. [44. 通配符匹配（困难）](#通配符匹配) 
-
-
-### 最大子数组
-[53 最大子数组](https://leetcode.com/problems/maximum-subarray/)
-
-![](../pictures/dp/sub1.png)
-
-?> **[思路]** 这题严格说不是子序问题，而是连续子数组，但是子数组在概念上其实是子序列的一个子集。因为是连续子数组。但是这题不能用`滑动窗口`，因为你并不能保证增加或者减少窗口长度会让你的值变大，因为数组里存在负数。暴力解法的话，就是两个for循环嘛(i: 0...n-1 --> j: i..n-1)，然后打擂台找最大值。但是这题其实是O(n)就能解决的。解决子串问题吧，就要谨记**连续**这个词，所以整着遍历数组，看看以这个数结尾的子串最大和是多少？这是不是就好找多了？就是看看这个nums[i]和上一个dp[i-1]的正负关系嘛。
-
-```js
-var maxSubArray = function(nums) {
-
-    let dp = Array(nums.length);
-    dp[0] = nums[0];
-    for(let i=1; i<dp.length; i++){
-        //看看是nums[i]本身大还是和上一个dp值连起来大
-        dp[i] = Math.max(nums[i], nums[i]+dp[i-1]);
-    }
-
-    //for循环一遍找最大值
-    let res = -Number.MAX_VALUE;
-    for(let i=0; i<dp.length; i++){
-        res = Math.max(res, dp[i]);
-    }
-
-    return res;
-};
-```
-```java
-class Solution {
-    //这题不能用滑动窗口，因为扩大或者缩小窗口并不能保证子窗口和增大（因为有负数）
-    public int maxSubArray(int[] nums) {
-        //用暴力法，i--> 0...n-1; j-->i...n-1 => O(n^3)
-        //暴力法的一个小优化，可以用一个presum前缀和组，加快两个点[i...j]之间的和计算
-        
-        //优化解法是动规。subArray的特性是元素必须是连续的
-        int n = nums.length;
-        if(n==0) return 0;
-        int[] dp = new int[n];
-        dp[0] = nums[0];
-        int res = dp[0];
-        for(int i=1; i<n; i++){
-            dp[i] = Math.max(dp[i-1]+nums[i], nums[i]);
-            res = Math.max(dp[i], res);
-        }
-        return res;
-    }
-}
-```
-
-
-### 最长递增子序
-[300 最长递增子序](https://leetcode.com/problems/longest-increasing-subsequence/)
-![](../pictures/dp/sub3.png)
-
-?> **[思路]** 这题是子序动规里最经典的问题了(LIS)，而且这题的衍生题目也很多。最长增子序LIS咋整？先理解子序。就是说子序可以是不连续元素的组合，但是元素之间的原序（前后序）还是要维持的。所以要计算第i个位置的最长LIS，如果已经知道前i-1个元素每个的LIS，能否计算出来？答案是能的，因为只要遍历[0...i-1]区间里比nums[i]值小的元素，并把他们的LIS值加1（因为这个nums[i]比它大），再然后就是从这些值里找最大值, 这就是高中学的数学归纳法(mathmatical induction)。所以两个坐标指针i和j，用j指针遍历dp[0...i-1]。
-
-```js
-var lengthOfLIS = function(nums) {
-    //LIS问题是经典的数学归纳法(mathmatical induction)的案例，一维dp数列找答案，然后再遍历dp数列找最终答案
-    let dp = Array(nums.length).fill(1); //每个元素至少是一个单独的增子序
-    //base case
-    //dp[0] = 1;
-    for(let i=1; i<nums.length; i++){
-        for(let j=0; j<i; j++){
-            if(nums[i]>nums[j]) dp[i] = Math.max(dp[i], dp[j]+1);
-        }
-    }
-    
-    //for循环一下dp数组找最大值
-    let res = 1;
-    for(let i=1; i<dp.length; i++){
-        res = Math.max(res, dp[i]);
-    }
-    return res;
-};
-```
-
-?> **[思路]** 上边的解法的时间复杂度是O(n^2)，还不是最佳解法，最佳解法实际上是O(n*logn)，用二分法。我在面Snowflake电面时候被问蒙了。二分法思路的一个核心思想就是维护一个subSeq的数组，这个subSeq数组思想上非常像单调递增栈，只不过这个“栈”只有在比最大元素大的时候才增长，当第i个元素值不大于“栈”里目前最大元素的时候，这时候的思想就是，找到**比这个第i个元素值大的最小值**。这里的思路你可以这么想：你想每次都能腾出点更多的空间，好使下一个i+1个元素可以被插入到这个subSeq的数组。最后这个subSeq数组实际上就是维护了最长的可能LIS，subSeq数组就应该是LIS的答案。举个例子，`[10, 11, 1,2,3]`，subSeq是最起初是`[10]`,遇到11，因为11是最大的，那就增加一个元素变成`[10, 11]`，然后遇到1，因为1不是最大，那就用二分法在subSeq数组中`去找比1大的最小元素`然后用1去replace那个元素，数组就变成了`[1, 11]`，类似的遇到2这个元素时候，数组就变成了`[1, 2]`，遇到3这个元素时候，数组就变成了`[1, 2，3]`。
-```java
-class Solution {
-    private int[] subSeq;
-    private int lastPos = 0;
-    public int lengthOfLIS(int[] nums) {
-        subSeq = new int[nums.length];
-        subSeq[0] = nums[0];
-        int res = 1;
-        for(int i=1; i<nums.length; i++){
-            replaceElement(nums[i]);
-            res = Math.max(res, lastPos+1);
-        }
-        
-        return res;
-    }
-    
-    //二分法找到比target大于等于的最小值
-    private void replaceElement(int target){
-        if(target>this.subSeq[lastPos]) {
-            this.subSeq[++lastPos] = target;
-            return;
-        }
-        
-        int left=0, right=this.lastPos;
-        while(left<right){
-            int mid = left +(right-left)/2;
-            if(this.subSeq[mid]==target){
-                return;
-            } else if(this.subSeq[mid]>target){
-                right = mid;
-            } else {
-                left = mid + 1;
-            }
-        }
-        
-        this.subSeq[left] = target;
-    }
-}
-```
-
-> **补充** 需要二分法时候，java里是有现成的API可以用的，而且不止数组有，集合也有；分别是，Arrays.binarySearch(arr1, targetNum)和Collections.binarySearch(list1, targetNum)；这里有一点要注意：前提是数组或者集合是有序的。
-```java
-class Solution {
-    public int lengthOfLIS(int[] nums) {
-        //类似于递增单调栈的概念
-        int n = nums.length;
-        int[] resultArray = new int[n];
-        resultArray[0] = nums[0];
-        int lastPos = 0;
-        
-        for(int i=1; i<n; i++){
-            if(resultArray[lastPos]<nums[i]){
-                lastPos++;
-                resultArray[lastPos]=nums[i];
-            } else {
-                int pos = Arrays.binarySearch(resultArray, 0, lastPos+1, nums[i]);
-                //System.out.println(pos+"|"+nums[i]);
-                if(pos<0) pos = -(pos+1);
-                resultArray[pos]=nums[i];
-            }
-        }
-            
-        return lastPos+1;
-    }
-}
-
-//version 2: 用list
-class Solution {
-    public int lengthOfLIS(int[] nums) {
-        //类似于递增单调栈的概念
-        int n = nums.length;
-        List<Integer> resultList = new ArrayList<>();
-        
-        for(int num : nums){
-            if(resultList.isEmpty() || resultList.get(resultList.size()-1)<num){
-                resultList.add(num);
-            } else {
-                int pos = Collections.binarySearch(resultList, num);
-                if(pos<0) pos = -(pos+1);
-                resultList.set(pos,num);
-            }
-        }
-            
-        return resultList.size();
-    }
-}
-```
-
-### 套娃问题
-[354 套娃问题](https://leetcode.com/problems/russian-doll-envelopes/)
-?> **[思路]** 这题就是是最长增子序(LIS)问题外加一层皮。
-```java
-class Solution {
-    public int maxEnvelopes(int[][] envelopes) {
-        //套娃问题，是LIS的一个升级版
-        Arrays.sort(envelopes, (a,b)-> {
-            if(a[0]==b[0]) return b[1]-a[1];
-            return a[0]-b[0];
-        });
-        
-        int[] nums = new int[envelopes.length];
-        for(int i=0; i<envelopes.length; i++){
-            nums[i] = envelopes[i][1];
-        }
-        
-        return getLIS(nums);
-    }
-    
-    private int[] subSeq;
-    private int lastPos = 0;
-    public int getLIS(int[] nums) {
-        subSeq = new int[nums.length];
-        subSeq[0] = nums[0];
-        int res = 1;
-        for(int i=1; i<nums.length; i++){
-            replaceElement(nums[i]);
-            res = Math.max(res, lastPos+1);
-        }
-        
-        return res;
-    }
-    
-    //二分法找到比target大于等于的最小值
-    private void replaceElement(int target){
-        if(target>this.subSeq[lastPos]) {
-            this.subSeq[++lastPos] = target;
-            return;
-        }
-        
-        int left=0, right=this.lastPos;
-        while(left<right){
-            int mid = left +(right-left)/2;
-            if(this.subSeq[mid]==target){
-                return;
-            } else if(this.subSeq[mid]>target){
-                right = mid;
-            } else {
-                left = mid + 1;
-            }
-        }
-        
-        this.subSeq[left] = target;
-    }
-    
-}
-```
 
 ### 最长公共子序
 [1143 最长公共子序](https://leetcode.com/problems/longest-common-subsequence/)
@@ -623,35 +413,6 @@ var minInsertions = function(s) {
 
     return dp[0][n-1];
 };
-```
-
-### 四键键盘
-[651. 四键键盘（中等）](https://www.lintcode.com/problem/867/) 
-
-![](../pictures/dp/sub10.png)
-
-?> **[思路]** 这题是一个具有很强技巧性的问题。首先，看道题，几乎很快能确认是个动规问题，一是因为在遍历每个第i个键时你明确有四个选择，其次是这题要求求最值。照着这个思路，先思考一下这动规题的状态吧。其实有三个变量是**状态**，按键i次后屏幕上已显示的输出的A的数量`a_num`，还剩余的按键次数`N-i`次，粘贴板上的缓存`copy`，既然每步都有四个选择，那就遍历这三个变量然后择优呗。这其实就是暴力动规算法的雏形。只不过这个暴力动规算法过不了leetcode，即使你用memo记忆化搜索也过不了。然后就继续深入思考一下，其实这题的答案肯定是这样的，当N比较小时候，就直接`按A键`，直到N比较大是再按这个规律去按键：`Ctrl-A，Ctrl-C，Ctrl-V，Ctrl-V，Ctrl-V...` 既然是这样，那怎么如果你已经知道了前`i-1`次操作能得到的最大输出A的数量，你能导出第i次操作的输出A最大值吗？答案是能的，又是高中学的数学归纳法(mathmatical induction)，你只要留出两步操作给`Ctrl-A，Ctrl-C`，剩下的就一直`Ctrl-V，Ctrl-V，Ctrl-V...`。好了，那么`Ctrl-V`时粘贴板上的最大值是多少呢？这个不一定是最后一个dp[i-3]哟，举个例子，当`N=7`时，dp[3]的值应该是4，就是说屏幕上输出是`AAAA`，然后最后3个操作可以留给复制粘贴操作，最后屏幕上输出是8个A`AAAAAAAA`，也就是说dp[6]是**8**. 实际上dp[6]最优解应该是**9**，怎么做到的呢？因为`dp[2]=3`，这时候你将剩余的4个操作进行`选择``复制``粘贴``粘贴`，这样就可以粘贴两次最后屏幕上输出是`AAAAAAAAA`（9个A）。既然不能直接用dp[i-3]，那么就遍历所有之前的i-1个`dp[j]`就好了；这个`j`要从哪儿开始遍历呢？答案是**2**，因为需要留两步操作给`Ctrl-A，Ctrl-C`，你就可以这么写了：`for(int j=2; j<i; j++)`，要注意哟，你现在站在`第i个`操作键上，而你遍历的是前`i-1`个键，所以你需要看的是`dp[j-2]`的值，然后一直粘贴粘贴粘贴... 现在回头想想，其实解题思路跟[最长递增子序](#最长递增子序)题差不多，都用了数学归纳法。
-
-```java
-public class Solution {
-    /**
-     * @param N: an integer
-     * @return: return an integer
-     */
-    public int maxA(int N) {
-      int[] dp = new int[N];
-      dp[0]=1;
-      for(int i=1; i<N; i++) {
-        dp[i] = dp[i-1]+1; //选择按A键，cover N比较小的状况
-        for(int j=2; j<i; j++){
-          // 全选 & 复制 dp[j-2]，连续粘贴 i - j 次
-          // 屏幕上共 dp[j - 2] * (i - j + 1) 个 A
-          dp[i] = Math.max(dp[i], dp[j - 2] * (i - j + 1));
-        }
-      }
-      return dp[N-1];
-    }
-}
 ```
 
 ### 不同的子序列
