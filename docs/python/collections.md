@@ -249,6 +249,13 @@ for index, value in enumerate(colors):
 # 所以说所有的list都是链表
 c = [-45, 6 ,0, 73 1543]
 
+# init a 2D array
+s1, s2 = 'abcde', 'cba'
+dp = [[0 for j in range(len(s2)+1)] for i in range(len(s1)+1)]
+
+# 比较一下JS
+# dp = [...Array(text1.length)].map(x=> Array(text2.length).fill(0));
+
 # 但是可以像array一样用index进行access
 c[0] # -45
 c[-1] # 1543
