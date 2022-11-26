@@ -42,6 +42,7 @@ class Solution:
 1. [1373 二叉搜索树中的最大子树和](#二叉搜索树中的最大子树和)
 1. [650 领扣 - 二叉树叶子顺序遍历](#二叉树叶子顺序遍历)
 1. [93 领扣 - 平衡二叉树](#平衡二叉树)
+1. [R 面试真题 - 员工的考核分](#员工的考核分)
 
 ### 二叉树直径
 
@@ -619,4 +620,42 @@ class Solution:
           return (True, max(left[1], right[1])+1)
 
         return tree_depth(root)[0]
+```
+
+### 员工的考核分
+
+>
+> 给你一个多叉树，节点是员工的考分，比如说：
+```
+         A(5)
+      /  |  |   \
+  B(2) C(3) D(2) E(3)
+                  / \
+                F(2) G(10)
+```
+> 现在让你组织一个公司会议，让你找出参加会议的员工名单，使得参加会议的员工名单具有考核分数最大值。这里的限制条件是：
+>
+> 如果一个员工参加了，那么TA的直接上司和TA的直接汇报员工则不能出现在会议名单里；比如说上边的例子里，考核分数最大的参会人员是`B+C+D+F+G=19`
+>
+> **思路** 就是个多叉树，还记得多叉树(二叉树)题的套路吗？第一步你需要思考在每个节点上**需要做什么**，这里的答案比较容易得到：**需要做的是在当前节点上考虑自己参加和自己不参加会议能得到的最大值**；第二步你需要思考在节点上**前序还是后序做这个逻辑**，这里显然需要后序遍历位置来做，因为你需要知道每个子节点的最优解才能觉得自己的最优解。这题有个限制条件，那就是如果自己参加会议，那意味着自己的子节点都不能参加会议了，这个条件怎样传递下来了？这就需要**自上而下的context**的概念了：**如果你选择了自己，那么你需要把这个信息告诉你的子节点，这样你的子节点会保证自己不参加会议了；如果你没选择自己，那么你也需要把这个信息告诉你的子节点，这样你的子节点可以选择自己是否参加会议**，所以这题用了**自上而下的context**来传递信息，同时又后序遍历位置做最优解，直接看代码吧：
+```python
+class Employee:
+  def __init__(self, name, rating, subordinates):
+    self.name = name
+    self.rating = rating
+    self.subordinates = subordinates
+
+  def find_max_score(self, exclusive=False):
+    max_score_exclusive = 0
+    max_score_inclusive = self.rating
+    
+    # this means self cannot be chosen
+    for subordinate in subordinates:
+      max_score_exclusive += subordinate.find_max_score()
+      max_score_inclusive += subordinate.find_max_score(exclusive=True)
+    if exclusive:
+      return max_score_exclusive
+
+    return max(max_score_inclusive, max_score_exclusive)
+
 ```
