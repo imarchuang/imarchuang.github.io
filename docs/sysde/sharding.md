@@ -11,5 +11,18 @@
 1. 反范式化(Denormalization)：重点就是把 analytics 的数据存储分出去，那些 analytics 数据应该用负荷大量 OLAP 的 Columnar Store 来存储。
 1. SQL Tuning: 用些 Query Cache, indices, pre-aggregation, slow query logs, tightup schema 等技巧让数据库的访问变快。
 
+### 重要考点
+1. 读流量出现了hotspot；
+
+
+### 核心思想
+> 1. 如果一台数据库服务器挂了，怎么做能到你的服务继续运行？你可以说我cluster的master多启动几台进行failover就好了；
+> 1. 如果很不幸整个的数据库服务器master cluster都挂了，保证你的服务还部分运行？这就是数据拆分(sharding)的好处了；Note：**我这里说的数据拆分包括横向拆分和纵向拆分**；
+> 1. 数据拆分(sharding)还有一个好处就是**分摊写请求（当然也适用于读请求）**，理想状态下，你的数据是均分在各个shard里的，所以所有的读写流量（前提是没有hotspot的情况下）应该是均分在各个shard上的；
+> 1. 再进阶一下，现实世界里，**写流量一般是远少于读流量的**，如果大量的读流量影响了写流量的速度的话，那么就涉及到**读写分离**的概念了，这就是所谓**数据复拆(shard replication)**的用武之地了。一个shard多个备份，这样就可以**分摊读流量**了；
+> 1. 现实世界里，我们不太讨论**写流量出现了hotspot**，因为这种情况真的很少发生，如果某段sharding key出现了写的hotspot，通常说明我们或者是sharding key选的不好，或者说需要在hotspot的sharding段进行更进一步拆分；但是**读流量出现了hotspot**的情况却在现实世界里经常发生，这里的解决方案也是很暴力：那就在**读流量hotspot**的sharding段进行更多的备份来分摊读流量；
+> 1. 基于上一个**读流量出现了hotspot**的问题，另外一个思考方向就是目前大数据数据库设计里比较流行的**compute cluster和storage cluster分类**，比较常见的大数据数据库产品如BigQuery，AzureSQL等都是基于这种架构。其实这个思想很早就出现了，比如说谷家的三驾马车的两架：GFS和MapReduce，HDFS就是storage层的解决方案，保证数据的可用性；MapReduce就相当于compute层，如果度流量很大（也或者很重）的话，那就在MapReduce多启几个并行运算吧。
+> 1. 上一条的概念在今天这阶段已经更通用化了，比如说Presto就是一个纯SQL优化，然后Presto可以把相应的计算运行中各种各样的数据库上，比如说pinot，SQL，MongoDB，DynamoDB等等；
+
 ### Consistent Hashing 一致性哈希
 
