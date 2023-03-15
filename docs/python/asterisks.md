@@ -128,3 +128,11 @@ foo(a=1.45, b=3.14, x=1, y=4)
 
 ### 通过星号把参数 reference 传入所呼叫的函数里
 > 这个不用多说了，最经典的莫过于`def __init__(self, *args, **kwargs)`，这里的*args，**kwargs的写法叫做 packing。
+>
+> 下面就简单展示一下所谓的**packing**和**variadic arguments**和配合使用
+```python
+class LazyAwareDataDict(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+```
+> 这里`*args`, `**kwargs`当做`__init__`函数的args时，用的就是所谓的**packing**技巧，然后当你直接借用它俩去invoke`super().__init__`函数时，那里就是所谓的**variadic arguments**的使用了。
