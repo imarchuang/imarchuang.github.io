@@ -172,7 +172,6 @@ card._make(values)
 # namedtuple实例可以转成OrderedDict
 card._asdict()
 # OrderedDict([('face', 'Queen'), ('suit', 'Hearts)])
-
 ```
 
 ## Data Class

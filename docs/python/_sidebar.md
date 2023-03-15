@@ -5,7 +5,7 @@
 * [背诵](./python/memorize)
 * [核心技巧](./python/index)
 ** [Python函数](./python/functions)
-** [Python常用数据结构](./python/collections)
+** [Python常用数据结构](./python/containers)
 ** [Python里的OOD](./python/classes)
 ** [duck-typing](./python/dynamic_python)
 * [核心技巧](./python/adv/index)
