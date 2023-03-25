@@ -4,6 +4,7 @@
 * [副主页](./coding/index)
 * [背诵](./coding/memorize)
 * [经典再现](./coding/classic/anagram)
+** [语言技巧](./coding/classic/lan_sum)
 ** [常用技巧](./coding/classic/freqused)
 ** [常用 Java 技巧](./coding/classic/freqused_java)
 ** [关于链表](./coding/classic/linkedlist)
