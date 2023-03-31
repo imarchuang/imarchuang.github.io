@@ -7,7 +7,7 @@
 1. [二分答案](./coding/binsearch/binanswer.md)
 
 ### **二分通用痛点**
-**二分法的题其实不简单，一是理解题意需要用二分法解决，而是理解题意转化题为找特定值或者找左右边界值得二分问题。**
+**二分法的题其实不简单，一是理解题意需要用二分法解决，而是理解题意转化题为找特定值或者找左右边界值得二分问题。** O(1)的算法题是不具备任何考察意义的，所以面试中遇到的最快的算法题应该就是O(n)的，这种情况下基本上就可以锁定是二分搜索题了。
 
 **更新(2022-10-13)**: 二分法是双指针技巧里比较特殊的一类，我个人觉得跟**滑动窗口老猛男**一样，属于用两个指针框定区间的用法。二分法里最希望的就是不断让两个指针距离变窄，直到exit条件满足。这么说好了，二分法解题框架可能很多，但我只推荐一种，那就是用**左闭右开**方法去寻找左右边界的题。这几条规则应该牢记：
 > 1. 这样缩小区间的路径只有**left=mid+1**或者**right=mid**
@@ -64,7 +64,7 @@ const find_left_bound = (nums, target) => {
         let mid = left + Math.floor((right-left)/2);
         if(nums[mid]==target){
             //把区间缩小至到mid（不包含mid）的空间，再去找target，
-            //因为结束条件是[right, right]，所以left之后最大会达到这个mid值
+            //因为结束条件是[right, right)，所以left之后最大会达到这个mid值
             right = mid; 
         } 
         else if(nums[mid]>target){
@@ -80,7 +80,7 @@ const find_left_bound = (nums, target) => {
     return nums[left]==target ? left : -1; 
 }
 
-// ----------找右边界--------------
+//----------找右边界--------------
 // 用**左闭右开**区间
 const find_right_bound = (nums, target) => {
     let left=0, right=nums.length; //左开右闭区间
@@ -88,7 +88,7 @@ const find_right_bound = (nums, target) => {
         let mid = left + Math.floor((right-left)/2);
         if(nums[mid]==target){
             //把区间缩小至到[mid+1,right)（不包含right）的空间，再去找target，
-            //因为结束条件是[right, right]，所以left之后最小会达到这个mid+1值
+            //因为结束条件是[right, right)，所以left之后最小会达到这个mid+1值
             //这是为什么返回的时候要left-1
             left = mid+1; 
         } 
