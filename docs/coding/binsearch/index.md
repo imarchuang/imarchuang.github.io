@@ -30,7 +30,7 @@
 >    * 左开右闭区间代表着你要搜索区间里的所有元素除了right索引上的那个，所以你right的初始值是`nums.length`，因为**不需要**搜索`nums[right]`的；
 >    * 这个左开右闭区间区间怎么缩小规则是：`[left, mid)`或者`[mid+1, right)`，重点就是怎么处理`nums[mid]==target`的情况：
 >       * 当你搜索左边界时候，即使遇到了`nums[mid]==target`，你还是*期望*这个mid的**左边**还有target元素对吧？最差就是mid索引了对吧？所以你要把右边界right缩小，即`right=mid`。你知道最差也是mid，然后你还把区间边界改成`[left, mid)`，说明你最终*可能*需要返回left; 这里的**可能**是因为你可能压根就没找到target，还有一种可能就是你搜过了所有元素全部都小于target，说明`left=right == nums.length`;
->       * 当你搜索左边界时候，即使遇到了`nums[mid]==target`，你还是*期望*这个mid的**右边**还有target元素对吧？最差就是mid索引了对吧？所以你要把右边界right缩小，即`left=mid+1`，这时候你知道最差也是mid，然后你还把区间边界改成`[mid+1, right)`，说明你最终*可能*需要返回left-1; 这里的**可能**是因为你可能压根就没找到target，还有一种可能就是你搜过了所有元素全部都大于target，说明`left=right == 0`;
+>       * 当你搜索右边界时候，即使遇到了`nums[mid]==target`，你还是*期望*这个mid的**右边**还有target元素对吧？最差就是mid索引了对吧？所以你要把右边界right缩小，即`left=mid+1`，这时候你知道最差也是mid，然后你还把区间边界改成`[mid+1, right)`，说明你最终*可能*需要返回left-1; 这里的**可能**是因为你可能压根就没找到target，还有一种可能就是你搜过了所有元素全部都大于target，说明`left=right == 0`;
 
 直接上模板吧
 
