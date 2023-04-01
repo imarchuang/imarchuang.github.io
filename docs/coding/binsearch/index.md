@@ -8,6 +8,7 @@
 
 ### **二分通用痛点**
 **二分法的题其实不简单，一是理解题意需要用二分法解决，而是理解题意转化题为找特定值或者找左右边界值得二分问题。** O(1)的算法题是不具备任何考察意义的，所以面试中遇到的最快的算法题应该就是O(n)的，这种情况下基本上就可以锁定是二分搜索题了。
+> 读完这篇帖子，建议直接去看看[排序那篇](./coding/twopointer/sort)，两个帖子有很多的联系，模板长得也类似。
 
 **更新(2022-10-13)**: 二分法是双指针技巧里比较特殊的一类，我个人觉得跟**滑动窗口老猛男**一样，属于用两个指针框定区间的用法。二分法里最希望的就是不断让两个指针距离变窄，直到exit条件满足。这么说好了，二分法解题框架可能很多，但我只推荐一种，那就是用**左闭右开**方法去寻找左右边界的题。这几条规则应该牢记：
 > 1. 这样缩小区间的路径只有**left=mid+1**或者**right=mid**
@@ -34,8 +35,8 @@
 
 直接上模板吧
 
-> ----------找特定值--------------
 ```js
+//----------找特定值--------------
 // 用左右都闭区间
 const find_target = (nums, target) => {
     let left=0, right=nums.length-1; //左右都闭区间
@@ -104,6 +105,30 @@ const find_right_bound = (nums, target) => {
     if(left==0) return -1;
     return nums[left-1]==target ? left-1 : -1; 
 
+}
+```
+
+为了方便比对，这里放个quick sort里的核心partition函数的模板以便比对：
+```js
+const partition = (nums, start, end) => {
+    if(start>=end) return end;
+    let left=start, right=end;
+    let pivot = nums[Math.floor((start+end)/2)];
+    while(left<=right){
+        while(left<=right && nums[left]<pivot){
+            left++;
+        } 
+        while(left<=right && nums[right]>pivot){
+            right--;
+        }
+        //交换
+        if(left<=right){
+            [nums[left],nums[right]] = [nums[right],nums[left]]
+            left++;
+            right--;
+        }
+    }
+    return [left, right];
 }
 ```
 
