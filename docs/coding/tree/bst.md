@@ -1,24 +1,34 @@
 # 关于二叉搜素树（BST)的一些操作
 
-- [刷题列表(10 道)](#刷题列表)
-
-> 关于 BST，先啰嗦几句。这类题跟二叉树有些不同，通常都会设计到对节点的操作（例如插入，删除，更该数值等）。一旦涉及到插入，删除，更该数值等操作，分治函数需要返回一个 TreeNode 的类型，并对递归调用的返回值进行接收。另外，针对于它的有序性，分治函数里通常会多一个参数叫做(target)，有了这个 target，最先应该先去想套用 BST 的解题模板。
+> 关于 BST，先啰嗦几句。这类题跟二叉树有些不同，通常都会设计到对节点的操作（例如插入，删除，更该数值等）。一旦涉及到插入，删除，更该数值等操作，【**敲黑板**】分治函数需要返回一个TreeNode类型的结果，并对递归调用的返回值进行接收。另外，针对于它的**有序性**，分治函数里通常会多一个参数叫做target，有了这个target，最先应该先去想套用BST的解题模板。
 >
-> BST 还有一类问题，就是利用中序遍历有序这个条件，对 BST 进行一些类似于 iterator 的加工。
+> BST 还有一类问题，就是利用中序遍历**有序**这个特性，对 BST 进行一些类似于iterator的加工。
 >
 > 关于模板，对于二叉树有序性方面进行有序递归操作，请参照一下模板：
 
 ```js
 const BST(TreeNode root, int target) {
-    if(!root) //base case 做该做的事情并return;
+    if(!root) 
+        //base case 做该做的事情并return;
     if (root.val == target)
-        // 找到目标，做点什么
+        // 找到目标，搞点事情
     if (root.val < target)
+        //递归去右边
         BST(root.right, target);
     if (root.val > target)
+        //递归去左边
         BST(root.left, target);
 }
 ```
+
+> **[更新 2022-04-01]**：如果问你，怎样验证一个数值nums是个非降序数组，你会怎么做？O(n)去遍历所有元素，只要出现了`nums[i]<nums[i-1]`就可以退出说不是非降序数组了，也就是说如果不是非降序数组，你可能不用遍历完所有元素就能得到答案。现在给你一个二叉树，问你怎么验证是否为BST，该怎么做呢？
+>
+> 比较暴力的做法就是先**中序遍历**完生成一个数组，然后去看这个数组是否为非降序数组。不过这样做的一个坏处就是，你必须遍历完所有节点才能得到答案，能不能剪枝一下呢？
+> 
+> 这就需要回到BST的invariant上来。BST的定义是说：在每个节点上，它的左子树的所有元素的值都**不比root值大**，它的右子树所有元素的值都**不比root值小**。这样看来，我有两中方法：
+> 1. 如果我知道左子树的*值域*`[left_min, left_max]`和右子树的的*值域*`[right_min, right_max]`，那么我就可以在每个节点上判断是否`left_max<=root.val<=right_min`就可以了。
+> 1. 针对某节点parent的左子树的根节点，那么我要保证me.val是不大于parent.val的，这还没完，我还得保证我的右儿子的所有节点值都是**不大于parent.val的并且不小于我自己的node.val**，看看你脑子是否能体会出这么一个函数签名了？`isBST(my_right_child, me.val, my_parent.val)`，对于我得左儿子，我也可以类似的得到这个函数签名：`isBST(my_left_child, -infinity, me.val)`，因为我本身的值肯定是不大过parent.val的。同样的，针对parent的右儿子，你可以得到这么两个签名：`isBST(my_left_child, my_parent.val, me.val)`和`isBST(my_right_child, me.val, +infinity)`。
+>
 
 > ! **敲黑板**：二叉搜索树的迭代遍历模板`**狠狠重要**`，建议背诵全文！有个小口诀：**无右则回头找左拐，有右则进入并一路向西**，这里我给个 python 版本:
 
@@ -280,7 +290,8 @@ const isValid = (root, min, max) => {
 
 ##### 二叉搜索树中的最大子树和
 
-[1373 二叉搜索树中的最大子树和](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree) **[思路]** 维护一个 maxVal 的 global 变量，然后分治遍历，在后序遍历位置维护这样一个数组[isBST（子树是不是 BST）, 以 root 为根的子树最小值, 以 root 为根的子树最大值, subTreeSum（子树的节点和）]
+[1373 二叉搜索树中的最大子树和](https://leetcode.com/problems/maximum-sum-bst-in-binary-tree) 
+**[思路]** 维护一个 maxVal 的 global 变量，然后分治遍历，在后序遍历位置维护这样一个数组[isBST（子树是不是 BST）, 以 root 为根的子树最小值, 以 root 为根的子树最大值, subTreeSum（子树的节点和）]
 
 ```js
 let maxVal = -Number.MAX_VALUE;
