@@ -2,6 +2,7 @@
 
 - [HOME](./)
 - [快速锁定](./system/shallowdive/index)
+- [Telemetry](./system/telemetry/index)
 - [Pro Monolithic](./system/promonolithic/index)
   - [Pro Monolithic](./system/promonolithic/index)
 - [API Gateway](./system/api/index)
