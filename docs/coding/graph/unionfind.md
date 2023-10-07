@@ -1,5 +1,21 @@
 # 并查集 Union-Find
 
+**UnionFind应用更新(2023-10-06)** 并查集UnionFind主要解决图论中`动态连通性`的问题，这个所谓的`动态连通性`问题，其实在面试题中的应用非常多，这个更新主要就是正对面试中的一些具体问题来的：
+>给你一个同义词集合，比如说：`synonyms = [('main', 'primary'),('main', 'first'),('first', 'primary'),('first', 'initial'),('rating', 'score'), ('count', 'number')]`
+> 这个同义词组非常显然就是个森林，然后每组同义词形成一颗独立的“树”，在说用UnionFind并查集模拟这个森林前，有没有其他方法呢？
+>
+>答案是有的，用adjacency list来模拟也可以对吧？上面的词组可以模拟为：
+> `synonyms_adjacency_list = {'main': ['primary', 'first'], 'primary': ['main', 'first'], 'first': ['main', 'primary', 'initial'],'initial': ['first'], 'rating': ['score'], 'score':['rating'], 'count': ['number'], 'number':['count']}`
+> 那么通过上个synonyms_adjacency_list，你能不能通过loop所有的list找出所有的近义词组？应该很直观对吧？用一个DFS的算法直接遍历所有的节点就能找出近义词组对吧? 记得DFS时候不要走回头路就好了。
+> 
+> 用adjacency_list来维护这个结构的成本有点高，因为要找到每个词属于哪个近义词组，似乎都得暴力的用DFS走一遍相应的节点。当然你可以把已经找到的近义词组cache起来，但是搜索某个词在哪个近义词组里时，你还得遍历cache里所有已经找到得近义词组，成本也不低！
+>
+> 这题最优解其实是用UnionFind并查集来维护这个“图”，并查集的经典是用一个数组来表示每个节点的parent节点，但实际应用中直接用数组的例子确实比较少，像这里我们其实就得用hashmap来模拟这个并查集，我们暂且称这个hashmap叫wordToRoot。
+> 1. 当你遇到一个tuple，比如说`('main', 'primary')`，你先分别看看`'main'`和`'primary'`有没有已经在并查集wordToRoot那个hashmap里了，如果没有，直接init进去先，init的时候一个核心就是每个word的root是他自己本身：`wordToRoot.put('main', 'main')`, `wordToRoot.put('primary', 'primary')`。这一步其实就是并查集UnionFind的init函数。
+> 1. 接下来就得说说union函数了，我们知道'main'和'primary'是连接在一起的，所以就得想办法实现这个union。方法也很简单：先找找'main'的root1是谁，再找找'primary'的root2是谁，如果他俩的root不是同一个节点，那就把这俩root直接连起来：`wordToRoot.put(root2, root1)`，这个的意思是root2的parent变成了root1。这这个union的过程中，我们其实也隐式的实现了connect函数，即：判断'main'和'primary'是否connected，方法就是看他俩的root是否相同。
+> 
+>
+
 **并查集应用** 并查集主要解决图论中`动态连通性`的问题，可以用来算Kruskal算法的最小扩展树，用在编译器判断同一个变量的不同引用，或者用在社交网络中的朋友圈计算等等。
 
 !> **总结** 何谓动态连通性？假设给你10个点，他们互不相连，如下图：
