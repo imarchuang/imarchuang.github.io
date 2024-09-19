@@ -1,6 +1,6 @@
 ![icon](https://cdn.jsdelivr.net/gh/wugenqiang/StaticRepo/images/icon.png)
 
-## 有产品情怀的架构师
+## 有产品情怀的技术领导者
 
 - 业精于勤，行成于思。一路上都在努力！切忌眼高手低。
 
