@@ -13,6 +13,7 @@
 ** [Descriptor协议](./python/descriptors)
 ** [Iterator & Generator](./python/iterator_generator)
 ** [Lazy Loading](./python/laziness)
+* [pytest](./python/pytest/index)
 * [Django](./python/django/index)
 * [DRF](./python/DRF/index)
 * [mongo engine](./python/mongoengine/index)

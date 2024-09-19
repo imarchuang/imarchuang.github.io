@@ -9,9 +9,8 @@
 * [Micro Frontend](./system/frontend/index)
 * [Micro Service](./system/microservice/index)
 * [Distributed System](./distributed/index)
-* [DevOps](./devops/index)     
-* [Data](./data/index)   
+* [DevOps](./devops/index)
+* [Data](./data/index)
 
 * [About](./about/index)
 * [Contact](./contact/index)
-
