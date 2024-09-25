@@ -81,12 +81,15 @@ I am ordinary
 def ordinary():
     print("I am ordinary")
 ordinary = make_pretty(ordinary)
+
 @make_pretty
 def ordinary():
     print("I am ordinary")
 ```
+>
 >说白了，Decorator就是在不改变原来Function代码的前提下在Pre和Post两个切点上进行逻辑上的装饰。
 >那么如果有参数呢？这就是Closure的用武之地了。
+>
 ```python
 def smart_divide(func):
     def inner(a, b):
@@ -116,3 +119,77 @@ def works_for_all(func):
     return inner
 ```
 >
+
+### Production环境里的decorators
+>
+> 举几个生产环境里的usecase，手把手的演示怎么用`functools.wraps`
+>
+>
+>
+>
+>
+
+>
+> 只用于function：
+```python
+from functools import wraps
+
+def run_three_times(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        for i in range(3):
+            fn(*args, **kwargs)
+
+    return wrapper
+
+@run_three_times
+def calculate_it(a,b):
+    print(f"input: {a} {b}")
+```
+
+>
+> 需要额外的configs：
+> 
+```python
+from functools import wraps
+
+def run_n_times(n):
+    def inner(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            for i in range(n):
+                fn(*args, **kwargs)
+
+        return wrapper
+
+    return inner
+
+@run_n_times(n=5)
+def calculate_it(a,b):
+    print(f"input: {a} {b}")
+```
+
+>
+> 用于function和class method:
+```python
+import inspect
+from functools import wraps
+
+def require_full_admin_role(function):
+    @wraps(function)
+    def wrapper_class_method(self, request, *args, **kwargs):
+        admin_role: RoleWithCompany = parseFullAdminRole(request)
+        kwargs["role"] = admin_role
+        return function(self, request, *args, **kwargs)
+
+    @wraps(function)
+    def wrapper(request, *args, **kwargs):
+        admin_role: RoleWithCompany = parseFullAdminRole(request)
+        kwargs["role"] = admin_role
+        return function(request, *args, **kwargs)
+
+    sig = inspect.signature(function)
+    if head(sig.parameters) == "request":
+        return wrapper
+    return wrapper_class_method
+```
