@@ -175,16 +175,16 @@ def calculate_it(a,b):
 import inspect
 from functools import wraps
 
-def require_full_admin_role(function):
+def require_full_admin(function):
     @wraps(function)
     def wrapper_class_method(self, request, *args, **kwargs):
-        admin_role: RoleWithCompany = parseFullAdminRole(request)
+        admin_role = 'admin'
         kwargs["role"] = admin_role
         return function(self, request, *args, **kwargs)
 
     @wraps(function)
     def wrapper(request, *args, **kwargs):
-        admin_role: RoleWithCompany = parseFullAdminRole(request)
+        admin_role = 'admin'
         kwargs["role"] = admin_role
         return function(request, *args, **kwargs)
 
