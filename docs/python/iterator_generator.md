@@ -4,7 +4,7 @@
 
 
 ## Python Iterator
->Python里呢有个东西叫**iterator protocol**，就是像duck-typing里提到的，只要一个Python的object实现了`__iter__()`和`__next__()`这两个函数，你的object就实现**iterator protocol**了，也就是说你可以`for`循环你的objects，可以用list comprehension了，也可以用generator了。如果一个对象实现了**iterator protocol**，那么就称这个为**iterable**。
+>Python里呢有个东西叫**iterator protocol**，就是像duck-typing里提到的，只要一个Python的object实现了`__iter__()`和`__next__()`这两个函数，你的object就实现**iterator protocol**了，也就是说你可以`for`循环你的objects，可以用list comprehension `[]`了，也可以用generator expression `()`了。如果一个对象实现了**iterator protocol**，那么就称这个为**iterable**。
 >1. `__iter__()`: 这个函数返回对象object本身；如果需要的话，你可以先做一些initialization；
 >1. `__next__()`: 这个函数返回序列里的下一个item，当没有剩余的item时候，raise一个StopIteration；
 >
@@ -108,7 +108,7 @@ for(let hobby of person){
 ```
 > 你体会一下，这是不是比Python更巧妙一点？Javascript用一个特殊的property`Symboal.iterator`来标记这个object是否为一个iterable，然后它的iterator本身实现了`next()`函数，这个next函数呢实际上返回item的值，也同时返回done这个flag来标记是否还有下一个item。
 
-> 延伸一下，这个iterator属性，他不知定义了`next()`函数，还有两个函数：
+> 延伸一下，这个iterator属性，他不只定义了`next()`函数，还有两个函数：
 >1. `throw()`函数
 >1. `return()`函数
 ```js
@@ -129,17 +129,18 @@ console.log(it.throws('An error ocurred'));
 console.log(it.next());
 console.log(it.return('Stop the loop by return'));
 console.log(it.next());
-``
+```
 
 ## Python Generator
->Python里的Generator是iterator的一个延伸，我们就看看直接看个简单例子吧：
+>
+> Python里的Generator是iterator的一个延伸，我们就看看直接看个简单例子吧：
 ```python
 # A simple generator function
 def my_gen():
     n = 1
     print('This is printed first')
     # Generator function contains yield statements
-    yield
+    yield n
 
     n += 1
     print('This is printed second')
@@ -181,7 +182,7 @@ StopIteration
 ```
 >上面的示例有个关键字叫做**yield**，这就是告诉Python，不要立即返回，而是当你在调用`__next__()`的时候在去eval。也就说用了这个**yield**关键字，它就自动的帮你实现了`__iter__()`和`__next__()`这两个函数，你的object就实现**iterator protocol**了，这不过这个iterable并不马上eval。
 >
-> 还有一个关键知识点，那就是上面示例里的变量`n`实际上是个**state**，所以当你多次调用`__next__()`函数时候，这个变量`n`的值是被一层一层传递下去的，这点不同于常规的函数，因为常规函数里的local variables是在函数执行完毕之后自动销毁的。
+> 还有一个关键知识点，那就是上面示例里的变量`n`实际上是个**state**，所以当你多次调用`__next__()`函数时候，这个变量`n`的值是被一层一层传递下去的，也就是说，当执行yield这个statement时候，generator函数会返回给caller function，但是generator函数会保留函数内的state，这点不同于常规的函数（aka, 用return返回），因为常规函数里的local variables是在函数执行完毕(aka, return)之后自动销毁的。
 >
 > 最后再说一个关键点，generator对象是**只能被循环一次**的。
 
@@ -202,7 +203,7 @@ for char in rev_str("hello"):
     print(char)
 
 ```
-> 就像用lambda可以定义匿名函数一样，有时候你可能需要定义一个匿名的generator函数，这就需要用到generator expression，示例如下：
+> 就像用**lambda**可以定义匿名函数一样，有时候你可能需要定义一个匿名的**generator函数**，这就需要用到**generator expression**，示例如下：
 ```python
 # Initialize the list
 my_list = [1, 3, 6, 10]
@@ -216,10 +217,10 @@ generator = (x**2 for x in my_list)
 print(list_) # [1, 9, 36, 100]
 print(generator) # <generator object <genexpr> at 0x7f5d4eb4bf50>
 
-print(next(a))
-print(next(a))
-print(next(a))
-print(next(a))
+print(next(generator))
+print(next(generator))
+print(next(generator))
+print(next(generator))
 ```
 > 上面Iterator示例中，我们考到了如何自定义一个`PowTwo`的class，那么如果用Generator的话，长什么样呢？
 ```python
@@ -229,6 +230,8 @@ def PowTwoGen(max=0):
         yield 2 ** n
         n += 1
 ```
+>
+> 也就是说，每次yield都会返回给caller函数，然后等`__next__`再被call的时候，generator函数里的states都是还在的。
 
 ## Javascript Generator
 >Javascript里呢，Generator的作用基本上跟Python是一样的。不过语法上是不同的
@@ -260,3 +263,14 @@ for(let ele of obj){
     console.log(ele);
 }
 ```
+
+## 深入一下Python Generator
+>
+>
+>
+```
+
+```
+>
+>
+>
