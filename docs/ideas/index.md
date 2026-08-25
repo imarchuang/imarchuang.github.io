@@ -24,6 +24,7 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Drops
 
+* [orbit-sketch](/drops/orbit-sketch/ ':ignore') — pointer-follow orbit canvas
 * [example](/drops/example/ ':ignore') — native HTML + canvas
 * [hello](/drops/hello/ ':ignore') — minimal shell
 
