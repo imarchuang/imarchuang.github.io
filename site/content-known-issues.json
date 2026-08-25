@@ -1,0 +1,312 @@
+[
+  {
+    "kind": "stale-link",
+    "source": "coding/bfs/shortest.md",
+    "target": "./coding/bfs/levels?id=二叉树的最小深度"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/binsearch/index.md",
+    "target": "./coding/binsearch/half.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/binsearch/index.md",
+    "target": "./coding/binsearch/ooxx.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/barchart.md",
+    "target": "./coding/dp/sebusequence?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/barchart.md",
+    "target": "./coding/memo/index?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/intervals.md",
+    "target": "./coding/dp/sebusequence?id=最长公共子序列"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/intervals.md",
+    "target": "./coding/dp/sebusequence?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/intervals.md",
+    "target": "./coding/memo/index?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/monoq.md",
+    "target": "./coding/classic/strings?id=去重重复字母"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/monoq.md",
+    "target": "下一个更大元素II"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/monoq.md",
+    "target": "最大树"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/recursion.md",
+    "target": "./coding/dfs/subset?id=子集"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/recursion.md",
+    "target": "./coding/dp/indices?id=最长公共子串"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/recursion.md",
+    "target": "./coding/dp/sebusequence?id=最长公共子序列"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/recursion.md",
+    "target": "./coding/dp/sebusequence?id=最长回文子序"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/recursion.md",
+    "target": "./coding/dp/sebusequence?id=构造回文的最小插入次数"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/recursion.md",
+    "target": "./coding/dp/sebusequence?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/recursion.md",
+    "target": "./coding/memo/index?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/recursion.md",
+    "target": "./coding/tree/index?id=什么是穷举遍历二叉树"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/strings.md",
+    "target": "./coding/dfs/subset?id=子集"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/strings.md",
+    "target": "./coding/dp/indices?id=最长公共子串"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/strings.md",
+    "target": "./coding/dp/sebusequence?id=最长公共子序列"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/strings.md",
+    "target": "./coding/dp/sebusequence?id=最长回文子序"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/strings.md",
+    "target": "./coding/dp/sebusequence?id=构造回文的最小插入次数"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/strings.md",
+    "target": "./coding/dp/sebusequence?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/classic/strings.md",
+    "target": "./coding/memo/index?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/index.md",
+    "target": "./coding/binsearch/half.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/index.md",
+    "target": "./coding/binsearch/ooxx.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/presum.md",
+    "target": "./coding/binsearch/half.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/presum.md",
+    "target": "./coding/binsearch/ooxx.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/stack.md",
+    "target": "./coding/binsearch/half.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/stack.md",
+    "target": "./coding/binsearch/ooxx.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/trie.md",
+    "target": "./coding/binsearch/half.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/trie.md",
+    "target": "./coding/binsearch/ooxx.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/unionfind.md",
+    "target": "./coding/binsearch/half.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/design/unionfind.md",
+    "target": "./coding/binsearch/ooxx.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dfs/backtracking.md",
+    "target": "./coding/memo/index?id=#K站中转内最便宜的航班"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dfs/index.md",
+    "target": "./coding/classic/sbusequence"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dp/decision.md",
+    "target": "如果s.substring(i-2,i"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dp/decision.md",
+    "target": "如果不是“0”"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dp/greedy.md",
+    "target": "下一个更大元素II"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dp/indices.md",
+    "target": "./coding/dp/subsequence?id=#最长公共子序"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dp/indices.md",
+    "target": "./coding/dp/subsequence?id=#最长递增子序"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dp/knapsack.md",
+    "target": "./coding/memo/index?id=目标和"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dp/subsequence.md",
+    "target": "./coding/memo/index?id=正则表达式匹配"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/dp/subsequence.md",
+    "target": "./coding/memo/index?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/memo/index.md",
+    "target": "../snippets/example.js \":include\""
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/memo/index.md",
+    "target": "./coding/dp/subsequence?id=#最长递增子序"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/memo/index.md",
+    "target": "./coding/dp/subsequence?id=编辑距离"
+  },
+  {
+    "kind": "stale-link",
+    "source": "coding/tree/reconstruct.md",
+    "target": "./coding/tree/postorder?id=二叉树最大乘积分割"
+  },
+  {
+    "kind": "stale-link",
+    "source": "devops/index.md",
+    "target": "./cloud/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "devops/index.md",
+    "target": "./java/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "devops/index.md",
+    "target": "./tomcat/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "distributed/index.md",
+    "target": "./cloud/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "distributed/index.md",
+    "target": "./java/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "distributed/index.md",
+    "target": "./tomcat/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "products/index.md",
+    "target": "./cloud/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "products/index.md",
+    "target": "./java/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "products/index.md",
+    "target": "./tomcat/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "system/index.md",
+    "target": "./cloud/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "system/index.md",
+    "target": "./java/index.md"
+  },
+  {
+    "kind": "stale-link",
+    "source": "system/index.md",
+    "target": "./tomcat/index.md"
+  }
+]
