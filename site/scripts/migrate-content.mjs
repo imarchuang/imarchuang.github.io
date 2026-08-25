@@ -1,7 +1,9 @@
 import {
   mkdir,
+  lstat,
   readdir,
   readFile,
+  realpath,
   rm,
   stat,
   writeFile,
@@ -227,6 +229,14 @@ function safeDecodeURIComponent(value) {
   }
 }
 
+function normalizeAnchor(anchor) {
+  if (!anchor) {
+    return "";
+  }
+  const decoded = safeDecodeURIComponent(anchor);
+  return decoded === null ? null : decoded.replace(/^#+/u, "");
+}
+
 function parseDocsifyHashHref(href) {
   if (!href.startsWith("/#/")) {
     return null;
@@ -245,7 +255,10 @@ function parseDocsifyHashHref(href) {
     return null;
   }
 
-  const anchor = new URLSearchParams(query).get("id");
+  const anchor = normalizeAnchor(new URLSearchParams(query).get("id"));
+  if (anchor === null) {
+    return null;
+  }
   return {
     reference: normalized,
     anchor: anchor ? `#${encodeURIComponent(anchor)}` : "",
@@ -261,19 +274,158 @@ function looksLikeAsset(href) {
   return ASSET_EXTENSIONS.has(path.posix.extname(cleanHref));
 }
 
-function rewriteMarkdownImages(markdown) {
-  return markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, href) => {
-    if (looksExternal(href) || href.startsWith("/")) {
-      return match;
+function isWithinRoot(rootPath, candidatePath) {
+  const relativePath = path.relative(rootPath, candidatePath);
+  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+}
+
+function encodePublicPath(relativePath) {
+  return `/${toPosix(relativePath)
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/")}`;
+}
+
+async function pathDetails(candidatePath) {
+  try {
+    return await lstat(candidatePath);
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
+}
+
+async function nearestExistingAncestor(candidatePath) {
+  let currentPath = candidatePath;
+  while (!(await pathDetails(currentPath))) {
+    const parentPath = path.dirname(currentPath);
+    if (parentPath === currentPath) {
+      break;
+    }
+    currentPath = parentPath;
+  }
+  return currentPath;
+}
+
+function issueFingerprint({
+  kind = "broken-reference",
+  source,
+  rawReference,
+  resolvedTarget,
+  validationContext = null,
+}) {
+  return {
+    kind,
+    sourceRoute: routeToUrl(trimSlashes(routeFor(source))),
+    validationContext,
+    rawReference,
+    resolvedTarget,
+  };
+}
+
+async function resolveLocalImage({
+  href,
+  currentRelativePath,
+  sourceDir,
+}) {
+  const cleanHref = href.split("#")[0].split("?")[0].trim();
+  let decodedHref;
+  try {
+    decodedHref = decodeURIComponent(cleanHref);
+  } catch {
+    throw new Error(`Malformed image reference "${href}" in "${currentRelativePath}"`);
+  }
+
+  const sourceRoot = path.resolve(sourceDir);
+  const sourceRelative = decodedHref.startsWith("/")
+    ? decodedHref.replace(/^\/+/u, "")
+    : path.join(path.dirname(currentRelativePath), decodedHref);
+  const candidatePath = path.resolve(sourceRoot, sourceRelative);
+
+  if (!isWithinRoot(sourceRoot, candidatePath)) {
+    throw new Error(`Image reference "${href}" in "${currentRelativePath}" resolves outside docs`);
+  }
+
+  const canonicalSourceRoot = await realpath(sourceRoot);
+  const existingAncestor = await nearestExistingAncestor(candidatePath);
+  const canonicalAncestor = await realpath(existingAncestor);
+  if (!isWithinRoot(canonicalSourceRoot, canonicalAncestor)) {
+    throw new Error(
+      `Image reference "${href}" in "${currentRelativePath}" has a symlink ancestor outside docs`,
+    );
+  }
+
+  const normalizedRelative = toPosix(path.relative(sourceRoot, candidatePath));
+  const publicPath = encodePublicPath(normalizedRelative);
+  const details = await pathDetails(candidatePath);
+  if (!details) {
+    return { exists: false, publicPath, source: normalizedRelative };
+  }
+
+  const canonicalPath = await realpath(candidatePath);
+  if (!isWithinRoot(canonicalSourceRoot, canonicalPath)) {
+    throw new Error(
+      `Image reference "${href}" in "${currentRelativePath}" has a symlink target outside docs`,
+    );
+  }
+  const canonicalDetails = await stat(canonicalPath);
+  if (!canonicalDetails.isFile()) {
+    throw new Error(`Image reference "${href}" in "${currentRelativePath}" is not a file`);
+  }
+
+  return { exists: true, publicPath, source: normalizedRelative };
+}
+
+async function rewriteMarkdownImages(
+  markdown,
+  currentRelativePath,
+  sourceDir,
+  issues,
+  localAssets,
+) {
+  const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  const matches = [...markdown.matchAll(imagePattern)];
+  let rewritten = "";
+  let cursor = 0;
+
+  for (const match of matches) {
+    const [wholeMatch, alt, href] = match;
+    rewritten += markdown.slice(cursor, match.index);
+    cursor = match.index + wholeMatch.length;
+
+    if (looksExternal(href) || !looksLikeAsset(href)) {
+      rewritten += wholeMatch;
+      continue;
     }
 
-    if (!looksLikeAsset(href)) {
-      return match;
+    const resolved = await resolveLocalImage({
+      href,
+      currentRelativePath,
+      sourceDir,
+    });
+    if (resolved.exists) {
+      localAssets.set(resolved.source, {
+        source: resolved.source,
+        publicPath: resolved.publicPath,
+      });
+      rewritten += `![${alt}](${resolved.publicPath})`;
+      continue;
     }
 
     const label = alt.trim() || href;
-    return `[${label}](${href})`;
-  });
+    rewritten += `[${label}](${resolved.publicPath})`;
+    issues.push(
+      issueFingerprint({
+        source: currentRelativePath,
+        rawReference: resolved.publicPath,
+        resolvedTarget: resolved.publicPath,
+      }),
+    );
+  }
+
+  return rewritten + markdown.slice(cursor);
 }
 
 function normalizePathForLookup(value) {
@@ -297,13 +449,33 @@ function parseTargetParts(rawTarget) {
     queryIndex === -1 ? pathAndQuery : pathAndQuery.slice(0, queryIndex);
   const query = queryIndex === -1 ? "" : pathAndQuery.slice(queryIndex + 1);
   const queryParams = new URLSearchParams(query);
-  const idAnchor = queryParams.get("id");
-  const anchor = hash || (idAnchor ? encodeURIComponent(idAnchor) : "");
+  const normalizedAnchor = normalizeAnchor(hash || queryParams.get("id"));
+  const anchor = normalizedAnchor === null ? "" : encodeURIComponent(normalizedAnchor);
 
   return {
     rawPath,
     anchor,
   };
+}
+
+function unresolvedTargetUrl(rawTarget, currentRelativePath) {
+  const { rawPath, anchor } = parseTargetParts(rawTarget);
+  const currentDirectory = path.posix.dirname(currentRelativePath);
+  const firstSegment = rawPath.replace(/^\.?\//u, "").split("/")[0];
+  const currentSection = currentRelativePath.split("/")[0];
+  const shouldResolveFromRoot =
+    rawPath.startsWith("/") ||
+    (rawPath.startsWith("./") && firstSegment === currentSection);
+  const lookupPath = normalizePathForLookup(
+    shouldResolveFromRoot
+      ? rawPath.replace(/^\/|^\.\//u, "")
+      : path.posix.join(currentDirectory, rawPath),
+  );
+  if (lookupPath === null) {
+    return null;
+  }
+  const route = routeToUrl(trimSlashes(routeFor(lookupPath)));
+  return `${route}${anchor ? `#${anchor}` : ""}`;
 }
 
 function resolveInternalReference(rawTarget, currentRelativePath, routeReferences) {
@@ -376,12 +548,19 @@ function rewriteMarkdownLinks(markdown, currentRelativePath, routeReferences, is
         routeReferences,
       );
       if (!resolved) {
-        issues.push({
-          kind: "stale-link",
-          source: currentRelativePath,
-          target: href,
-        });
-        return match;
+        const emittedTarget = unresolvedTargetUrl(href, currentRelativePath);
+        if (!emittedTarget) {
+          return match;
+        }
+        const emittedReference = encodeURI(emittedTarget);
+        issues.push(
+          issueFingerprint({
+            source: currentRelativePath,
+            rawReference: emittedReference,
+            resolvedTarget: emittedTarget.split("#")[0],
+          }),
+        );
+        return `${prefix}${emittedReference}${suffix}`;
       }
 
       return `${prefix}${resolved.url}${docsifyHash.anchor}${suffix}`;
@@ -400,12 +579,19 @@ function rewriteMarkdownLinks(markdown, currentRelativePath, routeReferences, is
 
     const resolved = resolveInternalReference(href, currentRelativePath, routeReferences);
     if (!resolved) {
-      issues.push({
-        kind: "stale-link",
-        source: currentRelativePath,
-        target: href,
-      });
-      return match;
+      const emittedTarget = unresolvedTargetUrl(href, currentRelativePath);
+      if (!emittedTarget) {
+        return match;
+      }
+      const emittedReference = encodeURI(emittedTarget);
+      issues.push(
+        issueFingerprint({
+          source: currentRelativePath,
+          rawReference: emittedReference,
+          resolvedTarget: emittedTarget.split("#")[0],
+        }),
+      );
+      return `${prefix}${emittedReference}${suffix}`;
     }
 
     return `${prefix}${resolved.url}${suffix}`;
@@ -491,11 +677,6 @@ function parseSidebar(sidebarMarkdown, routeReferences, issues, source = "_sideb
     const parsedHref = parseSidebarHref(rawHref, routeReferences);
 
     if (parsedHref.missing) {
-      issues.push({
-        kind: "stale-sidebar-link",
-        source,
-        target: rawHref,
-      });
       continue;
     }
 
@@ -694,10 +875,22 @@ function deepSortIssues(issues) {
   return [...issues].sort((left, right) => {
     return (
       left.kind.localeCompare(right.kind) ||
-      left.source.localeCompare(right.source) ||
-      left.target.localeCompare(right.target)
+      left.sourceRoute.localeCompare(right.sourceRoute) ||
+      String(left.validationContext).localeCompare(String(right.validationContext)) ||
+      left.rawReference.localeCompare(right.rawReference) ||
+      left.resolvedTarget.localeCompare(right.resolvedTarget)
     );
   });
+}
+
+function deriveLanguage(markdown) {
+  const prose = markdown
+    .replace(/```[\s\S]*?```/gu, "")
+    .replace(/`[^`]*`/gu, "")
+    .replace(/https?:\/\/\S+/gu, "");
+  const hanCount = prose.match(/\p{Script=Han}/gu)?.length ?? 0;
+  const latinCount = prose.match(/\p{Script=Latin}/gu)?.length ?? 0;
+  return hanCount > 0 && hanCount >= latinCount * 0.05 ? "zh-CN" : "en";
 }
 
 function toNavigationSections(items) {
@@ -728,12 +921,20 @@ async function writeGeneratedNote({
   relativePath,
   absolutePath,
   notesDir,
+  sourceDir,
   routeReferences,
   issues,
+  localAssets,
 }) {
   const rawMarkdown = await readFile(absolutePath, "utf8");
   const extracted = extractTitleAndBody(rawMarkdown);
-  const imageSafeBody = rewriteMarkdownImages(extracted.body);
+  const imageSafeBody = await rewriteMarkdownImages(
+    extracted.body,
+    relativePath,
+    sourceDir,
+    issues,
+    localAssets,
+  );
   const rewrittenBody = rewriteMarkdownLinks(
     imageSafeBody,
     relativePath,
@@ -749,6 +950,11 @@ async function writeGeneratedNote({
         ? extracted.frontmatter.description
         : "",
     legacyPath: buildLegacyPath(relativePath),
+    language:
+      extracted.frontmatter.language === "en" ||
+      extracted.frontmatter.language === "zh-CN"
+        ? extracted.frontmatter.language
+        : deriveLanguage(rawMarkdown),
   };
 
   const output = `${buildFrontmatterBlock(frontmatter)}${rewrittenBody.replace(/^\n+/, "")}`;
@@ -763,6 +969,7 @@ export async function migrateContent({
   notesDir,
   navigationFile,
   knownIssuesFile,
+  assetManifestFile = path.join(path.dirname(navigationFile), "local-assets.json"),
 }) {
   const sourceFiles = (await listMarkdownFiles(sourceDir))
     .map((absolutePath) => toPosix(path.relative(sourceDir, absolutePath)))
@@ -797,6 +1004,7 @@ export async function migrateContent({
 
   const routeReferences = buildRouteReferenceMap(migrated);
   const issues = [];
+  const localAssets = new Map();
 
   await rm(notesDir, { recursive: true, force: true });
   await mkdir(notesDir, { recursive: true });
@@ -806,8 +1014,10 @@ export async function migrateContent({
       relativePath,
       absolutePath: path.join(sourceDir, relativePath),
       notesDir,
+      sourceDir,
       routeReferences,
       issues,
+      localAssets,
     });
   }
 
@@ -837,6 +1047,10 @@ export async function migrateContent({
   await mkdir(path.dirname(navigationFile), { recursive: true });
   await writeFile(navigationFile, `${JSON.stringify(navigation, null, 2)}\n`, "utf8");
   await writeFile(knownIssuesFile, `${JSON.stringify(sortedIssues, null, 2)}\n`, "utf8");
+  const sortedLocalAssets = [...localAssets.values()].sort((left, right) =>
+    left.publicPath.localeCompare(right.publicPath),
+  );
+  await writeFile(assetManifestFile, `${JSON.stringify(sortedLocalAssets, null, 2)}\n`, "utf8");
 
   return {
     migratedCount: migrated.length,
@@ -846,19 +1060,24 @@ export async function migrateContent({
     generatedDirSkippedCount: skippedGeneratedDir.length,
     navigation,
     issues: sortedIssues,
+    localAssets: sortedLocalAssets,
   };
 }
 
 export async function runCli(overrides = {}) {
   const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const navigationFile =
+    overrides.navigationFile ?? path.resolve(siteRoot, "src/generated/navigation.json");
 
   const result = await migrateContent({
     sourceDir: overrides.sourceDir ?? path.resolve(siteRoot, "../docs"),
     notesDir: overrides.notesDir ?? path.resolve(siteRoot, "src/generated/notes"),
-    navigationFile:
-      overrides.navigationFile ?? path.resolve(siteRoot, "src/generated/navigation.json"),
+    navigationFile,
     knownIssuesFile:
       overrides.knownIssuesFile ?? path.resolve(siteRoot, "content-known-issues.json"),
+    assetManifestFile:
+      overrides.assetManifestFile ??
+      path.resolve(path.dirname(navigationFile), "local-assets.json"),
   });
 
   console.log(

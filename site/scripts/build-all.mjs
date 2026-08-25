@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
@@ -43,6 +44,7 @@ export async function buildAll({
   assemble = assembleStatic,
 } = {}) {
   await commandRunner(npmCommand, ["run", "build:astro"], { cwd: siteRoot });
+  await rm(path.join(siteRoot, "dist", "pagefind"), { recursive: true, force: true });
   await commandRunner(npmCommand, ["exec", "--", "pagefind", "--site", "dist"], {
     cwd: siteRoot,
   });

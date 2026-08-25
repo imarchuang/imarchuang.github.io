@@ -23,7 +23,16 @@ export function legacyHashToPath(hash: string): string | null {
   }
 
   const normalized = decoded.replace(/\/index$/i, "").replace(/^\/+|\/+$/g, "");
-  const anchor = new URLSearchParams(query).get("id");
+  const rawAnchor = new URLSearchParams(query).get("id");
+  let anchor = "";
+
+  if (rawAnchor) {
+    try {
+      anchor = decodeURIComponent(rawAnchor).replace(/^#+/u, "");
+    } catch {
+      return null;
+    }
+  }
 
   return `/${normalized}/${anchor ? `#${encodeURIComponent(anchor)}` : ""}`;
 }

@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -138,7 +138,7 @@ describe("migrate-content", () => {
     expect(gettingStarted).toContain("[home](/)");
     expect(gettingStarted).toContain("[sketch](/draw/)");
     expect(gettingStarted).toContain("[drop](/drops/demo/)");
-    expect(gettingStarted).toContain("[missing](./missing.md)");
+    expect(gettingStarted).toContain("[missing](/guides/missing/)");
 
     await expect(readFile(path.join(notesDir, "_sidebar.md"), "utf8")).rejects.toThrow();
     await expect(readFile(path.join(notesDir, "draw", "skip.md"), "utf8")).rejects.toThrow();
@@ -154,14 +154,11 @@ describe("migrate-content", () => {
     const issues = JSON.parse(await readFile(knownIssuesFile, "utf8"));
     expect(issues).toEqual([
       {
-        kind: "stale-link",
-        source: "guides/getting-started.md",
-        target: "./missing.md",
-      },
-      {
-        kind: "stale-sidebar-link",
-        source: "_sidebar.md",
-        target: "./missing",
+        kind: "broken-reference",
+        sourceRoute: "/guides/getting-started/",
+        validationContext: null,
+        rawReference: "/guides/missing/",
+        resolvedTarget: "/guides/missing/",
       },
     ]);
   });
@@ -181,6 +178,33 @@ describe("migrate-content", () => {
     ).rejects.toThrow(
       /Duplicate generated slug "guides\/intro" from "guides\/intro\.md" and "guides\/intro\/index\.md"/,
     );
+  });
+
+  test("rejects traversing and symlink-escaped local image references", async () => {
+    const { migrateContent } = await loadMigrationModule();
+    const repo = await makeTempDir("task-2-image-safety-");
+    const sourceDir = path.join(repo, "docs");
+    const outsideDir = path.join(repo, "outside");
+    const workspaceDir = path.join(repo, "output");
+
+    await mkdir(path.join(sourceDir, "guides"), { recursive: true });
+    await mkdir(outsideDir, { recursive: true });
+    await writeFile(path.join(outsideDir, "secret.png"), "secret");
+    await symlink(outsideDir, path.join(sourceDir, "guides", "escaped"));
+    await writeFile(
+      path.join(sourceDir, "guides", "images.md"),
+      "# Unsafe\n\n![](../../../outside.png)\n\n![](./escaped/secret.png)\n",
+    );
+
+    await expect(
+      migrateContent({
+        sourceDir,
+        notesDir: path.join(workspaceDir, "notes"),
+        navigationFile: path.join(workspaceDir, "navigation.json"),
+        knownIssuesFile: path.join(workspaceDir, "content-known-issues.json"),
+        assetManifestFile: path.join(workspaceDir, "local-assets.json"),
+      }),
+    ).rejects.toThrow(/image reference .*outside docs|symlink/i);
   });
 
   test("supports CLI execution with explicit paths", async () => {
@@ -210,19 +234,23 @@ describe("migrate-content", () => {
     );
   });
 
-  test("preserves source-language image fallback labels", async () => {
+  test("preserves tracked relative images and records truly missing image debt", async () => {
     const { migrateContent } = await loadMigrationModule();
     const sourceDir = await makeTempDir("task-4-images-source-");
     const workspaceDir = await makeTempDir("task-4-images-output-");
     const notesDir = path.join(workspaceDir, "notes");
     const navigationFile = path.join(workspaceDir, "navigation.json");
     const knownIssuesFile = path.join(workspaceDir, "content-known-issues.json");
+    const assetManifestFile = path.join(workspaceDir, "local-assets.json");
 
-    await mkdir(path.join(sourceDir, "guides"), { recursive: true });
+    await mkdir(path.join(sourceDir, "guides", "pictures"), { recursive: true });
+    await writeFile(path.join(sourceDir, "guides", "pictures", "diagram.png"), "tracked");
     await writeFile(
       path.join(sourceDir, "guides", "images.md"),
       [
         "# 图片回退",
+        "",
+        "![架构图](./pictures/diagram.png)",
         "",
         "![架构图](./missing-diagram.png)",
         "",
@@ -237,13 +265,43 @@ describe("migrate-content", () => {
       notesDir,
       navigationFile,
       knownIssuesFile,
+      assetManifestFile,
     });
 
     const generated = await readFile(path.join(notesDir, "guides", "images.md"), "utf8");
-    expect(generated).toContain("[架构图](./missing-diagram.png)");
-    expect(generated).toContain("[./diagram-without-alt.png](./diagram-without-alt.png)");
+    expect(generated).toContain("![架构图](/guides/pictures/diagram.png)");
+    expect(generated).toContain("[架构图](/guides/missing-diagram.png)");
+    expect(generated).toContain(
+      "[./diagram-without-alt.png](/guides/diagram-without-alt.png)",
+    );
     expect(generated).not.toContain("Image:");
     expect(generated).not.toContain("Image asset");
+    await expect(
+      readFile(assetManifestFile, "utf8").then((value) => JSON.parse(value)),
+    ).resolves.toEqual([
+      {
+        source: "guides/pictures/diagram.png",
+        publicPath: "/guides/pictures/diagram.png",
+      },
+    ]);
+    await expect(
+      readFile(knownIssuesFile, "utf8").then((value) => JSON.parse(value)),
+    ).resolves.toEqual([
+      {
+        kind: "broken-reference",
+        sourceRoute: "/guides/images/",
+        validationContext: null,
+        rawReference: "/guides/diagram-without-alt.png",
+        resolvedTarget: "/guides/diagram-without-alt.png",
+      },
+      {
+        kind: "broken-reference",
+        sourceRoute: "/guides/images/",
+        validationContext: null,
+        rawReference: "/guides/missing-diagram.png",
+        resolvedTarget: "/guides/missing-diagram.png",
+      },
+    ]);
   });
 
   test("accounts for all real docs markdown and clears valid relative id links from known issues", async () => {
@@ -296,8 +354,13 @@ describe("migrate-content", () => {
       path.join(notesDir, "products", "federated", "sticky_session_k8s.md"),
       "utf8",
     );
-    expect(stickySession).not.toContain("![websocket stick session]");
-    expect(stickySession).toContain("[websocket stick session](../../images/lock_sticky_session.png)");
+    expect(stickySession).toContain(
+      "![websocket stick session](/images/lock_sticky_session.png)",
+    );
+    expect(stickySession).toContain('language: "en"');
     expect(stickySession).not.toContain("Image:");
+    await expect(
+      readFile(path.join(notesDir, "coding", "tree", "index.md"), "utf8"),
+    ).resolves.toContain('language: "zh-CN"');
   });
 });

@@ -118,6 +118,59 @@ describe("assemble-static", () => {
     await expect(readFile(path.join(distDir, ".nojekyll"), "utf8")).resolves.toBe("");
   });
 
+  test("copies only manifested section assets and rejects manifest traversal", async () => {
+    const {
+      __testOnly: { assembleStaticWithRepoRoot },
+    } = await loadAssemblyModule();
+    const repoRoot = await makeTempDir("task-5-local-assets-");
+    const docsDir = path.join(repoRoot, "docs");
+    const distDir = path.join(repoRoot, "site", "dist");
+    const localAssetsFile = path.join(repoRoot, "site", "local-assets.json");
+
+    await writeFixtureFile(path.join(docsDir, "guides", "pictures", "used.png"), "used");
+    await writeFixtureFile(path.join(docsDir, "guides", "pictures", "unused.png"), "unused");
+    await writeFixtureFile(
+      localAssetsFile,
+      JSON.stringify([
+        {
+          source: "guides/pictures/used.png",
+          publicPath: "/guides/pictures/used.png",
+        },
+      ]),
+    );
+
+    await expect(
+      assembleStaticWithRepoRoot({
+        docsDir,
+        distDir,
+        repoRoot,
+        localAssetsFile,
+      }),
+    ).resolves.toMatchObject({ localAssetCount: 1 });
+    await expect(readFile(path.join(distDir, "guides", "pictures", "used.png"), "utf8")).resolves.toBe(
+      "used",
+    );
+    await expect(stat(path.join(distDir, "guides", "pictures", "unused.png"))).rejects.toThrow();
+
+    await writeFixtureFile(
+      localAssetsFile,
+      JSON.stringify([
+        {
+          source: "guides/pictures/used.png",
+          publicPath: "/../escaped.png",
+        },
+      ]),
+    );
+    await expect(
+      assembleStaticWithRepoRoot({
+        docsDir,
+        distDir,
+        repoRoot,
+        localAssetsFile,
+      }),
+    ).rejects.toThrow(/outside.*local asset destination|destination.*outside/i);
+  });
+
   test("removes stale legacy subtree files without touching unrelated dist output", async () => {
     const {
       __testOnly: { assembleStaticWithRepoRoot },

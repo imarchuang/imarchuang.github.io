@@ -3,6 +3,7 @@ import {
   lstat,
   mkdir,
   readdir,
+  readFile,
   realpath,
   rm,
   stat,
@@ -169,7 +170,12 @@ async function validateCopyTree(repoRoot, sourcePath, label, visitedPaths = new 
   }
 }
 
-async function assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot }) {
+async function assembleStaticWithRepoRoot({
+  docsDir,
+  distDir,
+  repoRoot,
+  localAssetsFile,
+}) {
   const canonicalRepoRoot = await resolveRepoRoot(repoRoot);
   const canonicalDocsDir = await resolveExistingPathWithinRepo(
     canonicalRepoRoot,
@@ -222,6 +228,52 @@ async function assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot }) {
     copied.push(directoryName);
   }
 
+  let localAssetCount = 0;
+  if (localAssetsFile && (await pathExists(localAssetsFile))) {
+    const canonicalManifest = await resolveExistingPathWithinRepo(
+      canonicalRepoRoot,
+      localAssetsFile,
+      "local asset manifest",
+    );
+    await validateFile(canonicalManifest, "local asset manifest");
+    const localAssets = JSON.parse(await readFile(canonicalManifest, "utf8"));
+
+    for (const asset of localAssets) {
+      if (
+        typeof asset?.source !== "string" ||
+        typeof asset?.publicPath !== "string" ||
+        !asset.publicPath.startsWith("/")
+      ) {
+        throw new Error("Local asset manifest contains an invalid entry");
+      }
+      const sourcePath = await resolveExistingPathWithinRepo(
+        canonicalRepoRoot,
+        path.join(canonicalDocsDir, asset.source),
+        `local asset source ${asset.source}`,
+      );
+      if (!isWithinRoot(canonicalDocsDir, sourcePath)) {
+        throw outsideRootError("local asset source", sourcePath, canonicalDocsDir);
+      }
+      await validateFile(sourcePath, `local asset source ${asset.source}`);
+
+      const destinationPath = await resolvePlannedPathWithinRepo(
+        canonicalRepoRoot,
+        path.join(resolvedDistDir, asset.publicPath.replace(/^\/+/u, "")),
+        `local asset destination ${asset.publicPath}`,
+      );
+      if (!isWithinRoot(resolvedDistDir, destinationPath)) {
+        throw outsideRootError("local asset destination", destinationPath, resolvedDistDir);
+      }
+      await mkdir(path.dirname(destinationPath), { recursive: true });
+      await cp(sourcePath, destinationPath, {
+        dereference: true,
+        force: true,
+        preserveTimestamps: true,
+      });
+      localAssetCount += 1;
+    }
+  }
+
   const noJekyllSource = path.join(canonicalDocsDir, ".nojekyll");
   const noJekyllDestination = await resolvePlannedPathWithinRepo(
     canonicalRepoRoot,
@@ -247,6 +299,7 @@ async function assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot }) {
   return {
     copied,
     skipped,
+    localAssetCount,
     distDir: resolvedDistDir,
   };
 }
@@ -256,6 +309,7 @@ export async function assembleStatic({ docsDir, distDir }) {
     repoRoot: productionRepoRoot,
     docsDir,
     distDir,
+    localAssetsFile: path.resolve(siteRoot, "src/generated/local-assets.json"),
   });
 }
 

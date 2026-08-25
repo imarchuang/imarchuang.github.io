@@ -29,7 +29,14 @@ async function snapshotDirectory(directoryPath: string) {
       }
 
       const relativePath = path.relative(directoryPath, entryPath);
-      const contents = await readFile(entryPath);
+      let contents = await readFile(entryPath);
+      if (relativePath === path.join("pagefind", "pagefind-entry.json")) {
+        const parsed = JSON.parse(contents.toString("utf8"));
+        parsed.languages = Object.fromEntries(
+          Object.entries(parsed.languages).sort(([left], [right]) => left.localeCompare(right)),
+        );
+        contents = Buffer.from(JSON.stringify(parsed));
+      }
       const digest = createHash("sha256").update(contents).digest("hex");
       snapshot.set(relativePath, digest);
     }
@@ -130,6 +137,43 @@ describe("build-all", () => {
         readFile(path.join(distDir, "drops", "orbit-sketch", "index.html"), "utf8"),
       ).resolves.toContain("html");
       await expect(readFile(path.join(distDir, ".nojekyll"), "utf8")).resolves.toBe("");
+
+      const migratedArticle = await readFile(
+        path.join(distDir, "products", "federated", "sticky_session_k8s", "index.html"),
+        "utf8",
+      );
+      expect(migratedArticle).toContain('lang="en"');
+      expect(migratedArticle).toContain(
+        '<img src="/images/lock_sticky_session.png" alt="websocket stick session">',
+      );
+      await expect(readFile(path.join(distDir, "images", "lock_sticky_session.png"))).resolves.toEqual(
+        await readFile(path.resolve("../docs/images/lock_sticky_session.png")),
+      );
+
+      const chineseArticle = await readFile(
+        path.join(distDir, "coding", "tree", "index.html"),
+        "utf8",
+      );
+      expect(chineseArticle).toContain('lang="zh-CN"');
+
+      const assetManifest = JSON.parse(
+        await readFile(path.join(cwd, "src", "generated", "local-assets.json"), "utf8"),
+      );
+      expect(assetManifest.length).toBeGreaterThan(0);
+      for (const asset of assetManifest) {
+        await expect(
+          readFile(path.join(distDir, asset.publicPath.replace(/^\//u, ""))),
+        ).resolves.toEqual(
+          await readFile(path.resolve("../docs", asset.source)),
+        );
+      }
+
+      const dropHtml = await readFile(
+        path.join(distDir, "drops", "orbit-sketch", "index.html"),
+        "utf8",
+      );
+      expect(dropHtml).toContain('href="/_media/favicon.ico"');
+      await expect(readFile(path.join(distDir, "_media", "favicon.ico"))).resolves.toBeTruthy();
 
       const firstSnapshot = await snapshotDirectory(distDir);
 

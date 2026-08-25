@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -23,7 +23,13 @@ async function createBuiltSiteFixture({
   knownIssues = [],
 }: {
   files: Record<string, string>;
-  knownIssues?: Array<{ kind: string; source: string; target: string }>;
+  knownIssues?: Array<{
+    kind: string;
+    sourceRoute: string;
+    validationContext: string | null;
+    rawReference: string;
+    resolvedTarget: string;
+  }>;
 }) {
   const rootDir = await makeTempDir("task-6-validate-site-");
   const distDir = path.join(rootDir, "dist");
@@ -183,7 +189,59 @@ describe("validate-site", () => {
     });
   });
 
-  test("ignores external, fragment-only, and javascript-free non-local URLs", async () => {
+  test("validates local fragments and accepts encoded compatible anchors", async () => {
+    const {
+      __testOnly: { collectValidationReport },
+    } = await loadValidationModule();
+    const fixture = await createBuiltSiteFixture({
+      files: {
+        "guides/topic/index.html": [
+          "<!doctype html>",
+          '<h2 id="最长递增子序">最长递增子序</h2>',
+          '<a name="legacy-anchor"></a>',
+          '<a href="#%E6%9C%80%E9%95%BF%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F">Encoded</a>',
+          '<a href="#legacy-anchor">Named</a>',
+          '<a href="#missing-heading">Missing</a>',
+          "",
+        ].join("\n"),
+      },
+    });
+
+    const report = await collectValidationReport(fixture);
+
+    expect(report.failures).toEqual([
+      expect.stringContaining('fragment "#missing-heading"'),
+    ]);
+  });
+
+  test("regenerates exact known fragment fingerprints deterministically", async () => {
+    const { updateKnownFragmentIssues } = await loadValidationModule();
+    const fixture = await createBuiltSiteFixture({
+      files: {
+        "guides/topic/index.html":
+          '<!doctype html><h2 id="valid">Valid</h2><a href="#missing">Missing</a>',
+      },
+    });
+
+    await expect(updateKnownFragmentIssues(fixture)).resolves.toMatchObject({ count: 1 });
+    const outputPath = path.join(
+      path.dirname(fixture.knownIssuesFile),
+      "content-known-fragments.json",
+    );
+    await expect(
+      readFile(outputPath, "utf8").then((value) => JSON.parse(value)),
+    ).resolves.toEqual([
+      {
+        kind: "broken-fragment",
+        sourceRoute: "/guides/topic/",
+        validationContext: null,
+        rawReference: "#missing",
+        resolvedTarget: "/guides/topic/#missing",
+      },
+    ]);
+  });
+
+  test("ignores external and javascript-free non-local URLs", async () => {
     const { validateSite } = await loadValidationModule();
     const fixture = await createBuiltSiteFixture({
       files: {
@@ -193,7 +251,6 @@ describe("validate-site", () => {
           '<a href="//cdn.example.com/library.js">CDN</a>',
           '<a href="mailto:test@example.com">Mail</a>',
           '<a href="tel:+61000000000">Phone</a>',
-          '<a href="#summary">Fragment</a>',
           '<img src="data:image/png;base64,abc123" alt="Inline" />',
           '<script src="https://cdn.example.com/app.js"></script>',
           "",
@@ -212,7 +269,15 @@ describe("validate-site", () => {
       __testOnly: { collectValidationReport },
     } = await loadValidationModule();
     const fixture = await createBuiltSiteFixture({
-      knownIssues: [{ kind: "stale-link", source: "guides/topic.md", target: "./missing.md" }],
+      knownIssues: [
+        {
+          kind: "broken-reference",
+          sourceRoute: "/guides/topic/",
+          validationContext: null,
+          rawReference: "../missing/",
+          resolvedTarget: "/guides/missing/",
+        },
+      ],
       files: {
         "guides/topic/index.html": [
           "<!doctype html>",
@@ -231,17 +296,26 @@ describe("validate-site", () => {
     ]);
   });
 
-  test("allowlists marked sidebar links without suppressing body links to the same target", async () => {
+  test("requires raw spelling and resolved target to match the exact fingerprint", async () => {
     const {
       __testOnly: { collectValidationReport },
     } = await loadValidationModule();
     const fixture = await createBuiltSiteFixture({
-      knownIssues: [{ kind: "stale-sidebar-link", source: "guides/_sidebar.md", target: "./missing" }],
+      knownIssues: [
+        {
+          kind: "broken-reference",
+          sourceRoute: "/guides/topic/",
+          validationContext: "sidebar-nav",
+          rawReference: "/missing/",
+          resolvedTarget: "/missing/",
+        },
+      ],
       files: {
         "guides/topic/index.html": [
           "<!doctype html>",
           '<nav><a href="/missing/" data-validation-context="sidebar-nav">Sidebar</a></nav>',
-          '<p><a href="/missing/">Body</a></p>',
+          '<nav><a href="/missing" data-validation-context="sidebar-nav">Different spelling</a></nav>',
+          '<p><a href="/missing/">Different context</a></p>',
           "",
         ].join("\n"),
       },
@@ -250,8 +324,30 @@ describe("validate-site", () => {
     const report = await collectValidationReport(fixture);
 
     expect(report.allowlistedFailures).toHaveLength(1);
+    expect(report.failures).toHaveLength(2);
+    expect(report.failures.join("\n")).toContain('"/missing"');
+    expect(report.failures.join("\n")).toContain('"/missing/"');
+  });
+
+  test("validates local download links while allowing existing downloads", async () => {
+    const {
+      __testOnly: { collectValidationReport },
+    } = await loadValidationModule();
+    const fixture = await createBuiltSiteFixture({
+      files: {
+        "guides/topic/index.html": [
+          "<!doctype html>",
+          '<a href="/downloads/guide.pdf" download>Download</a>',
+          '<a href="/downloads/missing.zip">Missing</a>',
+          "",
+        ].join("\n"),
+        "downloads/guide.pdf": "pdf",
+      },
+    });
+
+    const report = await collectValidationReport(fixture);
     expect(report.failures).toEqual([
-      expect.stringContaining('Broken internal link in "/guides/topic/"'),
+      expect.stringContaining("/downloads/missing.zip"),
     ]);
   });
 
@@ -280,6 +376,7 @@ describe("validate-site", () => {
       files: {
         "guides/topic/index.html": [
           "<!doctype html>",
+          '<h2 id="summary">Summary</h2>',
           '<a href="/guides">Section</a>',
           '<a href="../topic">Self</a>',
           '<a href="../topic/index.html#summary">Index</a>',

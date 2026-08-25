@@ -13,6 +13,14 @@ test("serves migrated articles with article chrome", async ({ page, request }, t
   }
 });
 
+test("preserves a representative legacy Chinese fragment URL", async ({ page }) => {
+  await page.goto("/#/coding/dp/subsequence?id=#编辑距离");
+  await expect(page).toHaveURL(
+    /\/coding\/dp\/subsequence\/#%E7%BC%96%E8%BE%91%E8%B7%9D%E7%A6%BB$/u,
+  );
+  await expect(page.locator('[id="编辑距离"]')).toBeVisible();
+});
+
 test("loads representative articles without local resource, script, or layout failures", async ({
   page,
   request,

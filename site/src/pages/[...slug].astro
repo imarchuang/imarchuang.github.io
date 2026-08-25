@@ -41,6 +41,7 @@ const { Content, headings } = await render(entry);
   headings={headings}
   previous={route.previous}
   next={route.next}
+  language={entry.data.language}
 >
   <Content />
 </ArticleLayout>

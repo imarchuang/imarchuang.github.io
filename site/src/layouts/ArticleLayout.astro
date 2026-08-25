@@ -23,6 +23,7 @@ interface Props {
   headings: HeadingLink[];
   previous: ArticleListItem | null;
   next: ArticleListItem | null;
+  language: "en" | "zh-CN";
 }
 
 const {
@@ -33,13 +34,14 @@ const {
   headings,
   previous,
   next,
+  language,
 } = Astro.props;
 
 const tocHeadings = headings.filter((heading) => heading.depth <= 4);
 const showToc = tocHeadings.length >= 2;
 ---
 
-<BaseLayout title={`${title} — Marc Huang`} description={description || title}>
+<BaseLayout title={`${title} — Marc Huang`} description={description || title} language={language}>
   <div class="article-shell page-shell">
     <SectionNav navigation={navigation} currentPath={currentPath} />
 
@@ -102,4 +104,34 @@ const showToc = tocHeadings.length >= 2;
       block.prepend(button);
     });
   }
+
+  const scrollToCompatibleLegacyFragment = () => {
+    if (!window.location.hash) {
+      return;
+    }
+
+    let fragment;
+    try {
+      fragment = decodeURIComponent(window.location.hash.slice(1)).replace(/^#+/u, "");
+    } catch {
+      return;
+    }
+    if (!fragment || document.getElementById(fragment) || document.getElementsByName(fragment).length) {
+      return;
+    }
+
+    const normalize = (value) =>
+      value
+        .normalize("NFKC")
+        .toLocaleLowerCase("en-US")
+        .replace(/[^\p{Letter}\p{Number}]/gu, "");
+    const expected = normalize(fragment);
+    const compatible = [...document.querySelectorAll("[id], a[name]")].find((element) => {
+      const candidate = element.id || element.getAttribute("name") || "";
+      return expected && normalize(candidate) === expected;
+    });
+    compatible?.scrollIntoView();
+  };
+
+  scrollToCompatibleLegacyFragment();
 </script>

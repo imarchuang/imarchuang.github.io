@@ -1,302 +1,331 @@
 [
   {
-    "kind": "stale-link",
-    "source": "coding/binsearch/index.md",
-    "target": "./coding/binsearch/half.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/binsearch/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/half/",
+    "resolvedTarget": "/coding/binsearch/half/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/binsearch/index.md",
-    "target": "./coding/binsearch/ooxx.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/binsearch/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/ooxx/",
+    "resolvedTarget": "/coding/binsearch/ooxx/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/barchart.md",
-    "target": "./coding/dp/sebusequence?id=编辑距离"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/barchart/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E7%25BC%2596%25E8%25BE%2591%25E8%25B7%259D%25E7%25A6%25BB",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/intervals.md",
-    "target": "./coding/dp/sebusequence?id=最长公共子序列"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/intervals/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E6%259C%2580%25E9%2595%25BF%25E5%2585%25AC%25E5%2585%25B1%25E5%25AD%2590%25E5%25BA%258F%25E5%2588%2597",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/intervals.md",
-    "target": "./coding/dp/sebusequence?id=编辑距离"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/intervals/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E7%25BC%2596%25E8%25BE%2591%25E8%25B7%259D%25E7%25A6%25BB",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/monoq.md",
-    "target": "下一个更大元素II"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/monoq/",
+    "validationContext": null,
+    "rawReference": "/coding/classic/%E4%B8%8B%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A4%A7%E5%85%83%E7%B4%A0II/",
+    "resolvedTarget": "/coding/classic/下一个更大元素II/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/monoq.md",
-    "target": "最大树"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/monoq/",
+    "validationContext": null,
+    "rawReference": "/coding/classic/%E6%9C%80%E5%A4%A7%E6%A0%91/",
+    "resolvedTarget": "/coding/classic/最大树/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/recursion.md",
-    "target": "./coding/dfs/subset?id=子集"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/monoq/",
+    "validationContext": null,
+    "rawReference": "/coding/classic/pictures/monoq1.jpeg",
+    "resolvedTarget": "/coding/classic/pictures/monoq1.jpeg"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/recursion.md",
-    "target": "./coding/dp/sebusequence?id=最长公共子序列"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/recursion/",
+    "validationContext": null,
+    "rawReference": "/coding/dfs/subset/#%25E5%25AD%2590%25E9%259B%2586",
+    "resolvedTarget": "/coding/dfs/subset/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/recursion.md",
-    "target": "./coding/dp/sebusequence?id=最长回文子序"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/recursion/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E6%259C%2580%25E9%2595%25BF%25E5%2585%25AC%25E5%2585%25B1%25E5%25AD%2590%25E5%25BA%258F%25E5%2588%2597",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/recursion.md",
-    "target": "./coding/dp/sebusequence?id=构造回文的最小插入次数"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/recursion/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E6%259C%2580%25E9%2595%25BF%25E5%259B%259E%25E6%2596%2587%25E5%25AD%2590%25E5%25BA%258F",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/recursion.md",
-    "target": "./coding/dp/sebusequence?id=编辑距离"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/recursion/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E6%259E%2584%25E9%2580%25A0%25E5%259B%259E%25E6%2596%2587%25E7%259A%2584%25E6%259C%2580%25E5%25B0%258F%25E6%258F%2592%25E5%2585%25A5%25E6%25AC%25A1%25E6%2595%25B0",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/strings.md",
-    "target": "./coding/dfs/subset?id=子集"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/recursion/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E7%25BC%2596%25E8%25BE%2591%25E8%25B7%259D%25E7%25A6%25BB",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/strings.md",
-    "target": "./coding/dp/sebusequence?id=最长公共子序列"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/strings/",
+    "validationContext": null,
+    "rawReference": "/coding/dfs/subset/#%25E5%25AD%2590%25E9%259B%2586",
+    "resolvedTarget": "/coding/dfs/subset/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/strings.md",
-    "target": "./coding/dp/sebusequence?id=最长回文子序"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/strings/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E6%259C%2580%25E9%2595%25BF%25E5%2585%25AC%25E5%2585%25B1%25E5%25AD%2590%25E5%25BA%258F%25E5%2588%2597",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/strings.md",
-    "target": "./coding/dp/sebusequence?id=构造回文的最小插入次数"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/strings/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E6%259C%2580%25E9%2595%25BF%25E5%259B%259E%25E6%2596%2587%25E5%25AD%2590%25E5%25BA%258F",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/classic/strings.md",
-    "target": "./coding/dp/sebusequence?id=编辑距离"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/strings/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E6%259E%2584%25E9%2580%25A0%25E5%259B%259E%25E6%2596%2587%25E7%259A%2584%25E6%259C%2580%25E5%25B0%258F%25E6%258F%2592%25E5%2585%25A5%25E6%25AC%25A1%25E6%2595%25B0",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/index.md",
-    "target": "./coding/binsearch/half.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/classic/strings/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/sebusequence/#%25E7%25BC%2596%25E8%25BE%2591%25E8%25B7%259D%25E7%25A6%25BB",
+    "resolvedTarget": "/coding/dp/sebusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/index.md",
-    "target": "./coding/binsearch/ooxx.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/half/",
+    "resolvedTarget": "/coding/binsearch/half/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/presum.md",
-    "target": "./coding/binsearch/half.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/ooxx/",
+    "resolvedTarget": "/coding/binsearch/ooxx/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/presum.md",
-    "target": "./coding/binsearch/ooxx.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/presum/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/half/",
+    "resolvedTarget": "/coding/binsearch/half/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/stack.md",
-    "target": "./coding/binsearch/half.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/presum/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/ooxx/",
+    "resolvedTarget": "/coding/binsearch/ooxx/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/stack.md",
-    "target": "./coding/binsearch/ooxx.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/stack/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/half/",
+    "resolvedTarget": "/coding/binsearch/half/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/trie.md",
-    "target": "./coding/binsearch/half.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/stack/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/ooxx/",
+    "resolvedTarget": "/coding/binsearch/ooxx/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/trie.md",
-    "target": "./coding/binsearch/ooxx.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/trie/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/half/",
+    "resolvedTarget": "/coding/binsearch/half/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/unionfind.md",
-    "target": "./coding/binsearch/half.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/trie/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/ooxx/",
+    "resolvedTarget": "/coding/binsearch/ooxx/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/design/unionfind.md",
-    "target": "./coding/binsearch/ooxx.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/unionfind/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/half/",
+    "resolvedTarget": "/coding/binsearch/half/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/dfs/index.md",
-    "target": "./coding/classic/sbusequence"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/design/unionfind/",
+    "validationContext": null,
+    "rawReference": "/coding/binsearch/ooxx/",
+    "resolvedTarget": "/coding/binsearch/ooxx/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/dp/decision.md",
-    "target": "如果s.substring(i-2,i"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/dfs/",
+    "validationContext": null,
+    "rawReference": "/coding/classic/sbusequence/",
+    "resolvedTarget": "/coding/classic/sbusequence/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/dp/decision.md",
-    "target": "如果不是“0”"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/dp/decision/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/%E5%A6%82%E6%9E%9C%E4%B8%8D%E6%98%AF%E2%80%9C0%E2%80%9D/",
+    "resolvedTarget": "/coding/dp/如果不是“0”/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/dp/greedy.md",
-    "target": "下一个更大元素II"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/dp/decision/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/%E5%A6%82%E6%9E%9Cs.substring(i-2,i/",
+    "resolvedTarget": "/coding/dp/如果s.substring(i-2,i/"
   },
   {
-    "kind": "stale-link",
-    "source": "coding/memo/index.md",
-    "target": "../snippets/example.js \":include\""
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/dp/greedy/",
+    "validationContext": null,
+    "rawReference": "/coding/dp/%E4%B8%8B%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A4%A7%E5%85%83%E7%B4%A0II/",
+    "resolvedTarget": "/coding/dp/下一个更大元素II/"
   },
   {
-    "kind": "stale-link",
-    "source": "devops/index.md",
-    "target": "./cloud/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/coding/memo/",
+    "validationContext": null,
+    "rawReference": "/coding/snippets/example.js%20%22:include%22/",
+    "resolvedTarget": "/coding/snippets/example.js \":include\"/"
   },
   {
-    "kind": "stale-link",
-    "source": "devops/index.md",
-    "target": "./java/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/devops/",
+    "validationContext": null,
+    "rawReference": "/devops/cloud/",
+    "resolvedTarget": "/devops/cloud/"
   },
   {
-    "kind": "stale-link",
-    "source": "devops/index.md",
-    "target": "./tomcat/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/devops/",
+    "validationContext": null,
+    "rawReference": "/devops/java/",
+    "resolvedTarget": "/devops/java/"
   },
   {
-    "kind": "stale-link",
-    "source": "distributed/index.md",
-    "target": "./cloud/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/devops/",
+    "validationContext": null,
+    "rawReference": "/devops/tomcat/",
+    "resolvedTarget": "/devops/tomcat/"
   },
   {
-    "kind": "stale-link",
-    "source": "distributed/index.md",
-    "target": "./java/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/distributed/",
+    "validationContext": null,
+    "rawReference": "/distributed/cloud/",
+    "resolvedTarget": "/distributed/cloud/"
   },
   {
-    "kind": "stale-link",
-    "source": "distributed/index.md",
-    "target": "./tomcat/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/distributed/",
+    "validationContext": null,
+    "rawReference": "/distributed/java/",
+    "resolvedTarget": "/distributed/java/"
   },
   {
-    "kind": "stale-link",
-    "source": "products/index.md",
-    "target": "./cloud/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/distributed/",
+    "validationContext": null,
+    "rawReference": "/distributed/tomcat/",
+    "resolvedTarget": "/distributed/tomcat/"
   },
   {
-    "kind": "stale-link",
-    "source": "products/index.md",
-    "target": "./java/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/products/",
+    "validationContext": null,
+    "rawReference": "/products/cloud/",
+    "resolvedTarget": "/products/cloud/"
   },
   {
-    "kind": "stale-link",
-    "source": "products/index.md",
-    "target": "./tomcat/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/products/",
+    "validationContext": null,
+    "rawReference": "/products/java/",
+    "resolvedTarget": "/products/java/"
   },
   {
-    "kind": "stale-link",
-    "source": "system/index.md",
-    "target": "./cloud/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/products/",
+    "validationContext": null,
+    "rawReference": "/products/tomcat/",
+    "resolvedTarget": "/products/tomcat/"
   },
   {
-    "kind": "stale-link",
-    "source": "system/index.md",
-    "target": "./java/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/pythonic/",
+    "validationContext": null,
+    "rawReference": "/pythonic/pictures/cover.png",
+    "resolvedTarget": "/pythonic/pictures/cover.png"
   },
   {
-    "kind": "stale-link",
-    "source": "system/index.md",
-    "target": "./tomcat/index.md"
+    "kind": "broken-reference",
+    "sourceRoute": "/sysde/",
+    "validationContext": null,
+    "rawReference": "/sysde/pictures/cover.png",
+    "resolvedTarget": "/sysde/pictures/cover.png"
   },
   {
-    "kind": "stale-sidebar-link",
-    "source": "coding/_sidebar.md",
-    "target": "./coding/binsearch/half"
+    "kind": "broken-reference",
+    "sourceRoute": "/system/",
+    "validationContext": null,
+    "rawReference": "/system/cloud/",
+    "resolvedTarget": "/system/cloud/"
   },
   {
-    "kind": "stale-sidebar-link",
-    "source": "coding/_sidebar.md",
-    "target": "./coding/binsearch/ooxx"
+    "kind": "broken-reference",
+    "sourceRoute": "/system/",
+    "validationContext": null,
+    "rawReference": "/system/java/",
+    "resolvedTarget": "/system/java/"
   },
   {
-    "kind": "stale-sidebar-link",
-    "source": "coding/_sidebar.md",
-    "target": "./coding/linkedlist/kgroupreverse"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "coding/_sidebar.md",
-    "target": "./coding/twopointer/inward"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "coding/_sidebar.md",
-    "target": "./coding/twopointer/outward"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "coding/_sidebar.md",
-    "target": "./coding/twopointer/twosum"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "python/_sidebar.md",
-    "target": "./python/adv/index"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "python/_sidebar.md",
-    "target": "./python/laziness"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "python/_sidebar.md",
-    "target": "./python/memorize"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "sysde/_sidebar.md",
-    "target": "./sysde/linkedlist/kgroupreverse"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "sysde/_sidebar.md",
-    "target": "./sysde/tree/bst"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "sysde/_sidebar.md",
-    "target": "./sysde/tree/index"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "sysde/_sidebar.md",
-    "target": "./sysde/tree/postorder"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "sysde/_sidebar.md",
-    "target": "./sysde/tree/reconstruct"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "sysde/_sidebar.md",
-    "target": "./sysde/tree/traversal"
-  },
-  {
-    "kind": "stale-sidebar-link",
-    "source": "system/_sidebar.md",
-    "target": "./system/codes/async_await"
+    "kind": "broken-reference",
+    "sourceRoute": "/system/",
+    "validationContext": null,
+    "rawReference": "/system/tomcat/",
+    "resolvedTarget": "/system/tomcat/"
   }
 ]

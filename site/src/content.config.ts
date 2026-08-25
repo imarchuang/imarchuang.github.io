@@ -7,6 +7,7 @@ const notes = defineCollection({
     title: z.string(),
     description: z.string().default(""),
     legacyPath: z.string(),
+    language: z.enum(["en", "zh-CN"]),
     navOrder: z.number().optional(),
   }),
 });

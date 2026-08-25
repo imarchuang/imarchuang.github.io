@@ -17,6 +17,7 @@ test("loads pagefind only after the search dialog opens", async ({ page }) => {
 
   await page.getByRole("button", { name: "打开搜索" }).click();
   await expect(page.getByRole("dialog", { name: "站内搜索" })).toBeVisible();
+  await expect(page.getByRole("status")).toHaveAttribute("aria-live", "polite");
 
   await expect
     .poll(() => requests.some((url) => url.includes("/pagefind/pagefind.js")))

@@ -1,8 +1,6 @@
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-
-import { routeFor } from "./migrate-content.mjs";
 
 const REQUIRED_ARTIFACTS = [
   {
@@ -135,15 +133,88 @@ function normalizeAssetPath(sitePath) {
   return `/${trimSlashes(sitePath)}`;
 }
 
-function splitReference(reference) {
-  const [withoutHash] = reference.split("#", 1);
-  const [pathname] = withoutHash.split("?", 1);
-  const trimmed = pathname.trim();
-
+function parseReference(reference) {
+  const hashIndex = reference.indexOf("#");
+  const beforeHash = hashIndex === -1 ? reference : reference.slice(0, hashIndex);
+  const rawFragment = hashIndex === -1 ? null : reference.slice(hashIndex + 1);
+  const [pathname] = beforeHash.split("?", 1);
+  let decodedPathname;
+  let decodedFragment = null;
   try {
-    return decodeURIComponent(trimmed);
+    decodedPathname = decodeURIComponent(pathname.trim());
+    decodedFragment = rawFragment === null ? null : decodeURIComponent(rawFragment);
   } catch {
-    return trimmed;
+    return {
+      pathname: pathname.trim(),
+      fragment: rawFragment,
+      malformed: true,
+    };
+  }
+  return {
+    pathname: decodedPathname,
+    fragment: decodedFragment?.replace(/^#+/u, "") ?? null,
+    malformed: false,
+  };
+}
+
+function decodeHtmlAttribute(value) {
+  return value
+    .replace(/&quot;/gu, '"')
+    .replace(/&#39;|&apos;/gu, "'")
+    .replace(/&amp;/gu, "&")
+    .replace(/&lt;/gu, "<")
+    .replace(/&gt;/gu, ">");
+}
+
+function collectFragmentTargets(html) {
+  const targets = new Set();
+  const sanitized = stripNonDocumentBodies(html);
+  const pattern = /\b(?:id|name)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/giu;
+  for (const match of sanitized.matchAll(pattern)) {
+    const target = decodeHtmlAttribute(match[1] ?? match[2] ?? match[3] ?? "");
+    if (target) {
+      targets.add(target);
+    }
+  }
+  return targets;
+}
+
+function compatibleFragment(value) {
+  return value
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^\p{Letter}\p{Number}]/gu, "");
+}
+
+function fragmentExists(targets, fragment) {
+  if (targets.has(fragment)) {
+    return true;
+  }
+  const normalized = compatibleFragment(fragment);
+  return normalized.length > 0 && [...targets].some((target) => compatibleFragment(target) === normalized);
+}
+
+function parseLegacyHashReference(reference) {
+  if (!reference.startsWith("/#/")) {
+    return null;
+  }
+  const raw = reference.slice(3);
+  const [routePart, query = ""] = raw.split("?");
+  try {
+    const decodedRoute = decodeURIComponent(routePart)
+      .replace(/\.md$/iu, "")
+      .replace(/\/index$/iu, "")
+      .replace(/^\/+|\/+$/gu, "");
+    const rawAnchor = new URLSearchParams(query).get("id");
+    const anchor = rawAnchor
+      ? decodeURIComponent(rawAnchor).replace(/^#+/u, "")
+      : null;
+    return {
+      route: routeToUrl(decodedRoute),
+      anchor,
+    };
+  } catch {
+    return { route: null, anchor: null };
   }
 }
 
@@ -180,94 +251,25 @@ function looksLikeHtmlRoute(pathname) {
   return pathname.endsWith("/") || extension === "" || extension === ".html" || extension === ".md";
 }
 
-function relativeSourceToRoute(source) {
-  return routeToUrl(routeFor(toPosix(source)));
-}
-
-function candidateForResolvedIssuePath(sitePath) {
-  const relativePath = trimSlashes(sitePath);
-  const extension = path.posix.extname(relativePath).toLowerCase();
-
-  if (!extension || extension === ".html" || extension === ".md") {
-    return routeToUrl(routeFor(relativePath));
-  }
-
-  return normalizeAssetPath(sitePath);
-}
-
-function issueTargetCandidates(issue) {
-  const rawPath = splitReference(issue.target);
-  const candidates = new Set();
-
-  if (!rawPath || looksExternal(rawPath) || rawPath.startsWith("#")) {
-    return candidates;
-  }
-
-  if (issue.kind === "stale-sidebar-link") {
-    const sidebarResolved = resolveReferencePath("README.md", rawPath);
-    if (!sidebarResolved.escaped && sidebarResolved.sitePath) {
-      candidates.add(candidateForResolvedIssuePath(sidebarResolved.sitePath));
-    }
-    return candidates;
-  }
-
-  const sourceRelative = toPosix(issue.source);
-  const sourceDirectory = path.posix.dirname(sourceRelative);
-  const fileRelative = resolveReferencePath(sourceRelative, rawPath);
-  if (!fileRelative.escaped && fileRelative.sitePath) {
-    candidates.add(candidateForResolvedIssuePath(fileRelative.sitePath));
-  }
-
-  const rootRelative = resolveReferencePath(path.posix.join(sourceDirectory, "index.md"), rawPath);
-  if (!rootRelative.escaped && rootRelative.sitePath) {
-    candidates.add(candidateForResolvedIssuePath(rootRelative.sitePath));
-  }
-
-  return candidates;
-}
-
 function buildAllowlist(knownIssues) {
-  return knownIssues.map((issue) => {
-    if (issue.kind === "stale-sidebar-link") {
-      return {
-        kind: issue.kind,
-        sourcePrefix: routeToUrl(path.posix.dirname(toPosix(issue.source))),
-        rawTarget: splitReference(issue.target),
-        targetCandidates: issueTargetCandidates(issue),
-      };
-    }
-
-    return {
-      kind: issue.kind,
-      sourceRoute: relativeSourceToRoute(issue.source),
-      rawTarget: splitReference(issue.target),
-      targetCandidates: issueTargetCandidates(issue),
-    };
-  });
+  return knownIssues.map((issue) => ({
+    kind: issue.kind,
+    sourceRoute: issue.sourceRoute,
+    validationContext: issue.validationContext ?? null,
+    rawReference: issue.rawReference,
+    resolvedTarget: issue.resolvedTarget,
+  }));
 }
 
 function isAllowlistedFailure(failure, allowlist) {
-  if (failure.kind !== "broken-reference") {
-    return false;
-  }
-
-  return allowlist.some((entry) => {
-    const rawTargetMatches = entry.rawTarget && splitReference(failure.rawReference) === entry.rawTarget;
-    const normalizedTargetMatches = entry.targetCandidates.has(failure.resolvedTarget);
-
-    if (!rawTargetMatches && !normalizedTargetMatches) {
-      return false;
-    }
-
-    if (entry.kind === "stale-sidebar-link") {
-      return (
-        failure.validationContext === "sidebar-nav" &&
-        failure.sourceRoute.startsWith(entry.sourcePrefix)
-      );
-    }
-
-    return failure.sourceRoute === entry.sourceRoute;
-  });
+  return allowlist.some(
+    (entry) =>
+      failure.kind === entry.kind &&
+      failure.sourceRoute === entry.sourceRoute &&
+      (failure.validationContext ?? null) === entry.validationContext &&
+      failure.rawReference === entry.rawReference &&
+      failure.resolvedTarget === entry.resolvedTarget,
+  );
 }
 
 async function pathExists(candidatePath) {
@@ -309,6 +311,8 @@ function formatFailure(failure) {
       return `Missing required artifact "${failure.href}": expected "${failure.expectedPath}" (${failure.reason}). Run "npm run build" before validation.`;
     case "broken-reference":
       return `${failure.referenceType} in "${failure.sourceRoute}" (${failure.sourceFile}): "${failure.rawReference}" resolved to "${failure.resolvedTarget}" but no built page or file exists.`;
+    case "broken-fragment":
+      return `Broken local fragment "${failure.rawReference.slice(failure.rawReference.indexOf("#"))}" in "${failure.sourceRoute}" (${failure.sourceFile}): destination "${failure.resolvedTarget}" has no compatible id or name.`;
     case "escaped-reference":
       return `${failure.referenceType} escapes dist in "${failure.sourceRoute}" (${failure.sourceFile}): "${failure.rawReference}".`;
     default:
@@ -316,17 +320,25 @@ function formatFailure(failure) {
   }
 }
 
-async function loadKnownIssues(knownIssuesFile) {
-  if (!(await pathExists(knownIssuesFile))) {
-    return [];
+async function loadKnownIssues(knownIssuesFile, includeFragmentAllowlist = true) {
+  const issues = [];
+  if (await pathExists(knownIssuesFile)) {
+    issues.push(...JSON.parse(await readFile(knownIssuesFile, "utf8")));
   }
-
-  return JSON.parse(await readFile(knownIssuesFile, "utf8"));
+  const fragmentIssuesFile = path.join(
+    path.dirname(knownIssuesFile),
+    "content-known-fragments.json",
+  );
+  if (includeFragmentAllowlist && (await pathExists(fragmentIssuesFile))) {
+    issues.push(...JSON.parse(await readFile(fragmentIssuesFile, "utf8")));
+  }
+  return issues;
 }
 
 export async function collectValidationReport({
   distDir,
   knownIssuesFile,
+  includeFragmentAllowlist = true,
 } = {}) {
   const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const resolvedDistDir = path.resolve(distDir ?? path.join(siteRoot, "dist"));
@@ -346,6 +358,7 @@ export async function collectValidationReport({
   const fileSet = new Set(relativeFiles.map((relativePath) => normalizeAssetPath(relativePath)));
   const htmlFiles = relativeFiles.filter((relativePath) => relativePath.endsWith(".html"));
   const routeOwners = new Map();
+  const fragmentTargetsByRoute = new Map();
   const rawFailures = [];
   let checkedReferences = 0;
 
@@ -367,6 +380,8 @@ export async function collectValidationReport({
     }
 
     routeOwners.set(route, `dist/${relativePath}`);
+    const html = await readFile(path.join(resolvedDistDir, relativePath), "utf8");
+    fragmentTargetsByRoute.set(route, collectFragmentTargets(html));
   }
 
   for (const artifact of REQUIRED_ARTIFACTS) {
@@ -399,17 +414,50 @@ export async function collectValidationReport({
     const html = await readFile(path.join(resolvedDistDir, relativePath), "utf8");
 
     for (const reference of parseAttributeReferences(html)) {
-      const pathname = splitReference(reference.rawValue);
-      if (!pathname || pathname === "." || pathname === "./" || pathname === "#") {
+      const legacyHash = parseLegacyHashReference(reference.rawValue);
+      if (legacyHash) {
+        checkedReferences += 1;
+        const legacyRouteExists = legacyHash.route && routeOwners.has(legacyHash.route);
+        const legacyAnchorExists =
+          !legacyHash.anchor ||
+          (legacyHash.route &&
+            fragmentExists(
+              fragmentTargetsByRoute.get(legacyHash.route) ?? new Set(),
+              legacyHash.anchor,
+            ));
+        if (legacyRouteExists && legacyAnchorExists) {
+          continue;
+        }
+        rawFailures.push({
+          kind: legacyRouteExists ? "broken-fragment" : "broken-reference",
+          sourceFile,
+          sourceRoute,
+          rawReference: reference.rawValue,
+          resolvedTarget: legacyHash.route
+            ? `${legacyHash.route}${legacyHash.anchor ? `#${legacyHash.anchor}` : ""}`
+            : reference.rawValue,
+          referenceType: "Broken legacy hash link",
+          validationContext: reference.validationContext,
+        });
         continue;
       }
 
-      if (looksExternal(pathname)) {
+      const parsedReference = parseReference(reference.rawValue);
+      const pathname = parsedReference.pathname;
+      if (
+        (pathname === "." || pathname === "./") &&
+        parsedReference.fragment === null
+      ) {
+        continue;
+      }
+
+      if (looksExternal(reference.rawValue)) {
         continue;
       }
 
       const isAnchorLink = reference.attribute === "href" && reference.tagName === "a";
-      const resolved = resolveReferencePath(relativePath, pathname);
+      const pathForResolution = pathname || ".";
+      const resolved = resolveReferencePath(relativePath, pathForResolution);
       const referenceType = isAnchorLink
         ? "Broken internal link"
         : "Missing local asset reference";
@@ -427,18 +475,43 @@ export async function collectValidationReport({
         continue;
       }
 
-      if (isAnchorLink && !looksLikeHtmlRoute(pathname)) {
-        continue;
-      }
-
       checkedReferences += 1;
       const resolvedTarget = resolved.sitePath;
       const assetPath = normalizeAssetPath(resolvedTarget);
       const routePath = normalizeTargetRoute(resolvedTarget);
-      const existsAsRoute = looksLikeHtmlRoute(pathname) && routeOwners.has(routePath);
+      const existsAsRoute = looksLikeHtmlRoute(pathForResolution) && routeOwners.has(routePath);
       const existsAsFile = fileSet.has(assetPath);
 
       if (existsAsRoute || existsAsFile) {
+        if (
+          isAnchorLink &&
+          parsedReference.fragment !== null &&
+          existsAsRoute &&
+          !parsedReference.malformed
+        ) {
+          const targets = fragmentTargetsByRoute.get(routePath) ?? new Set();
+          if (!fragmentExists(targets, parsedReference.fragment)) {
+            rawFailures.push({
+              kind: "broken-fragment",
+              sourceFile,
+              sourceRoute,
+              rawReference: reference.rawValue,
+              resolvedTarget: `${routePath}#${parsedReference.fragment}`,
+              referenceType,
+              validationContext: reference.validationContext,
+            });
+          }
+        } else if (isAnchorLink && parsedReference.malformed) {
+          rawFailures.push({
+            kind: "broken-fragment",
+            sourceFile,
+            sourceRoute,
+            rawReference: reference.rawValue,
+            resolvedTarget: `${routePath}#${parsedReference.fragment ?? ""}`,
+            referenceType,
+            validationContext: reference.validationContext,
+          });
+        }
         continue;
       }
 
@@ -447,16 +520,19 @@ export async function collectValidationReport({
         sourceFile,
         sourceRoute,
         rawReference: reference.rawValue,
-        resolvedTarget: looksLikeHtmlRoute(pathname) ? routePath : assetPath,
+        resolvedTarget: looksLikeHtmlRoute(pathForResolution) ? routePath : assetPath,
         referenceType,
         validationContext: reference.validationContext,
       });
     }
   }
 
-  const allowlist = buildAllowlist(await loadKnownIssues(resolvedKnownIssuesFile));
+  const allowlist = buildAllowlist(
+    await loadKnownIssues(resolvedKnownIssuesFile, includeFragmentAllowlist),
+  );
   const failures = [];
   const allowlistedFailures = [];
+  const failureFingerprints = [];
 
   for (const failure of rawFailures) {
     const formatted = formatFailure(failure);
@@ -465,10 +541,27 @@ export async function collectValidationReport({
       continue;
     }
     failures.push(formatted);
+    if (failure.kind === "broken-reference" || failure.kind === "broken-fragment") {
+      failureFingerprints.push({
+        kind: failure.kind,
+        sourceRoute: failure.sourceRoute,
+        validationContext: failure.validationContext ?? null,
+        rawReference: failure.rawReference,
+        resolvedTarget: failure.resolvedTarget,
+      });
+    }
   }
 
   failures.sort((left, right) => left.localeCompare(right));
   allowlistedFailures.sort((left, right) => left.localeCompare(right));
+  failureFingerprints.sort(
+    (left, right) =>
+      left.kind.localeCompare(right.kind) ||
+      left.sourceRoute.localeCompare(right.sourceRoute) ||
+      String(left.validationContext).localeCompare(String(right.validationContext)) ||
+      left.rawReference.localeCompare(right.rawReference) ||
+      left.resolvedTarget.localeCompare(right.resolvedTarget),
+  );
 
   return {
     checkedFiles: relativeFiles.length,
@@ -477,6 +570,7 @@ export async function collectValidationReport({
     failureCount: failures.length,
     allowlistedFailureCount: allowlistedFailures.length,
     failures,
+    failureFingerprints,
     allowlistedFailures,
   };
 }
@@ -494,6 +588,24 @@ export async function validateSite(options = {}) {
   }
 
   return report;
+}
+
+export async function updateKnownFragmentIssues(options = {}) {
+  const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const knownIssuesFile = path.resolve(
+    options.knownIssuesFile ?? path.join(siteRoot, "content-known-issues.json"),
+  );
+  const report = await collectValidationReport({
+    ...options,
+    knownIssuesFile,
+    includeFragmentAllowlist: false,
+  });
+  const fragments = report.failureFingerprints.filter(
+    (failure) => failure.kind === "broken-fragment",
+  );
+  const outputPath = path.join(path.dirname(knownIssuesFile), "content-known-fragments.json");
+  await writeFile(outputPath, `${JSON.stringify(fragments, null, 2)}\n`, "utf8");
+  return { outputPath, count: fragments.length };
 }
 
 export const __testOnly = {
@@ -521,7 +633,11 @@ export async function runCli(overrides = {}) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   try {
-    await runCli();
+    if (process.argv.includes("--update-known-fragments")) {
+      console.log(JSON.stringify(await updateKnownFragmentIssues(), null, 2));
+    } else {
+      await runCli();
+    }
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;
