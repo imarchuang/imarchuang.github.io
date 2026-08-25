@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>什么是计算机科学 | 五年级计算机科学互动课程</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root{--p:#1f4f82;--s:#e8f2ff;--a:#1f9d9f;--d:#12304d;--ink:#1e2f3f;--line:#d9e4ec;--paper:#fffefa}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:linear-gradient(180deg,#f3f7fb,#ebf1f7)}
+    .app{max-width:1280px;margin:0 auto;padding:14px}
+    .top{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+    .group{display:flex;gap:8px;flex-wrap:wrap}
+    button,a{font:inherit}
+    .ctl{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;text-decoration:none;color:var(--ink);cursor:pointer}
+    .stage-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px;min-width:0}
+    .stage{min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:10px;box-shadow:0 12px 26px rgba(15,40,68,.1)}
+    .slides{aspect-ratio:16/9;min-height:0;position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .slide{position:absolute;inset:0;display:none;padding:16px;overflow:auto}
+    .slide.active{display:grid;grid-template-rows:auto 1fr;gap:12px}
+    .slide-head{display:flex;justify-content:space-between;gap:10px}
+    .kicker{margin:0;color:var(--p);font-weight:700}
+    h1{margin:4px 0 0;font-size:clamp(26px,2.8vw,38px)}
+    .sub{margin:8px 0 0;color:#526171;line-height:1.6}
+    .count{margin:0;color:#667;white-space:nowrap}
+    .slide-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,40%);gap:10px}
+    .panel{background:#fcfefe;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .panel ul{margin:0;padding-left:18px;line-height:1.7}
+    .panel h2{margin:0 0 8px;font-size:18px;color:var(--p)}
+    .panel p{margin:6px 0;line-height:1.65}
+    .explorer-root,.quiz-root,.demo-root{display:grid;gap:8px}
+    .explorer-title{font-weight:700}
+    .explorer-detail,.quiz-feedback{min-height:24px}
+    .quiz-options{display:grid;gap:6px}
+    .demo-status{padding:10px;border:1px dashed #b7c9d9;border-radius:10px;background:#f8fcff}
+    .button-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .button-row button,.pixel-grid .pixel,.program-grid select{min-height:44px}
+    .button-row button,.pixel-grid .pixel{border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 10px;cursor:pointer}
+    .pixel-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .pixel.on{background:var(--d);color:#fff}
+    .program-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .program-grid label{display:grid;gap:4px;font-size:14px}
+    .program-grid select,input,select{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px}
+    .nav{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+    .notes{min-width:0;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 26px rgba(15,40,68,.1);overflow:hidden}
+    .notes h2{margin:0;padding:12px;border-bottom:1px solid var(--line);font-size:18px}
+    .notes .body{padding:12px;display:grid;gap:10px;max-height:75vh;overflow:auto}
+    .note-card{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fbfdff}
+    .note-card h3{margin:0 0 6px;font-size:14px;color:var(--p)}
+    .note-card p,.note-card ul{margin:0;line-height:1.6;padding-left:16px}
+    .note-card p{padding-left:0}
+    .safe-banner{margin-top:14px;padding:12px;border:1px solid #f0cfb4;border-radius:12px;background:#fff7ef}
+    .safe-banner ul{margin:8px 0 0;padding-left:18px;line-height:1.6}
+    .exercise{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .exercise h2{margin:0 0 8px;font-size:24px}
+    .exercise-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .exercise-grid.bonus{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .exercise-card{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fcfefe;display:grid;gap:8px}
+    .exercise-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}
+    .exercise-filter{min-height:40px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:6px 12px;cursor:pointer}
+    .exercise-filter.active{background:var(--s);border-color:var(--p);color:var(--p);font-weight:700}
+    .exercise-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+    .question{margin:0;line-height:1.6}
+    details p{margin:6px 0 0}
+    .toggle-answer{border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 10px;cursor:pointer}
+    .answer{border:1px dashed #b9c9d7;border-radius:10px;background:#f7fbff;padding:8px}
+    .answer p{margin:6px 0;line-height:1.6}
+    .progress-panel{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .progress-item{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fbfdff}
+    .progress-item strong{display:block;font-size:20px;color:var(--p)}
+    .live{position:absolute;left:-9999px}
+    .hidden-notes .stage-wrap{grid-template-columns:minmax(0,1fr)}
+    .hidden-notes .notes{display:none}
+    @media (max-width:1024px){.stage-wrap{grid-template-columns:1fr}.slide-main{grid-template-columns:1fr}.slides{aspect-ratio:auto;min-height:620px}.notes .body{max-height:none}.exercise-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:640px){.app{padding:10px}.slides{min-height:620px;aspect-ratio:auto}.exercise-grid,.exercise-grid.bonus,.progress-grid{grid-template-columns:1fr}.top{display:grid}.group{width:100%}.ctl{flex:1}}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+    @media print{body{background:#fff}.top,.notes,.nav,.exercise details,.toggle-answer,.button-row{display:none !important}.app{max-width:none;padding:0}.slides{border:none;aspect-ratio:auto;min-height:0;overflow:visible}.slide{position:static;display:grid !important;page-break-after:always;border:1px solid #d8e2ea;margin-bottom:8mm}.slide:last-child{page-break-after:auto}.slide-main{grid-template-columns:1fr 1fr}.answer{display:block !important}}
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="top">
+      <div class="group">
+        <a class="ctl" href="../index.html">返回目录</a>
+        <button class="ctl" id="notesToggle" type="button" aria-expanded="true" aria-controls="notes">隐藏教案</button>
+        <button class="ctl" id="fullscreenToggle" type="button">全屏</button>
+      </div>
+      <div class="group"><span class="ctl">第 1 章 · 什么是计算机科学</span></div>
+    </header>
+    <section class="stage-wrap">
+      <section class="stage">
+        <div class="slides" id="slides" tabindex="0" aria-label="什么是计算机科学">
+          <section class="slide active" id="slide-1" data-index="1">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">第 1 章 · 什么是计算机科学</p>
+        <h1>情境任务</h1>
+        <p class="sub">机器人能按步骤做早餐吗？</p>
+      </div>
+      <p class="count">1 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>任务：让机器人准备麦片早餐。</li><li>约束：不能靠猜测，必须按指令。</li><li>成功标准：步骤有限且结果稳定。</li></ul></section>
+      <section class="panel">
+        <h2>词汇卡</h2><p>输入 / 处理 / 输出 / 算法 / 调试</p><h2>安全提醒</h2><p>仅使用虚构情境，不输入真实姓名、学校、地址或密码。</p>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-2" data-index="2">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">第 1 章 · 什么是计算机科学</p>
+        <h1>核心概念</h1>
+        <p class="sub">输入、处理、输出形成系统循环</p>
+      </div>
+      <p class="count">2 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>输入：按键、传感器、语音。</li><li>处理：比较、判断、计算。</li><li>输出：屏幕、声音、动作。</li></ul></section>
+      <section class="panel">
+        <h2>词汇卡</h2><p>输入 / 处理 / 输出 / 算法 / 调试</p><h2>安全提醒</h2><p>仅使用虚构情境，不输入真实姓名、学校、地址或密码。</p>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-3" data-index="3">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">第 1 章 · 什么是计算机科学</p>
+        <h1>可视化模型</h1>
+        <p class="sub">流程图帮助看清依赖关系</p>
+      </div>
+      <p class="count">3 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>开始 -&gt; 取碗 -&gt; 倒麦片 -&gt; 倒牛奶 -&gt; 放勺子 -&gt; 结束。</li><li>每一步都写动作词。</li><li>每轮复测只改一个关键点。</li></ul></section>
+      <section class="panel">
+        <div class="explorer-root" data-explorer="chapter-1-what-is-cs">
+    <h2>模型探索器</h2>
+    <p class="explorer-title" data-exp-title>任务拆解</p>
+    <p class="explorer-detail" data-exp-detail>先写目标，再列中间状态，再写结束条件。</p>
+    <div class="button-row">
+      <button type="button" data-exp-action="prev">上一条</button>
+      <button type="button" data-exp-action="next">下一条</button>
+    </div>
+  </div>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-4" data-index="4">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">第 1 章 · 什么是计算机科学</p>
+        <h1>直接操作实验</h1>
+        <p class="sub">先预测，再运行，再修正</p>
+      </div>
+      <p class="count">4 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>点击步骤卡片构建程序。</li><li>点击检查获得原因型反馈。</li><li>记录哪一步导致异常。</li></ul></section>
+      <section class="panel">
+        <h2>机器人早餐实验</h2><p>按正确顺序编排早餐指令。</p><div class="demo-root" data-demo="chapter-1-what-is-cs" data-demo-type="robot-breakfast">
+    <p class="demo-status" role="status" aria-live="polite">按正确顺序编排早餐指令。</p>
+      <div class="button-row">
+        <button type="button" data-step="bowl">拿碗</button><button type="button" data-step="cereal">倒麦片</button><button type="button" data-step="milk">倒牛奶</button><button type="button" data-step="spoon">放勺子</button>
+      </div>
+      <p>当前程序： <span data-program>（空）</span></p>
+      <div class="button-row"><button type="button" data-action="check">检查答案</button><button type="button" data-action="reset">重置选择</button></div>
+    </div>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-5" data-index="5">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">第 1 章 · 什么是计算机科学</p>
+        <h1>调试侦探</h1>
+        <p class="sub">错误是线索，不是扣分标签</p>
+      </div>
+      <p class="count">5 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>常见错：顺序错导致结果异常。</li><li>定位：先找第一个不合理结果。</li><li>修复：单点修改并复测。</li></ul></section>
+      <section class="panel">
+        <div class="quiz-root" data-quiz="chapter-1-what-is-cs">
+    <h2>快速判断</h2>
+    <p>哪一条最像机器可执行步骤？</p>
+    <div class="quiz-options">
+      <label><input type="radio" name="quiz-chapter-1-what-is-cs" value="0"> <span>把教室整理好</span></label><label><input type="radio" name="quiz-chapter-1-what-is-cs" value="1"> <span>打开应用并点击提交按钮</span></label><label><input type="radio" name="quiz-chapter-1-what-is-cs" value="2"> <span>快一点完成</span></label>
+    </div>
+    <div class="button-row">
+      <button type="button" data-quiz-action="check">检查答案</button>
+      <button type="button" data-quiz-action="reset">重置选择</button>
+    </div>
+    <p class="quiz-feedback" data-quiz-feedback aria-live="polite"></p>
+  </div><h2>误区修正</h2><ul><li><strong>计算机科学等于背快捷键。</strong><br>计算机科学核心是问题建模与验证。</li><li><strong>机器会猜你的意思。</strong><br>机器只执行明确指令。</li><li><strong>调试代表失败。</strong><br>调试是定位原因并持续改进。</li></ul>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-6" data-index="6">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">第 1 章 · 什么是计算机科学</p>
+        <h1>应用挑战</h1>
+        <p class="sub">把算法迁移到新任务</p>
+      </div>
+      <p class="count">6 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>为“整理书包”写 5 步算法。</li><li>加入明确结束条件。</li><li>同伴互测并给改进建议。</li></ul></section>
+      <section class="panel">
+        <h2>词汇卡</h2><p>输入 / 处理 / 输出 / 算法 / 调试</p><h2>安全提醒</h2><p>仅使用虚构情境，不输入真实姓名、学校、地址或密码。</p>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-7" data-index="7">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">第 1 章 · 什么是计算机科学</p>
+        <h1>小结与自评</h1>
+        <p class="sub">我能解释为什么这样设计</p>
+      </div>
+      <p class="count">7 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>我能区分输入/处理/输出。</li><li>我能写明确、有限步骤。</li><li>我会用调试闭环改进方案。</li></ul></section>
+      <section class="panel">
+        <h2>词汇卡</h2><p>输入 / 处理 / 输出 / 算法 / 调试</p><h2>安全提醒</h2><p>仅使用虚构情境，不输入真实姓名、学校、地址或密码。</p>
+      </section>
+    </div>
+  </section>
+        </div>
+        <div class="nav">
+          <button class="ctl" id="prevButton" type="button">上一页</button>
+          <button class="ctl" id="nextButton" type="button">下一页</button>
+        </div>
+      </section>
+      <aside class="notes" id="notes"><h2>教师提示</h2><div class="body" id="notesBody"></div></aside>
+    </section>
+    <section class="safe-banner"><strong>儿童在线安全提醒</strong><ul><li>不输入真实姓名、学校、地址、电话、密码、验证码或真实照片。</li><li>遇到陌生链接、索要信息或让你不舒服的内容，先停止并告诉可信任的大人。</li><li>HTTPS 或锁图标有帮助，但不代表内容一定可信。</li></ul><p>仅使用虚构情境，不输入真实姓名、学校、地址或密码。</p></section>
+    <section class="exercise" id="exercise">
+      <h2>课后练习</h2><p>每章 6 道强化题与 2 道附加题，完成状态保存在当前浏览器。</p>
+      <div class="exercise-toolbar">
+        <button class="exercise-filter active" type="button" data-filter="all">全部题目</button>
+        <button class="exercise-filter" type="button" data-filter="reinforcement">强化练习</button>
+        <button class="exercise-filter" type="button" data-filter="bonus">附加挑战</button>
+      </div>
+      <h3>强化练习</h3>
+      <div class="exercise-grid"><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 1</strong>
+      <label><input type="checkbox" data-check="chapter-1-what-is-cs-reinforcement-1"> 完成</label>
+    </div>
+    <p class="question">把“早上到校打卡”拆成 4 个明确步骤。</p>
+    <details><summary>提示</summary><p>每一步用动作词。</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-1-what-is-cs-reinforcement-1-answer" aria-expanded="false">显示答案</button>
+    <div id="chapter-1-what-is-cs-reinforcement-1-answer" class="answer" hidden>
+      <p><strong>答案:</strong> 打开应用 -&gt; 选择班级 -&gt; 点击打卡 -&gt; 检查成功提示。</p>
+      <p><strong>原因:</strong> 机器需要可执行、可检查步骤。</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 2</strong>
+      <label><input type="checkbox" data-check="chapter-1-what-is-cs-reinforcement-2"> 完成</label>
+    </div>
+    <p class="question">“把教室整理好”为什么不适合直接给机器？</p>
+    <details><summary>提示</summary><p>机器能否唯一理解？</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-1-what-is-cs-reinforcement-2-answer" aria-expanded="false">显示答案</button>
+    <div id="chapter-1-what-is-cs-reinforcement-2-answer" class="answer" hidden>
+      <p><strong>答案:</strong> 描述过于模糊，应改为明确动作列表。</p>
+      <p><strong>原因:</strong> 模糊指令无法稳定执行。</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 3</strong>
+      <label><input type="checkbox" data-check="chapter-1-what-is-cs-reinforcement-3"> 完成</label>
+    </div>
+    <p class="question">输入-处理-输出中，扫码枪发声属于哪一环？</p>
+    <details><summary>提示</summary><p>看“结果呈现”环节。</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-1-what-is-cs-reinforcement-3-answer" aria-expanded="false">显示答案</button>
+    <div id="chapter-1-what-is-cs-reinforcement-3-answer" class="answer" hidden>
+      <p><strong>答案:</strong> 输出。</p>
+      <p><strong>原因:</strong> 声音是系统对外反馈。</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 4</strong>
+      <label><input type="checkbox" data-check="chapter-1-what-is-cs-reinforcement-4"> 完成</label>
+    </div>
+    <p class="question">为什么调试时一次只改一个关键点？</p>
+    <details><summary>提示</summary><p>思考可归因。</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-1-what-is-cs-reinforcement-4-answer" aria-expanded="false">显示答案</button>
+    <div id="chapter-1-what-is-cs-reinforcement-4-answer" class="answer" hidden>
+      <p><strong>答案:</strong> 便于定位真正生效的改动。</p>
+      <p><strong>原因:</strong> 单点修改能形成清晰因果。</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 5</strong>
+      <label><input type="checkbox" data-check="chapter-1-what-is-cs-reinforcement-5"> 完成</label>
+    </div>
+    <p class="question">给“整理书包”写一个结束条件。</p>
+    <details><summary>提示</summary><p>结束条件必须可检查。</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-1-what-is-cs-reinforcement-5-answer" aria-expanded="false">显示答案</button>
+    <div id="chapter-1-what-is-cs-reinforcement-5-answer" class="answer" hidden>
+      <p><strong>答案:</strong> 课表所需物品齐全且拉链关闭时结束。</p>
+      <p><strong>原因:</strong> 结束条件保障流程终止。</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 6</strong>
+      <label><input type="checkbox" data-check="chapter-1-what-is-cs-reinforcement-6"> 完成</label>
+    </div>
+    <p class="question">写一个算法成功标准示例。</p>
+    <details><summary>提示</summary><p>包含结果与约束。</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-1-what-is-cs-reinforcement-6-answer" aria-expanded="false">显示答案</button>
+    <div id="chapter-1-what-is-cs-reinforcement-6-answer" class="answer" hidden>
+      <p><strong>答案:</strong> 机器人 6 步内把作业本送到目标组。</p>
+      <p><strong>原因:</strong> 成功标准让测试客观。</p>
+    </div>
+  </article></div>
+      <h3>附加挑战</h3>
+      <div class="exercise-grid bonus"><article class="exercise-card" data-ex-type="bonus">
+    <div class="exercise-head">
+      <strong>附加挑战 1</strong>
+      <label><input type="checkbox" data-check="chapter-1-what-is-cs-bonus-1"> 完成</label>
+    </div>
+    <p class="question">把借书流程写成 6 步，并加入异常处理。</p>
+    <details><summary>提示</summary><p>包含“找不到书”分支。</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-1-what-is-cs-bonus-1-answer" aria-expanded="false">显示答案</button>
+    <div id="chapter-1-what-is-cs-bonus-1-answer" class="answer" hidden>
+      <p><strong>答案:</strong> 查目录 -&gt; 找书架 -&gt; 扫码 -&gt; 找不到则登记 -&gt; 借阅确认 -&gt; 记录归还日期。</p>
+      <p><strong>原因:</strong> 完整流程需覆盖异常场景。</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="bonus">
+    <div class="exercise-head">
+      <strong>附加挑战 2</strong>
+      <label><input type="checkbox" data-check="chapter-1-what-is-cs-bonus-2"> 完成</label>
+    </div>
+    <p class="question">如何反驳“算法越复杂越高级”？</p>
+    <details><summary>提示</summary><p>从正确性与可维护性回答。</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-1-what-is-cs-bonus-2-answer" aria-expanded="false">显示答案</button>
+    <div id="chapter-1-what-is-cs-bonus-2-answer" class="answer" hidden>
+      <p><strong>答案:</strong> 算法价值在正确、清晰、可测，不在复杂本身。</p>
+      <p><strong>原因:</strong> 可读和可验证比花哨更重要。</p>
+    </div>
+  </article></div>
+    </section>
+    <section class="progress-panel" id="progressPanel">
+      <h3>学习进度面板</h3>
+      <div class="progress-grid">
+        <div class="progress-item"><span>练习完成</span><strong data-progress-ex>0/8</strong></div>
+        <div class="progress-item"><span>互动里程碑</span><strong data-progress-ms>0/3</strong></div>
+        <div class="progress-item"><span>当前章节</span><strong>什么是计算机科学</strong></div>
+      </div>
+      <p data-coach-message>先完成 2 道强化题，再对照“原因”检查自己的想法。</p>
+      <div class="button-row"><button type="button" data-coach-action="next">生成下一步挑战</button></div>
+      <p data-coach-challenge>挑战：把本章一个方法迁移到生活任务中。</p>
+    </section>
+    <p class="live" id="liveRegion" aria-live="polite"></p>
+  </main>
+  <script>
+    (() => {
+      const locale = "zh";
+      const isZh = locale === "zh";
+      const chapterKey = "chapter-1-what-is-cs";
+      const chapterSlides = [{"idx":1,"title":"情境任务","notes":{"timing":"4 分钟","prompts":["让学生口述日常流程。","追问哪一步最容易遗漏。","强调不依赖主观猜测。"],"responses":["能提出流程步骤。","意识到机器不会补全。","愿意写清动作词。"]}},{"idx":2,"title":"核心概念","notes":{"timing":"5 分钟","prompts":["引导学生用生活设备举例。","比较三个环节差异。","追问处理阶段为什么关键。"],"responses":["能准确拆分系统环节。","能解释处理逻辑。","能区分输入与输出。"]}},{"idx":3,"title":"可视化模型","notes":{"timing":"4 分钟","prompts":["要求学生读一遍流程图。","让学生指出依赖关系。","引导添加结束条件。"],"responses":["能画出简易流程。","能指出先后依赖。","能加上终止条件。"]}},{"idx":4,"title":"直接操作实验","notes":{"timing":"8 分钟","prompts":["运行前先预测结果。","失败时只改一个点。","让学生复述修复理由。"],"responses":["能根据反馈调整顺序。","能记录错误步号。","能解释修复原因。"]}},{"idx":5,"title":"调试侦探","notes":{"timing":"5 分钟","prompts":["展示一个错误顺序。","让学生定位第一处异常。","复测验证修复有效。"],"responses":["能描述错误影响。","能提出修复策略。","能验证问题已消失。"]}},{"idx":6,"title":"应用挑战","notes":{"timing":"7 分钟","prompts":["迁移到新情境。","要求写成功标准。","同伴互测并给反馈。"],"responses":["能输出可执行方案。","能写检查点。","能给同伴建议。"]}},{"idx":7,"title":"小结与自评","notes":{"timing":"4 分钟","prompts":["自评分成会/半会/不会。","让学生写一句关键原则。","提醒复盘比速度更重要。"],"responses":["能自我评估。","能总结核心原则。","形成调试习惯。"]}}];
+      const explorerData = [{"title":"任务拆解","detail":"先写目标，再列中间状态，再写结束条件。"},{"title":"动作词原则","detail":"使用可观察动作词，避免“弄好”“处理一下”。"},{"title":"测试闭环","detail":"执行-观察-修正-复测，直到成功标准达成。"}];
+      const quizData = {"question":"哪一条最像机器可执行步骤？","options":["把教室整理好","打开应用并点击提交按钮","快一点完成"],"correctIndex":1,"correctFeedback":"正确：动作明确、结果可检查。","wrongFeedback":"再想想：机器需要可执行动作和可验证结果。"};
+      const ui = {"localeLabel":"中文","childSafetyTitle":"儿童在线安全提醒","backToRoot":"返回总入口","switchLocale":"切换到 English 版","backToCatalog":"返回目录","enterChapter":"进入章节","chapterLabel":"第 {{n}} 章","notesTitle":"教师提示","hideNotes":"隐藏教案","showNotes":"显示教案","fullscreen":"全屏","exitFullscreen":"退出全屏","previous":"上一页","next":"下一页","exerciseTitle":"课后练习","exerciseDesc":"每章 6 道强化题与 2 道附加题，完成状态保存在当前浏览器。","reinforcement":"强化练习","bonus":"附加挑战","done":"完成","hint":"提示","showAnswer":"显示答案","hideAnswer":"隐藏答案","answer":"答案","rationale":"原因","quizTitle":"快速判断","quizCheck":"检查答案","quizReset":"重置选择","explorerTitle":"模型探索器","explorerPrev":"上一条","explorerNext":"下一条"};
+      const demoSuccess = "成功：顺序正确，机器人稳定完成任务。";
+      const demoReset = "已重置，请重新设计算法。";
+      const total = chapterSlides.length;
+      const app = document.getElementById("app");
+      const slidesEl = document.getElementById("slides");
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const prevButton = document.getElementById("prevButton");
+      const nextButton = document.getElementById("nextButton");
+      const notesToggle = document.getElementById("notesToggle");
+      const fullscreenToggle = document.getElementById("fullscreenToggle");
+      const notesBody = document.getElementById("notesBody");
+      const live = document.getElementById("liveRegion");
+      const progressExercises = document.querySelector("[data-progress-ex]");
+      const progressMilestones = document.querySelector("[data-progress-ms]");
+      const coachMessage = document.querySelector("[data-coach-message]");
+      const coachChallenge = document.querySelector("[data-coach-challenge]");
+      let current = 1;
+      let touchStartX = null;
+      let touchStartY = null;
+      const milestoneNames = ["demo", "explorer", "quiz"];
+      const challengeBank = isZh
+        ? [
+            "挑战：写一个 3 步检查清单，验证你今天的算法是否可执行。",
+            "挑战：挑 1 道做错题，写“先错在哪里，再怎么改”。",
+            "挑战：把本章方法迁移到家庭任务，并写出成功标准。",
+          ]
+        : [
+            "Challenge: write a 3-step checklist to verify if your algorithm is executable.",
+            "Challenge: pick one wrong answer and write what failed, then how to fix it.",
+            "Challenge: transfer one chapter method to a home task and define success criteria.",
+          ];
+      let challengeIndex = 0;
+
+      function milestoneKey(name) {
+        return "grade5-cs:" + locale + ":" + chapterKey + ":milestone:" + name;
+      }
+      function markMilestone(name) {
+        try { localStorage.setItem(milestoneKey(name), "1"); } catch (err) {}
+        updateProgressPanel();
+      }
+      function updateProgressPanel() {
+        const checks = Array.from(document.querySelectorAll("[data-check]"));
+        const checked = checks.filter((input) => input.checked).length;
+        if (progressExercises) progressExercises.textContent = checked + "/" + checks.length;
+        let msDone = 0;
+        milestoneNames.forEach((name) => {
+          try {
+            if (localStorage.getItem(milestoneKey(name)) === "1") msDone += 1;
+          } catch (err) {}
+        });
+        if (progressMilestones) progressMilestones.textContent = msDone + "/" + milestoneNames.length;
+        if (coachMessage) {
+          if (checked === checks.length) {
+            coachMessage.textContent = isZh ? "练习全完成！请向同伴解释一道题的原因，巩固迁移能力。" : "All tasks completed! Explain one rationale to a peer to strengthen transfer.";
+          } else if (checked >= 5) {
+            coachMessage.textContent = isZh ? "进度很好：优先补完剩余题，再做一题附加挑战。" : "Great progress: finish remaining tasks, then attempt one bonus challenge.";
+          } else if (checked >= 2) {
+            coachMessage.textContent = isZh ? "继续保持：每做完一题，都对照“原因”检查是否真正理解。" : "Keep going: after each answer, compare with the rationale to confirm understanding.";
+          } else {
+            coachMessage.textContent = isZh ? "先完成 2 道强化题，再对照“原因”检查自己的想法。" : "Finish 2 reinforcement tasks first, then compare your reasoning with the explanations.";
+          }
+        }
+      }
+
+      function getHashIndex() {
+        const match = location.hash.match(/^#slide-(\d+)$/);
+        if (!match) return 1;
+        const value = Number(match[1]);
+        return Number.isFinite(value) && value >= 1 && value <= total ? value : 1;
+      }
+      function renderNotes(index) {
+        const note = chapterSlides[index - 1];
+        notesBody.innerHTML = [
+          '<div class="note-card"><h3>' + (isZh ? '页码' : 'Page') + '</h3><p>' + (isZh ? '第 ' + index + ' 页：' : 'Page ' + index + ': ') + note.title + '</p></div>',
+          '<div class="note-card"><h3>' + (isZh ? '建议时长' : 'Suggested time') + '</h3><p>' + note.notes.timing + '</p></div>',
+          '<div class="note-card"><h3>' + (isZh ? '教学提示' : 'Teacher prompts') + '</h3><ul>' + note.notes.prompts.map((p) => '<li>' + p + '</li>').join('') + '</ul></div>',
+          '<div class="note-card"><h3>' + (isZh ? '预期回应' : 'Expected responses') + '</h3><ul>' + note.notes.responses.map((p) => '<li>' + p + '</li>').join('') + '</ul></div>',
+        ].join("");
+      }
+      function updateButtons() {
+        prevButton.disabled = current === 1;
+        nextButton.disabled = current === total;
+      }
+      function setSlide(index, silent = false) {
+        current = index;
+        slides.forEach((slide, slideIndex) => {
+          const active = slideIndex === index - 1;
+          slide.classList.toggle("active", active);
+          slide.setAttribute("aria-hidden", active ? "false" : "true");
+        });
+        updateButtons();
+        renderNotes(index);
+        history.replaceState(null, "", "#slide-" + index);
+        if (!silent) live.textContent = (isZh ? "已切换到第 " : "Switched to page ") + index + (isZh ? " 页。" : ".");
+      }
+      function go(delta) {
+        const next = Math.min(total, Math.max(1, current + delta));
+        if (next !== current) setSlide(next);
+      }
+
+      prevButton.addEventListener("click", () => go(-1));
+      nextButton.addEventListener("click", () => go(1));
+      notesToggle.addEventListener("click", () => {
+        const hidden = app.classList.toggle("hidden-notes");
+        notesToggle.textContent = hidden ? ui.showNotes : ui.hideNotes;
+        notesToggle.setAttribute("aria-expanded", String(!hidden));
+      });
+      fullscreenToggle.addEventListener("click", async () => {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+            fullscreenToggle.textContent = ui.exitFullscreen;
+          } else {
+            await document.exitFullscreen();
+            fullscreenToggle.textContent = ui.fullscreen;
+          }
+        } catch (err) {
+          live.textContent = isZh ? "全屏不可用。" : "Fullscreen unavailable.";
+        }
+      });
+      document.addEventListener("fullscreenchange", () => {
+        fullscreenToggle.textContent = document.fullscreenElement ? ui.exitFullscreen : ui.fullscreen;
+      });
+      document.addEventListener("keydown", (event) => {
+        const target = event.target;
+        const tag = target && target.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (target && target.isContentEditable)) return;
+        if (target && target.closest("button, summary, a[href], [role='button']")) return;
+        if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " " || event.code === "Space") { event.preventDefault(); go(1); }
+        else if (event.key === "ArrowLeft" || event.key === "PageUp") { event.preventDefault(); go(-1); }
+        else if (event.key === "Home") { event.preventDefault(); setSlide(1); }
+        else if (event.key === "End") { event.preventDefault(); setSlide(total); }
+      });
+      const coachButton = document.querySelector('[data-coach-action="next"]');
+      if (coachButton && coachChallenge) {
+        coachButton.addEventListener("click", () => {
+          challengeIndex = (challengeIndex + 1) % challengeBank.length;
+          coachChallenge.textContent = challengeBank[challengeIndex];
+          live.textContent = challengeBank[challengeIndex];
+        });
+      }
+      slidesEl.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+      }, { passive: true });
+      slidesEl.addEventListener("touchend", (event) => {
+        if (touchStartX === null || touchStartY === null) return;
+        const touch = event.changedTouches[0];
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) go(1);
+          if (dx > 0) go(-1);
+        }
+        touchStartX = null;
+        touchStartY = null;
+      }, { passive: true });
+      window.addEventListener("hashchange", () => setSlide(getHashIndex(), true));
+
+      document.querySelectorAll(".toggle-answer").forEach((button) => {
+        button.addEventListener("click", () => {
+          const panel = document.getElementById(button.dataset.target);
+          const open = !panel.hasAttribute("hidden");
+          if (open) {
+            panel.setAttribute("hidden", "");
+            button.textContent = ui.showAnswer;
+            button.setAttribute("aria-expanded", "false");
+          } else {
+            panel.removeAttribute("hidden");
+            button.textContent = ui.hideAnswer;
+            button.setAttribute("aria-expanded", "true");
+          }
+        });
+      });
+      document.querySelectorAll("[data-check]").forEach((input) => {
+        const key = "grade5-cs:" + locale + ":" + chapterKey + ":" + input.dataset.check;
+        try { input.checked = localStorage.getItem(key) === "1"; } catch (err) {}
+        input.addEventListener("change", () => {
+          try { localStorage.setItem(key, input.checked ? "1" : "0"); } catch (err) {}
+          updateProgressPanel();
+        });
+      });
+      document.querySelectorAll("[data-filter]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const mode = button.dataset.filter;
+          document.querySelectorAll("[data-filter]").forEach((item) => item.classList.toggle("active", item === button));
+          document.querySelectorAll(".exercise-card").forEach((card) => {
+            const type = card.dataset.exType;
+            const show = mode === "all" || mode === type;
+            card.style.display = show ? "" : "none";
+          });
+        });
+      });
+
+      document.querySelectorAll("[data-explorer]").forEach((root) => {
+        let idx = 0;
+        const title = root.querySelector("[data-exp-title]");
+        const detail = root.querySelector("[data-exp-detail]");
+        function paint() {
+          const item = explorerData[idx];
+          title.textContent = item.title;
+          detail.textContent = item.detail;
+        }
+        root.querySelector('[data-exp-action="prev"]').addEventListener("click", () => {
+          idx = (idx - 1 + explorerData.length) % explorerData.length;
+          paint();
+          markMilestone("explorer");
+        });
+        root.querySelector('[data-exp-action="next"]').addEventListener("click", () => {
+          idx = (idx + 1) % explorerData.length;
+          paint();
+          markMilestone("explorer");
+        });
+      });
+
+      document.querySelectorAll("[data-quiz]").forEach((root) => {
+        const feedback = root.querySelector("[data-quiz-feedback]");
+        root.querySelector('[data-quiz-action="check"]').addEventListener("click", () => {
+          const picked = root.querySelector("input[type='radio']:checked");
+          if (!picked) {
+            feedback.textContent = isZh ? "请先选择一个选项。" : "Please choose an option first.";
+            return;
+          }
+          const value = Number(picked.value);
+          const correct = value === quizData.correctIndex;
+          feedback.textContent = correct ? quizData.correctFeedback : quizData.wrongFeedback;
+          if (correct) markMilestone("quiz");
+        });
+        root.querySelector('[data-quiz-action="reset"]').addEventListener("click", () => {
+          root.querySelectorAll("input[type='radio']").forEach((input) => { input.checked = false; });
+          feedback.textContent = "";
+        });
+      });
+
+      setupDemo();
+      updateProgressPanel();
+      setSlide(getHashIndex(), true);
+
+      function setupDemo() {
+        const root = document.querySelector(".demo-root");
+        if (!root) return;
+        const type = root.dataset.demoType;
+        const status = root.querySelector(".demo-status");
+        const say = (message) => { status.textContent = message; live.textContent = message; };
+
+        if (type === "robot-breakfast") {
+          const target = ["bowl", "cereal", "milk", "spoon"];
+          const stepName = {
+            bowl: isZh ? "拿碗" : "Get bowl",
+            cereal: isZh ? "倒麦片" : "Add cereal",
+            milk: isZh ? "倒牛奶" : "Pour milk",
+            spoon: isZh ? "放勺子" : "Add spoon",
+          };
+          const selected = [];
+          const programText = root.querySelector("[data-program]");
+          root.querySelectorAll("[data-step]").forEach((button) => {
+            button.addEventListener("click", () => {
+              if (selected.length < target.length) {
+                selected.push(button.dataset.step);
+                programText.textContent = selected.join(" -> ");
+              }
+            });
+          });
+          root.querySelector('[data-action="check"]').addEventListener("click", () => {
+            if (selected.join("|") === target.join("|")) {
+              say(demoSuccess);
+              markMilestone("demo");
+            } else {
+              const mismatch = selected.findIndex((value, index) => value !== target[index]);
+              const step = mismatch === -1 ? selected.length + 1 : mismatch + 1;
+              const expectedKey = target[mismatch === -1 ? selected.length : mismatch];
+              const expected = expectedKey ? stepName[expectedKey] : (isZh ? "结束" : "finish");
+              say(
+                isZh
+                  ? "第 " + step + " 步开始偏离，建议这里应是 " + expected + "。"
+                  : "Mismatch starts at step " + step + ". Expected " + expected + " at this point."
+              );
+            }
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            selected.length = 0;
+            programText.textContent = isZh ? "（空）" : "(empty)";
+            say(demoReset);
+          });
+          return;
+        }
+
+        if (type === "binary-pixel") {
+          const target = "10110010";
+          const bits = Array.from(root.querySelectorAll(".pixel"));
+          const code = root.querySelector("[data-code]");
+          const read = () => bits.map((bit) => bit.textContent.trim()).join("");
+          bits.forEach((bit) => {
+            bit.addEventListener("click", () => {
+              bit.textContent = bit.textContent.trim() === "0" ? "1" : "0";
+              bit.classList.toggle("on", bit.textContent.trim() === "1");
+              code.textContent = read();
+            });
+          });
+          root.querySelector('[data-action="check"]').addEventListener("click", () => {
+            const now = read();
+            if (now === target) {
+              say(demoSuccess);
+              markMilestone("demo");
+            } else {
+              const mismatchBits = [];
+              for (let i = 0; i < target.length; i++) {
+                if (now[i] !== target[i]) mismatchBits.push(i + 1);
+              }
+              say(
+                isZh
+                  ? "第 " + mismatchBits.join("、") + " 位不一致，请先修正这些位。"
+                  : "Bits " + mismatchBits.join(", ") + " mismatch. Fix these first."
+              );
+            }
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            bits.forEach((bit) => { bit.textContent = "0"; bit.classList.remove("on"); });
+            code.textContent = "00000000";
+            say(demoReset);
+          });
+          return;
+        }
+
+        if (type === "maze-debug") {
+          const selects = Array.from(root.querySelectorAll("[data-move]"));
+          const wall = "1,1";
+          const goal = "2,2";
+          root.querySelector('[data-action="run"]').addEventListener("click", () => {
+            let x = 0;
+            let y = 0;
+            for (let i = 0; i < selects.length; i++) {
+              const move = selects[i].value;
+              if (move === "stay") continue;
+              if (move === "right") x += 1;
+              if (move === "left") x -= 1;
+              if (move === "down") y += 1;
+              if (move === "up") y -= 1;
+              if (x < 0 || x > 2 || y < 0 || y > 2) { say(isZh ? "第 " + (i + 1) + " 步越界，当前位置(" + x + "," + y + ")。" : "Step " + (i + 1) + " out of bounds at (" + x + "," + y + ")."); return; }
+              if (x + "," + y === wall) { say(isZh ? "第 " + (i + 1) + " 步撞墙（1,1）。" : "Step " + (i + 1) + " hits wall (1,1)."); return; }
+            }
+            if (x + "," + y === goal) {
+              say(demoSuccess);
+              markMilestone("demo");
+            }
+            else say(isZh ? "未到达终点，请继续调试。" : "Goal not reached yet. Keep debugging.");
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            selects.forEach((select) => { select.value = "stay"; });
+            say(demoReset);
+          });
+          return;
+        }
+
+        if (type === "treasure-program") {
+          const loops = root.querySelector("[data-loops]");
+          const needed = root.querySelector("[data-needed]");
+          const trace = root.querySelector("[data-trace]");
+          root.querySelector('[data-action="run"]').addEventListener("click", () => {
+            const n = Math.max(0, Math.min(8, Number(loops.value) || 0));
+            const k = Math.max(1, Math.min(8, Number(needed.value) || 1));
+            let keys = 0;
+            for (let i = 0; i < n; i++) keys += 1;
+            trace.textContent = (isZh ? "运行结束：" : "Run finished: ") + "loops=" + n + ", keys=" + keys + ", threshold=" + k;
+            if (keys >= k) {
+              say(demoSuccess);
+              markMilestone("demo");
+            }
+            else say(isZh ? "钥匙不足，条件未达成。" : "Not enough keys to pass the condition.");
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            loops.value = "3";
+            needed.value = "3";
+            trace.textContent = isZh ? "等待运行。" : "Waiting to run.";
+            say(demoReset);
+          });
+          return;
+        }
+
+        if (type === "library-search") {
+          const arr = [12, 18, 23, 30, 35, 42, 47, 53];
+          const steps = root.querySelector("[data-steps]");
+          root.querySelector('[data-action="linear"]').addEventListener("click", () => {
+            let count = 0;
+            for (let i = 0; i < arr.length; i++) {
+              count += 1;
+              if (arr[i] === 42) {
+                steps.textContent = isZh ? "顺序搜索比较 " + count + " 次找到 42。" : "Linear search found 42 in " + count + " comparisons.";
+                say(isZh ? "已完成顺序搜索。" : "Linear search completed.");
+                return;
+              }
+            }
+          });
+          root.querySelector('[data-action="binary"]').addEventListener("click", () => {
+            let left = 0;
+            let right = arr.length - 1;
+            let count = 0;
+            while (left <= right) {
+              const mid = Math.floor((left + right) / 2);
+              count += 1;
+              if (arr[mid] === 42) {
+                steps.textContent = isZh ? "二分搜索比较 " + count + " 次找到 42。" : "Binary search found 42 in " + count + " comparisons.";
+                say(demoSuccess + (isZh ? " 二分更高效。" : " Binary search is more efficient."));
+                markMilestone("demo");
+                return;
+              }
+              if (arr[mid] < 42) left = mid + 1; else right = mid - 1;
+            }
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            steps.textContent = isZh ? "尚未搜索。" : "No search run yet.";
+            say(demoReset);
+          });
+          return;
+        }
+
+        const msg = root.querySelector("[data-msg]");
+        const route = root.querySelector("[data-route]");
+        root.querySelector('[data-action="send"]').addEventListener("click", () => {
+          if (msg.value === "private") { say(isZh ? "已拦截：不要发送个人信息，请求助可信任大人。" : "Blocked: do not send personal information. Ask a trusted adult."); return; }
+          if (route.value === "risky") { say(isZh ? "路径风险高，请改用安全路由。" : "Route is risky. Choose the safe route."); return; }
+          say(demoSuccess);
+          markMilestone("demo");
+        });
+        root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+          msg.value = "public";
+          route.value = "safe";
+          say(demoReset);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

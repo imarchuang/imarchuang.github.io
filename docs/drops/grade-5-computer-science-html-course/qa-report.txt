@@ -1,0 +1,96 @@
+Grade 5 Computer Science HTML Course - Bilingual QA Report
+Date: 2026-08-26
+Path: /Users/marc.huang/shadow-marc/.superpowers/grade5-computer-science-html-course
+
+1) IMPLEMENTATION STATUS
+--------------------------------------------------
+- Chinese edition: complete.
+- English edition: complete first-class sibling edition.
+- Output structure:
+  - index.html (portal)
+  - zh/index.html + 6 chapter pages
+  - en/index.html + 6 chapter pages
+
+2) SELF-OPTIMIZATION ROUNDS
+--------------------------------------------------
+Round 1 (baseline bilingual delivery):
+- Added shared generator for `zh` and `en`.
+- Added standalone localized catalogs and chapter pages.
+- Added per chapter:
+  - deterministic core demo
+  - model explorer interaction
+  - quick-check quiz interaction
+- Added bilingual exercise banks (6 reinforcement + 2 bonus each chapter).
+
+Round 2 (feedback richness):
+- Improved demo feedback quality across both editions:
+  - first mismatch identification for ordering tasks
+  - bit-position mismatch diagnostics for binary board
+  - coordinate-aware maze failures
+  - milestone tracking for successful demo/quiz/explorer actions
+- Added chapter progress panel (exercise completion + interaction milestones).
+
+Round 3 (practice workflow enrichment):
+- Added exercise focus switcher:
+  - all tasks
+  - reinforcement only
+  - bonus only
+- Preserved completion state and answer tools while improving practice flow.
+
+3) COMMANDS RUN
+--------------------------------------------------
+Core generation + QA (multiple rounds):
+- node generate-course.js
+- node qa.js
+
+Final QA output:
+- QA PASS: bilingual structure, safety, and generated HTML checks passed.
+- {"locales":2,"chaptersPerLocale":6,"totalSlides":84,"reinforcement":72,"bonus":24}
+
+Browser verification:
+- python3 -m http.server 8899 --directory "/Users/marc.huang/shadow-marc/.superpowers/grade5-computer-science-html-course"
+- Playwright checks on representative Chinese + English pages and all demo types (Chinese set).
+- kill <server-pid>
+- ps -p <server-pid> (confirm stopped)
+
+4) BROWSER CHECK RESULTS
+--------------------------------------------------
+Viewport overflow checks (both editions, chapter 1 representative):
+- 1440x900: PASS
+- 1024x768: PASS
+- 768x1024: PASS
+- 390x844: PASS
+- 320x568: PASS
+- 844x390: PASS
+
+Chinese representative checks:
+- deep-link + nav + notes toggle: PASS
+- explorer interaction: PASS
+- quick-check quiz feedback: PASS
+- exercise filter toolbar: PASS
+- completion persistence after reload: PASS
+
+Chinese demo coverage (all 6 types):
+- chapter-1-what-is-cs: PASS
+- chapter-2-binary-and-representation: PASS
+- chapter-3-algorithms-and-debugging: PASS
+- chapter-4-variables-conditions-loops: PASS
+- chapter-5-data-structures-and-search: PASS
+- chapter-6-networks-and-safety: PASS
+
+English representative checks:
+- chapter-1 quiz feedback: PASS
+- chapter-2 demo: PASS
+- chapter-6 network safety demo: PASS
+
+5) REQUIREMENT COMPLIANCE SUMMARY
+--------------------------------------------------
+- 6 chapters per edition: PASS
+- 7 slides per chapter: PASS
+- 6 reinforcement + 2 bonus per chapter: PASS
+- at least two meaningful interactions/chapter: PASS (demo + explorer + quiz)
+- no external deps/network/PPT/account creation: PASS
+- explicit child online-safety guidance: PASS
+- responsive/accessibility/navigation/notes/answers/persistence/print: PASS
+
+FINAL QA VERDICT: PASS
