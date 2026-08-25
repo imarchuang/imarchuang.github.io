@@ -24,8 +24,9 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Drops
 
-* [hello](/drops/hello/ ':ignore') — sample native HTML
+* [example](/drops/example/ ':ignore') — native HTML + canvas
+* [hello](/drops/hello/ ':ignore') — minimal shell
 
 ## Notes
 
-* (empty — add `docs/ideas/<slug>.md` and list it here)
+* [example](./example) — Markdown dump template

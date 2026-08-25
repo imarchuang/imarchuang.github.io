@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>example drop</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font: 16px/1.5 ui-sans-serif, system-ui, sans-serif;
+        background: #0d0d0d;
+        color: #eee;
+      }
+      main { max-width: 40rem; padding: 2rem; }
+      canvas {
+        display: block;
+        width: 100%;
+        max-width: 420px;
+        height: auto;
+        border: 1px solid #333;
+        border-radius: 8px;
+        background: #161616;
+      }
+      a { color: #c9a0ff; }
+      code { font-size: 0.9em; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Example drop (native HTML)</h1>
+      <p>
+        This file is served as a real page, not through Docsify.
+        URL: <code>/drops/example/</code>
+      </p>
+      <canvas id="c" width="420" height="160" aria-label="sample canvas"></canvas>
+      <p>Copy <code>docs/drops/example/</code> to <code>docs/drops/&lt;slug&gt;/</code> and push.</p>
+      <p>
+        <a href="/drops/">All drops</a>
+        ·
+        <a href="/#/ideas/example">Markdown example</a>
+      </p>
+    </main>
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#c9a0ff";
+      ctx.font = "20px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("native canvas", 24, 88);
+      ctx.strokeStyle = "#444";
+      ctx.beginPath();
+      ctx.moveTo(24, 110);
+      ctx.lineTo(396, 110);
+      ctx.stroke();
+    </script>
+  </body>
+</html>
