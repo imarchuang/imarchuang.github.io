@@ -140,6 +140,7 @@
       transform: translate(-50%, -50%);
       transition: left .28s ease, top .28s ease;
     }
+    .evidence-card.dragging { transition: none; }
     .evidence-card:active { cursor: grabbing; }
     .evidence-card[data-group="checkout"] { border-top: 5px solid var(--blue); }
     .evidence-card[data-group="latency"] { border-top: 5px solid var(--coral); }
@@ -198,6 +199,7 @@
     .edit-rollout { display: flex; gap: .5rem; align-items: center; margin: .7rem 0; }
     .edit-rollout input { width: 5rem; padding: .5rem; border: 1px solid var(--ink); }
     .execution { margin-top: .7rem; padding: .7rem; border-left: 5px solid var(--mint); background: #E2F5ED; }
+    .action-notice { margin-bottom: .8rem; border-left: 5px solid var(--violet); }
     .case-file dl { margin: 0; }
     .case-file div { padding: .65rem 0; border-bottom: 1px solid var(--rule); }
     .case-file dt { color: var(--muted); font: .68rem var(--mono); text-transform: uppercase; }
@@ -370,7 +372,11 @@
         proposedActionId: "rollback",
         rolloutPercent: 100,
         actionMode: "review",
+        actionNotice: null,
         fixtureRelease: "2026.08.25",
+        telemetryInspected: false,
+        bannerDraft: null,
+        movementMenuId: null,
         executions: [],
         events: [createEvent("state", "system", "Case opened", { caseId: "CX-204" }, false)],
         eventFilter: "all",
@@ -380,7 +386,8 @@
     }
 
     function appendEvent(type, actor, summary, payload, reversible) {
-      const event = createEvent(type, actor, summary, payload, reversible);
+      const payloadSnapshot = JSON.parse(JSON.stringify(payload));
+      const event = createEvent(type, actor, summary, payloadSnapshot, reversible);
       state.events.push(event);
       state.announcement = summary;
       pulseTape = true;
@@ -457,6 +464,7 @@
     function resetSense() {
       state.evidence = EVIDENCE.map(item => ({ ...item, group: null }));
       state.clustered = false;
+      state.movementMenuId = null;
       appendEvent("state", "human", "Evidence canvas reset", { station: "sense" }, false);
       render();
     }
@@ -471,6 +479,7 @@
         return { ...item, x: target[0], y: target[1], group: target[2] };
       });
       state.clustered = true;
+      state.movementMenuId = null;
       appendEvent("state", "agent", "Signals clustered by semantic and spatial cues", {
         groups: ["mobile checkout", "payment latency"],
         unrelated: ["desktop search icons"]
@@ -478,13 +487,33 @@
       render();
     }
 
-    function moveEvidence(id, dx, dy) {
+    function clampEvidencePosition(x, y) {
+      return {
+        x: Math.max(8, Math.min(92, x)),
+        y: Math.max(10, Math.min(90, y))
+      };
+    }
+
+    function setEvidencePosition(id, x, y) {
+      const current = state.evidence.find(item => item.id === id);
+      if (!current) return false;
+      const next = clampEvidencePosition(x, y);
+      const moved = next.x !== current.x || next.y !== current.y;
+      if (!moved) return false;
       state.evidence = state.evidence.map(item => item.id === id
-        ? { ...item, x: Math.max(8, Math.min(92, item.x + dx)), y: Math.max(10, Math.min(90, item.y + dy)), group: null }
-        : item);
+        ? { ...item, x: next.x, y: next.y, group: null }
+        : { ...item, group: null });
       state.clustered = false;
+      return true;
+    }
+
+    function moveEvidence(id, dx, dy, direction) {
+      const current = state.evidence.find(item => item.id === id);
+      if (!current || !setEvidencePosition(id, current.x + dx, current.y + dy)) return;
+      state.movementMenuId = id;
       appendEvent("state", "human", "Moved evidence card", { evidenceId: id, delta: [dx, dy] }, false);
       render();
+      document.querySelector('[data-evidence-id="' + id + '"][data-move-direction="' + direction + '"]')?.focus();
     }
 
     function enableDrag(card, evidence) {
@@ -492,23 +521,38 @@
         if (event.target.closest("details")) return;
         card.setPointerCapture(event.pointerId);
         const canvas = card.parentElement;
+        let moved = false;
+        card.classList.add("dragging");
         const move = moveEvent => {
           const rect = canvas.getBoundingClientRect();
-          evidence.x = Math.max(8, Math.min(92, (moveEvent.clientX - rect.left) / rect.width * 100));
-          evidence.y = Math.max(10, Math.min(90, (moveEvent.clientY - rect.top) / rect.height * 100));
-          card.style.left = evidence.x + "%";
-          card.style.top = evidence.y + "%";
+          const nextX = (moveEvent.clientX - rect.left) / rect.width * 100;
+          const nextY = (moveEvent.clientY - rect.top) / rect.height * 100;
+          if (setEvidencePosition(evidence.id, nextX, nextY)) {
+            moved = true;
+            const current = state.evidence.find(item => item.id === evidence.id);
+            card.style.left = current.x + "%";
+            card.style.top = current.y + "%";
+            card.dataset.group = "raw";
+          }
         };
-        const up = upEvent => {
-          card.releasePointerCapture(upEvent.pointerId);
+        const finish = finishEvent => {
+          if (card.hasPointerCapture(finishEvent.pointerId)) card.releasePointerCapture(finishEvent.pointerId);
           card.removeEventListener("pointermove", move);
-          card.removeEventListener("pointerup", up);
-          state.clustered = false;
-          appendEvent("state", "human", "Dragged evidence card", { evidenceId: evidence.id, position: [Math.round(evidence.x), Math.round(evidence.y)] }, false);
-          render();
+          card.removeEventListener("pointerup", finish);
+          card.removeEventListener("pointercancel", finish);
+          card.classList.remove("dragging");
+          if (moved) {
+            const current = state.evidence.find(item => item.id === evidence.id);
+            appendEvent("state", "human", "Dragged evidence card", {
+              evidenceId: evidence.id,
+              position: [Math.round(current.x), Math.round(current.y)]
+            }, false);
+            render();
+          }
         };
         card.addEventListener("pointermove", move);
-        card.addEventListener("pointerup", up);
+        card.addEventListener("pointerup", finish);
+        card.addEventListener("pointercancel", finish);
       });
     }
 
@@ -525,12 +569,15 @@
         card.dataset.group = evidence.group || "raw";
         card.append(element("span", "card-kind", evidence.kind), element("p", "card-copy", evidence.text));
         const menu = element("details", "card-menu");
+        menu.open = state.movementMenuId === evidence.id;
         const summary = element("summary", "", "Move");
         summary.setAttribute("aria-label", "Move " + evidence.kind + " card");
         const grid = element("div", "move-grid");
         [["↑", 0, -5, "up"], ["←", -5, 0, "left"], ["→", 5, 0, "right"], ["↓", 0, 5, "down"]].forEach(move => {
-          const control = button(move[0], () => moveEvidence(evidence.id, move[1], move[2]));
+          const control = button(move[0], () => moveEvidence(evidence.id, move[1], move[2], move[3]));
           control.setAttribute("aria-label", "Move card " + move[3]);
+          control.dataset.evidenceId = evidence.id;
+          control.dataset.moveDirection = move[3];
           grid.append(control);
         });
         menu.append(summary, grid);
@@ -769,29 +816,53 @@
     function executeAction(actionId, decision, modifications) {
       const action = ACTIONS.find(item => item.id === actionId);
       if (!action) return;
+      const activeExecution = state.executions.find(item => item.actionId === actionId && !item.undone);
+      if (activeExecution) {
+        state.actionNotice = action.title + " is already active. Undo it before making another decision.";
+        state.announcement = state.actionNotice;
+        render();
+        return;
+      }
       if (decision === "reject") {
         appendEvent("interrupt", "human", "Rejected " + action.title, { actionId, decision }, false);
         state.actionMode = "rejected";
+        state.actionNotice = action.title + " rejected. No side effect was applied.";
         render();
         return;
       }
       if (action.risk === "consequential" && decision !== "approve") {
         state.actionMode = "edit";
+        state.actionNotice = "Editing rollout scope. Approval is still required.";
         appendEvent("interrupt", "human", "Requested rollback modification", { actionId, decision: "edit" }, false);
         render();
         return;
       }
       const rollout = modifications?.rolloutPercent || 100;
+      let before;
+      let after;
+      if (actionId === "inspect") {
+        before = { telemetryInspected: state.telemetryInspected };
+        after = { telemetryInspected: true };
+      } else if (actionId === "banner") {
+        before = { bannerDraft: state.bannerDraft };
+        after = { bannerDraft: "Mobile checkout issue identified · draft only" };
+      } else {
+        before = { release: state.fixtureRelease, rolloutPercent: 0 };
+        after = { release: "2026.08.18", rolloutPercent: rollout };
+      }
       const execution = {
         id: "execution-" + (state.executions.length + 1),
         actionId,
-        before: { release: state.fixtureRelease, rolloutPercent: 0 },
-        after: { release: actionId === "rollback" ? "2026.08.18" : state.fixtureRelease, rolloutPercent: rollout },
+        before,
+        after,
         undone: false
       };
       state.executions.push(execution);
-      if (actionId === "rollback") state.fixtureRelease = "2026.08.18";
+      if (actionId === "inspect") state.telemetryInspected = true;
+      if (actionId === "banner") state.bannerDraft = after.bannerDraft;
+      if (actionId === "rollback") state.fixtureRelease = after.release;
       state.actionMode = "executed";
+      state.actionNotice = action.title + " executed. An undo control is available below.";
       appendEvent("tool", "agent", "Executed approved " + action.title, execution, true);
       render();
     }
@@ -800,8 +871,11 @@
       const execution = state.executions.find(item => item.id === executionId);
       if (!execution || execution.undone) return;
       execution.undone = true;
-      state.fixtureRelease = execution.before.release;
+      if (execution.actionId === "inspect") state.telemetryInspected = execution.before.telemetryInspected;
+      if (execution.actionId === "banner") state.bannerDraft = execution.before.bannerDraft;
+      if (execution.actionId === "rollback") state.fixtureRelease = execution.before.release;
       state.actionMode = "review";
+      state.actionNotice = execution.actionId + " action undone. Prior fixture state restored.";
       appendEvent("tool", "human", "Undid " + execution.actionId + " action", { executionId, restored: execution.before }, true);
       render();
     }
@@ -809,10 +883,26 @@
     function resetAct() {
       state.executions = [];
       state.fixtureRelease = "2026.08.25";
+      state.telemetryInspected = false;
+      state.bannerDraft = null;
       state.rolloutPercent = 100;
       state.actionMode = "review";
+      state.actionNotice = null;
       appendEvent("state", "human", "Action station reset", { station: "act" }, false);
       render();
+    }
+
+    function renderExecutionRecords(step, actionId) {
+      state.executions.filter(item => item.actionId === actionId).forEach(execution => {
+        const record = element("div", "execution");
+        record.append(element("strong", "", execution.undone ? "Action undone" : "Executed · audit record " + execution.id));
+        if (!execution.undone) {
+          const undo = button("Undo this action", () => undoAction(execution.id));
+          undo.setAttribute("aria-label", "Undo " + actionId + " action");
+          record.append(undo);
+        }
+        step.append(record);
+      });
     }
 
     function renderAct(container) {
@@ -820,15 +910,24 @@
       const controls = element("div", "controls");
       controls.append(button("Reset actions", resetAct));
       container.append(controls);
+      if (state.actionNotice) {
+        const notice = element("div", "panel action-notice", state.actionNotice);
+        notice.setAttribute("role", "status");
+        container.append(notice);
+      }
       const plan = element("div", "action-plan");
       ACTIONS.forEach(action => {
         const step = element("article", "action-step");
+        const activeExecution = state.executions.find(item => item.actionId === action.id && !item.undone);
         step.append(element("span", "risk risk-" + action.risk, action.risk), element("h3", "", action.title), element("p", "", action.detail));
         if (action.id === "inspect") {
           const inspect = button("Run inspection", () => executeAction("inspect", "approve"));
+          inspect.disabled = Boolean(activeExecution);
           step.append(inspect);
         } else if (action.id === "banner") {
-          step.append(button("Create preview", () => executeAction("banner", "approve")));
+          const preview = button("Create preview", () => executeAction("banner", "approve"));
+          preview.disabled = Boolean(activeExecution);
+          step.append(preview);
         } else {
           const diff = element("div", "diff");
           diff.append(
@@ -837,7 +936,7 @@
             element("span", "", "Impact: ~3,400 active sessions restart checkout")
           );
           step.append(diff);
-          if (state.actionMode === "edit") {
+          if (state.actionMode === "edit" && !activeExecution) {
             const edit = element("div", "edit-rollout");
             const label = element("label", "", "Rollout percentage");
             label.htmlFor = "rollout";
@@ -854,20 +953,17 @@
             edit.append(label, input, element("span", "", "%"));
             step.append(edit);
           }
-          const decisions = element("div", "decision-row");
-          decisions.append(
-            button(state.actionMode === "edit" ? "Approve modified rollout" : "Approve rollback", () => executeAction("rollback", "approve", { rolloutPercent: state.rolloutPercent }), "primary"),
-            button("Edit rollout", () => executeAction("rollback", "edit")),
-            button("Reject", () => executeAction("rollback", "reject"), "danger")
-          );
-          step.append(decisions);
-          state.executions.filter(item => item.actionId === "rollback").forEach(execution => {
-            const record = element("div", "execution");
-            record.append(element("strong", "", execution.undone ? "Action undone" : "Executed · audit record " + execution.id));
-            if (!execution.undone) record.append(button("Undo this action", () => undoAction(execution.id)));
-            step.append(record);
-          });
+          if (!activeExecution) {
+            const decisions = element("div", "decision-row");
+            decisions.append(
+              button(state.actionMode === "edit" ? "Approve modified rollout" : "Approve rollback", () => executeAction("rollback", "approve", { rolloutPercent: state.rolloutPercent }), "primary"),
+              button("Edit rollout", () => executeAction("rollback", "edit")),
+              button("Reject", () => executeAction("rollback", "reject"), "danger")
+            );
+            step.append(decisions);
+          }
         }
+        renderExecutionRecords(step, action.id);
         plan.append(step);
       });
       container.append(plan);
