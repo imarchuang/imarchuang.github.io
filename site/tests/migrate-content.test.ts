@@ -61,7 +61,7 @@ describe("migrate-content", () => {
     );
   });
 
-  test("migrates fixture docs, rewrites links with source context, and merges nested sidebars", async () => {
+  test("migrates fixture docs, rewrites links with source context, and collapses duplicate sidebar aliases", async () => {
     const { migrateContent } = await loadMigrationModule();
     const sourceDir = path.join(fixtureRoot, "basic");
     const workspaceDir = await makeTempDir("task-2-basic-");
@@ -76,7 +76,7 @@ describe("migrate-content", () => {
       knownIssuesFile,
     });
 
-    expect(result.migratedCount).toBe(5);
+    expect(result.migratedCount).toBe(6);
     expect(result.excludedCount).toBe(6);
     expect(result.navigation).toEqual([
       {
@@ -102,7 +102,13 @@ describe("migrate-content", () => {
           {
             title: "Advanced",
             href: "/guides/advanced/",
-            children: [],
+            children: [
+              {
+                title: "FAQ",
+                href: "/guides/faq/",
+                children: [],
+              },
+            ],
           },
         ],
       },
@@ -143,6 +149,7 @@ describe("migrate-content", () => {
 
     const navigationJson = JSON.parse(await readFile(navigationFile, "utf8"));
     expect(navigationJson).toEqual(result.navigation);
+    expect(JSON.stringify(result.navigation)).not.toContain("Advanced Alias");
 
     const issues = JSON.parse(await readFile(knownIssuesFile, "utf8"));
     expect(issues).toEqual([
@@ -192,7 +199,7 @@ describe("migrate-content", () => {
         knownIssuesFile,
       }),
     ).resolves.toMatchObject({
-      migratedCount: 5,
+      migratedCount: 6,
       excludedCount: 6,
     });
 

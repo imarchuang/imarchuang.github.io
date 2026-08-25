@@ -268,3 +268,48 @@ Tests       11 passed (11)
   - `/python/` (`11` items)
   - `/sysde/` (`3` items)
 - Remaining `?id=` entries in known issues dropped to `13`, indicating the valid relative-anchor cases covered by this fix are no longer being misclassified.
+
+## Final Navigation-Fidelity Fix
+
+Closed the remaining subsection-sidebar fidelity gap by collapsing duplicate `href` aliases inside incoming sidebar subtrees before they merge into root navigation sections.
+
+### What changed
+
+- kept the first meaningful sidebar node/title/order for a repeated `href`
+- discarded duplicate alias nodes that pointed to the same `href`
+- merged any unique descendants from the alias subtree into the first kept node
+- added a focused fixture where `Advanced` contains a child alias with the same `href` plus a unique `FAQ` child, and asserted that generated navigation keeps only `Advanced -> FAQ`
+
+### Exact verification
+
+Focused migration coverage:
+
+```bash
+npm test -- migrate-content.test.ts
+```
+
+Observed:
+
+```bash
+Test Files  1 passed (1)
+Tests       5 passed (5)
+```
+
+Real migration after the alias-collapse fix:
+
+```bash
+node scripts/migrate-content.mjs
+```
+
+Observed:
+
+```json
+{
+  "migratedCount": 164,
+  "excludedCount": 15,
+  "accountedCount": 174,
+  "supportExcludedCount": 10,
+  "generatedDirSkippedCount": 5,
+  "issuesCount": 60
+}
+```

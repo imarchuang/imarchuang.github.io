@@ -2,3 +2,5 @@
   * [Getting Started](./guides/getting-started)
   * [Deep Dive](./guides/nested/child)
   * [Advanced](./guides/advanced)
+    * [Advanced Alias](./guides/advanced)
+      * [FAQ](./guides/faq)

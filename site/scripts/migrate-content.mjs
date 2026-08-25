@@ -581,6 +581,40 @@ function flattenSectionSidebarItems(items, sectionHref) {
   return flattened;
 }
 
+function collapseDuplicateSubtreeItems(items) {
+  const seen = new Map();
+  const collapsed = [];
+
+  function appendCollapsed(targetItems, item) {
+    const existing = seen.get(item.href);
+    if (existing) {
+      for (const child of item.children) {
+        appendCollapsed(existing.children, child);
+      }
+      return;
+    }
+
+    const normalized = {
+      title: item.title,
+      href: item.href,
+      children: [],
+    };
+
+    seen.set(normalized.href, normalized);
+    targetItems.push(normalized);
+
+    for (const child of item.children) {
+      appendCollapsed(normalized.children, child);
+    }
+  }
+
+  for (const item of items) {
+    appendCollapsed(collapsed, item);
+  }
+
+  return collapsed;
+}
+
 async function mergeSectionSidebars({
   navigation,
   sourceDir,
@@ -624,12 +658,13 @@ async function mergeSectionSidebars({
         parsedItems,
         mergedNavigation[sectionIndex].href,
       );
+      const normalizedItems = collapseDuplicateSubtreeItems(flattenedItems);
 
       mergedNavigation[sectionIndex] = {
         ...mergedNavigation[sectionIndex],
         items: mergeNavigationItems(
           mergedNavigation[sectionIndex].items,
-          flattenedItems,
+          normalizedItems,
         ),
       };
     } catch {
