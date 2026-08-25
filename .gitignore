@@ -1,4 +1,5 @@
 .idea/*
 .idea/
+.superpowers/
 .worktrees/
 whiteboard/node_modules/
