@@ -1,0 +1,86 @@
+:root {
+  color-scheme: light dark;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root,
+.app,
+.editor {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.loading {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  background: #f5f5f3;
+  color: #34343a;
+}
+
+.scratchpad-badge {
+  position: fixed;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 10;
+  display: grid;
+  gap: 0.1rem;
+  max-width: min(13rem, calc(100vw - 1.5rem));
+  padding: 0.55rem 0.7rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, Canvas 88%, transparent);
+  color: CanvasText;
+  text-decoration: none;
+  backdrop-filter: blur(10px);
+}
+
+.scratchpad-badge span {
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.scratchpad-badge small {
+  overflow: hidden;
+  font-size: 0.65rem;
+  opacity: 0.65;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scratchpad-badge:focus-visible {
+  outline: 3px solid #6965db;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .scratchpad-badge {
+    right: 0.5rem;
+    bottom: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .loading {
+    background: #121216;
+    color: #f4f4f5;
+  }
+}

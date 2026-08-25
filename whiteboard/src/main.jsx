@@ -1,5 +1,11 @@
-const root = document.getElementById("root");
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "@excalidraw/excalidraw/index.css";
+import App from "./App";
+import "./styles.css";
 
-if (root) {
-  root.textContent = "Personal whiteboard";
-}
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
