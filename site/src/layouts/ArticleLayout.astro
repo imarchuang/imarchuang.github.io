@@ -1,0 +1,104 @@
+---
+import ArticlePager from "../components/ArticlePager.astro";
+import Comments from "../components/Comments.astro";
+import SectionNav from "../components/SectionNav.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import BaseLayout from "./BaseLayout.astro";
+import "../styles/article.css";
+
+import type { ArticleListItem } from "../lib/articles";
+import type { NavigationSection } from "../lib/navigation";
+
+interface HeadingLink {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  navigation: NavigationSection[];
+  currentPath: string;
+  headings: HeadingLink[];
+  previous: ArticleListItem | null;
+  next: ArticleListItem | null;
+}
+
+const {
+  title,
+  description,
+  navigation,
+  currentPath,
+  headings,
+  previous,
+  next,
+} = Astro.props;
+
+const tocHeadings = headings.filter((heading) => heading.depth <= 4);
+const showToc = tocHeadings.length >= 2;
+---
+
+<BaseLayout title={`${title} — Marc Huang`} description={description || title}>
+  <div class="article-shell page-shell">
+    <SectionNav navigation={navigation} currentPath={currentPath} />
+
+    <article class="article-main">
+      <header class="article-header">
+        <p class="kicker">Knowledge base / Article</p>
+        <h1>{title}</h1>
+        {description && <p class="article-lede">{description}</p>}
+      </header>
+
+      <div class="article-content-shell">
+        <div class="article-prose-wrap">
+          <div class="article-prose" data-article-prose>
+            <slot />
+          </div>
+          <ArticlePager previous={previous} next={next} />
+          <Comments />
+        </div>
+        {showToc && <TableOfContents headings={tocHeadings} />}
+      </div>
+    </article>
+  </div>
+</BaseLayout>
+
+<script is:inline>
+  const prose = document.querySelector("[data-article-prose]");
+
+  if (prose instanceof HTMLElement) {
+    const blocks = prose.querySelectorAll("pre");
+
+    blocks.forEach((block, index) => {
+      if (!(block instanceof HTMLElement) || block.dataset.copyReady === "true") {
+        return;
+      }
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "code-copy-button";
+      button.textContent = "复制代码";
+      button.setAttribute("aria-label", `复制代码块 ${index + 1}`);
+
+      button.addEventListener("click", async () => {
+        const text = block.innerText;
+        try {
+          await navigator.clipboard.writeText(text);
+          button.textContent = "已复制";
+          window.setTimeout(() => {
+            button.textContent = "复制代码";
+          }, 1500);
+        } catch {
+          button.textContent = "复制失败";
+          window.setTimeout(() => {
+            button.textContent = "复制代码";
+          }, 1500);
+        }
+      });
+
+      block.dataset.copyReady = "true";
+      block.prepend(button);
+    });
+  }
+</script>

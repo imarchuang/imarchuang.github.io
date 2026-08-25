@@ -1,0 +1,23 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="页面未找到 — Marc Huang" description="你访问的页面不存在，但可以继续浏览作品与笔记。">
+  <section class="landing page-shell not-found">
+    <p class="kicker">404 / Recovery</p>
+    <h1>页面未找到</h1>
+    <p class="lede">这个地址暂时没有内容。你可以回到可继续探索的入口，或者直接开始搜索。</p>
+    <div class="card-grid">
+      <a class="collection-card" href="/work/">
+        <span class="kicker">Work</span>
+        <h2>去作品页</h2>
+        <p>查看交互图解、视觉实验与可探索作品。</p>
+      </a>
+      <a class="collection-card" href="/notes/">
+        <span class="kicker">Notes</span>
+        <h2>去笔记页</h2>
+        <p>回到知识库入口，按主题继续阅读。</p>
+      </a>
+    </div>
+  </section>
+</BaseLayout>

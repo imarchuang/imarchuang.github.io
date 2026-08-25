@@ -1,0 +1,77 @@
+<section class="article-comments" aria-labelledby="comments-title">
+  <div class="article-comments-shell" data-comments-root>
+    <div class="article-comments-header">
+      <div>
+        <p class="kicker">Discuss / Utterances</p>
+        <h2 id="comments-title">留言</h2>
+      </div>
+      <button type="button" class="comments-load" data-comments-load>加载评论</button>
+    </div>
+    <p class="article-comments-copy" data-comments-status>
+      评论区会在你接近这里时再按需加载，不会阻塞正文阅读。
+    </p>
+    <div class="article-comments-frame" data-comments-frame></div>
+  </div>
+</section>
+
+<script is:inline>
+  const root = document.querySelector("[data-comments-root]");
+
+  if (root instanceof HTMLElement) {
+    const loadButton = root.querySelector("[data-comments-load]");
+    const frame = root.querySelector("[data-comments-frame]");
+    const status = root.querySelector("[data-comments-status]");
+    let loaded = false;
+    let loading = false;
+
+    const updateStatus = (message) => {
+      if (status instanceof HTMLElement) {
+        status.textContent = message;
+      }
+    };
+
+    const loadComments = () => {
+      if (loaded || loading || !(frame instanceof HTMLElement)) {
+        return;
+      }
+
+      loading = true;
+      updateStatus("正在加载评论…");
+
+      const script = document.createElement("script");
+      script.src = "https://utteranc.es/client.js";
+      script.setAttribute("repo", "imarchuang/imarchuang.github.io");
+      script.setAttribute("issue-term", "pathname");
+      script.setAttribute("theme", "github-light");
+      script.setAttribute("crossorigin", "anonymous");
+      script.async = true;
+
+      script.addEventListener("load", () => {
+        loaded = true;
+        loading = false;
+        updateStatus("评论已加载。");
+      });
+
+      script.addEventListener("error", () => {
+        loading = false;
+        updateStatus("评论加载失败，但正文阅读不受影响。");
+      });
+
+      frame.append(script);
+    };
+
+    if (loadButton instanceof HTMLButtonElement) {
+      loadButton.addEventListener("click", loadComments);
+    }
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadComments();
+          observer.disconnect();
+        }
+      });
+      observer.observe(root);
+    }
+  }
+</script>

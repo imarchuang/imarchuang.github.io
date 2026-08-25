@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import navigationData from "../generated/navigation.json";
 
 export interface NavigationItem {
   title: string;
@@ -94,7 +94,10 @@ export function validateNavigation(value: unknown): NavigationSection[] {
   });
 }
 
+export function freezeNavigation(value: NavigationSection[]): NavigationSection[] {
+  return freezeTree(value);
+}
+
 export function getNavigation(): NavigationSection[] {
-  const raw = readFileSync(new URL("../generated/navigation.json", import.meta.url), "utf8");
-  return freezeTree(validateNavigation(JSON.parse(raw)));
+  return freezeNavigation(validateNavigation(navigationData));
 }

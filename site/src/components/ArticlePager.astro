@@ -1,0 +1,32 @@
+---
+interface PagerItem {
+  href: string;
+  title: string;
+}
+
+interface Props {
+  previous: PagerItem | null;
+  next: PagerItem | null;
+}
+
+const { previous, next } = Astro.props;
+---
+
+{(previous || next) && (
+  <nav class="article-pager" aria-label="文章分页">
+    {previous ? (
+      <a class="article-pager-link" href={previous.href}>
+        <span class="kicker">Previous</span>
+        <strong>{previous.title}</strong>
+      </a>
+    ) : (
+      <span class="article-pager-spacer" aria-hidden="true"></span>
+    )}
+    {next && (
+      <a class="article-pager-link article-pager-link-next" href={next.href}>
+        <span class="kicker">Next</span>
+        <strong>{next.title}</strong>
+      </a>
+    )}
+  </nav>
+)}

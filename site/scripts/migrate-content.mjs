@@ -261,6 +261,21 @@ function looksLikeAsset(href) {
   return ASSET_EXTENSIONS.has(path.posix.extname(cleanHref));
 }
 
+function rewriteMarkdownImages(markdown) {
+  return markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, href) => {
+    if (looksExternal(href) || href.startsWith("/")) {
+      return match;
+    }
+
+    if (!looksLikeAsset(href)) {
+      return match;
+    }
+
+    const label = alt.trim() ? `Image: ${alt.trim()}` : "Image asset";
+    return `[${label}](${href})`;
+  });
+}
+
 function normalizePathForLookup(value) {
   const normalized = path.posix.normalize(value);
 
@@ -718,8 +733,9 @@ async function writeGeneratedNote({
 }) {
   const rawMarkdown = await readFile(absolutePath, "utf8");
   const extracted = extractTitleAndBody(rawMarkdown);
+  const imageSafeBody = rewriteMarkdownImages(extracted.body);
   const rewrittenBody = rewriteMarkdownLinks(
-    extracted.body,
+    imageSafeBody,
     relativePath,
     routeReferences,
     issues,

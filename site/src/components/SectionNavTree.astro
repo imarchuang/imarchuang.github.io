@@ -1,0 +1,57 @@
+---
+import type { NavigationItem, NavigationSection } from "../lib/navigation";
+
+interface Props {
+  items: Array<NavigationSection | NavigationItem>;
+  currentPath: string;
+}
+
+const { items, currentPath } = Astro.props;
+
+function normalizeHref(value: string): string {
+  return value.endsWith("/") ? value : `${value}/`;
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function hasCurrent(value: string): boolean {
+  return normalizeHref(value) === normalizeHref(currentPath);
+}
+
+function branchIncludesCurrent(item: NavigationItem | NavigationSection): boolean {
+  if (hasCurrent(item.href)) {
+    return true;
+  }
+
+  const children = "items" in item ? item.items : item.children;
+  return children.some((child) => branchIncludesCurrent(child));
+}
+
+function renderItems(branches: Array<NavigationSection | NavigationItem>): string {
+  const markup = branches
+    .map((item) => {
+      const children = "items" in item ? item.items : item.children;
+      const classes = [
+        hasCurrent(item.href) ? "is-active" : "",
+        branchIncludesCurrent(item) ? "is-active-branch" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      const current = hasCurrent(item.href) ? ' aria-current="page"' : "";
+      const nested = children.length > 0 ? renderItems(children) : "";
+
+      return `<li class="${classes}"><a href="${escapeHtml(item.href)}"${current}>${escapeHtml(item.title)}</a>${nested}</li>`;
+    })
+    .join("");
+
+  return `<ul class="section-nav-list">${markup}</ul>`;
+}
+---
+
+<Fragment set:html={renderItems(items)} />

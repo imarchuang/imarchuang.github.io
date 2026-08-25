@@ -1,6 +1,7 @@
 ---
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
+import SearchDialog from "../components/SearchDialog.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -22,6 +23,9 @@ const isHome = Astro.url.pathname === "/";
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    <script is:inline>
+      document.documentElement.dataset.js = "true";
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="zh_CN" />
     <meta property="og:title" content={title} />
@@ -34,6 +38,7 @@ const isHome = Astro.url.pathname === "/";
   <body>
     <a class="skip-link" href="#main-content">跳到主要内容</a>
     <SiteHeader />
+    <SearchDialog />
     <main id="main-content" tabindex="-1">
       <slot />
     </main>

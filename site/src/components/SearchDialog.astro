@@ -1,0 +1,210 @@
+<dialog id="site-search-dialog" class="search-dialog" aria-label="站内搜索">
+  <div class="search-dialog-shell">
+    <div class="search-dialog-heading">
+      <div>
+        <p class="kicker">Search / Pagefind</p>
+        <h2>站内搜索</h2>
+      </div>
+      <button type="button" class="search-dialog-close" data-search-close>关闭</button>
+    </div>
+
+    <label class="search-field">
+      <span>搜索文章</span>
+      <input
+        type="search"
+        name="query"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="从标题、正文和路径里搜索"
+        data-search-input
+      />
+    </label>
+
+    <p class="search-status" data-search-status>输入关键词后开始搜索。</p>
+
+    <ol class="search-results" data-search-results></ol>
+
+    <div class="search-empty" data-search-empty hidden>
+      <p>没有找到结果。你也可以从这些入口继续浏览：</p>
+      <ul>
+        <li><a href="/work/">Work / Visual systems</a></li>
+        <li><a href="/system/">System Pattern</a></li>
+        <li><a href="/coding/">Algo</a></li>
+        <li><a href="/python/">Python</a></li>
+      </ul>
+    </div>
+  </div>
+</dialog>
+
+<script is:inline>
+  const dialog = document.querySelector("#site-search-dialog");
+  const openButtons = document.querySelectorAll("[data-search-open]");
+
+  if (dialog instanceof HTMLDialogElement) {
+    const closeButton = dialog.querySelector("[data-search-close]");
+    const input = dialog.querySelector("[data-search-input]");
+    const status = dialog.querySelector("[data-search-status]");
+    const results = dialog.querySelector("[data-search-results]");
+    const empty = dialog.querySelector("[data-search-empty]");
+    let pagefindPromise = null;
+    let pagefindModule = null;
+    let lastTrigger = null;
+    let searchToken = 0;
+    let debounceHandle = null;
+
+    const clearResults = () => {
+      if (results instanceof HTMLElement) {
+        results.innerHTML = "";
+      }
+    };
+
+    const showEmptyState = (message) => {
+      clearResults();
+      if (status instanceof HTMLElement) {
+        status.textContent = message;
+      }
+      if (empty instanceof HTMLElement) {
+        empty.hidden = false;
+      }
+    };
+
+    const hideEmptyState = () => {
+      if (empty instanceof HTMLElement) {
+        empty.hidden = true;
+      }
+    };
+
+    const ensurePagefind = async () => {
+      if (pagefindModule) {
+        return pagefindModule;
+      }
+
+      if (!pagefindPromise) {
+        pagefindPromise = import("/pagefind/pagefind.js")
+          .then(async (module) => {
+            if (typeof module.options === "function") {
+              await module.options({ excerptLength: 18 });
+            }
+            pagefindModule = module;
+            return module;
+          })
+          .catch(() => null);
+      }
+
+      const loaded = await pagefindPromise;
+      if (loaded) {
+        pagefindModule = loaded;
+      }
+      return loaded;
+    };
+
+    const renderResults = (items) => {
+      if (!(results instanceof HTMLElement)) {
+        return;
+      }
+
+      results.innerHTML = items
+        .map(
+          (item) =>
+            `<li><a href="${item.url}"><strong>${item.meta?.title ?? item.url}</strong><span>${item.excerpt ?? ""}</span><code>${item.url}</code></a></li>`,
+        )
+        .join("");
+    };
+
+    const runSearch = async (query) => {
+      const token = ++searchToken;
+      const trimmed = query.trim();
+
+      if (!trimmed) {
+        clearResults();
+        hideEmptyState();
+        if (status instanceof HTMLElement) {
+          status.textContent = "输入关键词后开始搜索。";
+        }
+        return;
+      }
+
+      if (status instanceof HTMLElement) {
+        status.textContent = "正在搜索…";
+      }
+
+      const pagefind = await ensurePagefind();
+      if (token !== searchToken) {
+        return;
+      }
+
+      if (!pagefind || typeof pagefind.search !== "function") {
+        showEmptyState("没有找到结果，或者本地搜索索引尚未生成。");
+        return;
+      }
+
+      const matches = await pagefind.search(trimmed);
+      if (token !== searchToken) {
+        return;
+      }
+
+      if (!matches.results.length) {
+        showEmptyState("没有找到结果。");
+        return;
+      }
+
+      hideEmptyState();
+      const items = await Promise.all(matches.results.slice(0, 8).map((item) => item.data()));
+      if (token !== searchToken) {
+        return;
+      }
+
+      if (status instanceof HTMLElement) {
+        status.textContent = `找到 ${items.length} 条结果。`;
+      }
+      renderResults(items);
+    };
+
+    for (const button of openButtons) {
+      if (!(button instanceof HTMLButtonElement)) {
+        continue;
+      }
+
+      button.addEventListener("click", () => {
+        lastTrigger = button;
+        if (!dialog.open) {
+          dialog.showModal();
+        }
+        void ensurePagefind();
+        if (input instanceof HTMLInputElement) {
+          input.focus();
+        }
+      });
+    }
+
+    if (closeButton instanceof HTMLButtonElement) {
+      closeButton.addEventListener("click", () => {
+        dialog.close();
+      });
+    }
+
+    dialog.addEventListener("close", () => {
+      if (lastTrigger instanceof HTMLElement) {
+        lastTrigger.focus();
+      }
+    });
+
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) {
+        dialog.close();
+      }
+    });
+
+    if (input instanceof HTMLInputElement) {
+      input.addEventListener("input", () => {
+        if (debounceHandle) {
+          window.clearTimeout(debounceHandle);
+        }
+
+        debounceHandle = window.setTimeout(() => {
+          void runSearch(input.value);
+        }, 120);
+      });
+    }
+  }
+</script>

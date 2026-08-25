@@ -19,9 +19,18 @@ test("renders the approved Chinese-first homepage", async ({ page }) => {
   await expect(page.locator("main")).toBeVisible();
   await expect(page.locator('a[href="#main-content"]')).toBeAttached();
   await expect(page.getByRole("navigation", { name: "主导航" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "作品", exact: true })).toHaveAttribute("href", "/work/");
-  await expect(page.getByRole("link", { name: "笔记", exact: true })).toHaveAttribute("href", "/notes/");
-  await expect(page.getByRole("link", { name: "关于", exact: true })).toHaveAttribute("href", "/about/");
+  await expect(page.getByRole("link", { name: "作品", exact: true })).toHaveAttribute(
+    "href",
+    "/work/",
+  );
+  await expect(page.getByRole("link", { name: "笔记", exact: true })).toHaveAttribute(
+    "href",
+    "/notes/",
+  );
+  await expect(page.getByRole("link", { name: "关于", exact: true })).toHaveAttribute(
+    "href",
+    "/about/",
+  );
   await expect(page.getByRole("link", { name: "GitHub ↗" })).toHaveAttribute(
     "href",
     "https://github.com/imarchuang",

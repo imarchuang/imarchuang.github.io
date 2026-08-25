@@ -255,5 +255,14 @@ describe("migrate-content", () => {
         }),
       ]),
     );
+
+    const stickySession = await readFile(
+      path.join(notesDir, "products", "federated", "sticky_session_k8s.md"),
+      "utf8",
+    );
+    expect(stickySession).toContain(
+      "[Image: websocket stick session](../../images/lock_sticky_session.png)",
+    );
+    expect(stickySession).not.toContain("![websocket stick session]");
   });
 });
