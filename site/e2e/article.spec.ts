@@ -21,6 +21,22 @@ test("preserves a representative legacy Chinese fragment URL", async ({ page }) 
   await expect(page.locator('[id="编辑距离"]')).toBeVisible();
 });
 
+test("scrolls compatible legacy fragments after same-page hash changes", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 300 });
+  await page.goto("/sysde/LBS/");
+
+  const target = page.locator('[id="scenario-层"]');
+  await expect(target).not.toBeInViewport();
+  await page
+    .locator("[data-article-prose]")
+    .getByRole("link", { name: "Scenario 层", exact: true })
+    .click();
+
+  await expect(page).toHaveURL(/\/sysde\/LBS\/#Scenario(?:%E5%B1%82|层)$/u);
+  await expect(target).toBeInViewport();
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+});
+
 test("loads representative articles without local resource, script, or layout failures", async ({
   page,
   request,

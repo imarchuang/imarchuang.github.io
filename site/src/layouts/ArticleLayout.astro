@@ -133,5 +133,15 @@ const showToc = tocHeadings.length >= 2;
     compatible?.scrollIntoView();
   };
 
+  const listenerKey = "__articleLegacyFragmentController";
+  const previousController = window[listenerKey];
+  if (previousController instanceof AbortController) {
+    previousController.abort();
+  }
+  const fragmentController = new AbortController();
+  window[listenerKey] = fragmentController;
+  window.addEventListener("hashchange", scrollToCompatibleLegacyFragment, {
+    signal: fragmentController.signal,
+  });
   scrollToCompatibleLegacyFragment();
 </script>
