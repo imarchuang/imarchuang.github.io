@@ -40,12 +40,23 @@ function transact(mode, operation) {
   );
 }
 
-function isPersistedObject(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
 }
 
 function isPersistedElement(value) {
-  return typeof value === "object" && value !== null;
+  return (
+    isPlainObject(value) &&
+    typeof value.id === "string" &&
+    value.id.trim().length > 0 &&
+    typeof value.type === "string" &&
+    value.type.trim().length > 0
+  );
 }
 
 function validateScene(scene) {
@@ -54,11 +65,11 @@ function validateScene(scene) {
   }
 
   if (
-    !isPersistedObject(scene) ||
+    !isPlainObject(scene) ||
     !Array.isArray(scene.elements) ||
     !scene.elements.every(isPersistedElement) ||
-    !isPersistedObject(scene.appState) ||
-    !isPersistedObject(scene.files)
+    !isPlainObject(scene.appState) ||
+    !isPlainObject(scene.files)
   ) {
     return null;
   }
@@ -98,9 +109,67 @@ export function clearScene() {
 }
 
 export function debounce(fn, delay) {
-  let timer;
-  return (...args) => {
+  let timer = null;
+  let latestArgs = null;
+  let pendingPromise = null;
+  let resolvePending = null;
+  let rejectPending = null;
+
+  function clearPending() {
+    pendingPromise = null;
+    resolvePending = null;
+    rejectPending = null;
+    latestArgs = null;
+  }
+
+  function invoke() {
+    timer = null;
+
+    const run = Promise.resolve().then(() => fn(...latestArgs));
+
+    run.then(
+      (value) => {
+        resolvePending?.(value);
+        clearPending();
+      },
+      (error) => {
+        rejectPending?.(error);
+        clearPending();
+      },
+    );
+
+    return run;
+  }
+
+  const debounced = (...args) => {
+    latestArgs = args;
+
+    if (!pendingPromise) {
+      pendingPromise = new Promise((resolve, reject) => {
+        resolvePending = resolve;
+        rejectPending = reject;
+      });
+    }
+
     clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
+    timer = setTimeout(invoke, delay);
+    return pendingPromise;
   };
+
+  debounced.flush = () => {
+    if (!pendingPromise) {
+      return Promise.resolve(null);
+    }
+
+    if (timer) {
+      clearTimeout(timer);
+      return invoke();
+    }
+
+    return pendingPromise;
+  };
+
+  debounced.pending = () => pendingPromise !== null;
+
+  return debounced;
 }

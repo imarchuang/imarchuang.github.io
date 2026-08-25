@@ -1,5 +1,5 @@
 import "fake-indexeddb/auto";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clearScene,
   debounce,
@@ -33,6 +33,10 @@ function putRawScene(scene) {
 describe("scene persistence", () => {
   beforeEach(async () => {
     await clearScene();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("round-trips elements, safe app state, and files", async () => {
@@ -78,6 +82,29 @@ describe("scene persistence", () => {
     expect(await loadScene()).toBeNull();
   });
 
+  it("returns null when persisted elements are malformed objects", async () => {
+    const malformedElements = [
+      {},
+      [],
+      new Date(),
+      { type: "rectangle" },
+      { id: "box" },
+      { id: "", type: "rectangle" },
+      { id: "box", type: "" },
+    ];
+
+    for (const element of malformedElements) {
+      await putRawScene({
+        elements: [element],
+        appState: { theme: "dark" },
+        files: {},
+      });
+
+      expect(await loadScene()).toBeNull();
+      await clearScene();
+    }
+  });
+
   it("keeps only restorable app-state fields", () => {
     expect(
       selectPersistedAppState({
@@ -89,15 +116,38 @@ describe("scene persistence", () => {
     ).toEqual({ theme: "light", gridSize: 20 });
   });
 
-  it("debounces writes", () => {
+  it("debounces writes", async () => {
     vi.useFakeTimers();
     const fn = vi.fn();
     const run = debounce(fn, 250);
     run("first");
     run("second");
-    vi.advanceTimersByTime(250);
+    await vi.advanceTimersByTimeAsync(250);
     expect(fn).toHaveBeenCalledOnce();
     expect(fn).toHaveBeenCalledWith("second");
-    vi.useRealTimers();
+  });
+
+  it("flushes the latest pending call immediately", async () => {
+    vi.useFakeTimers();
+    const fn = vi.fn().mockResolvedValue("saved");
+    const run = debounce(fn, 250);
+
+    run("first");
+    const pending = run("second");
+    const flushed = run.flush();
+
+    await expect(flushed).resolves.toBe("saved");
+    await expect(pending).resolves.toBe("saved");
+    expect(fn).toHaveBeenCalledOnce();
+    expect(fn).toHaveBeenCalledWith("second");
+  });
+
+  it("rejects when IndexedDB is unavailable", async () => {
+    const originalIndexedDB = globalThis.indexedDB;
+    Reflect.deleteProperty(globalThis, "indexedDB");
+
+    await expect(loadScene()).rejects.toThrow();
+
+    globalThis.indexedDB = originalIndexedDB;
   });
 });
