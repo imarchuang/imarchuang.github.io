@@ -1,5 +1,6 @@
 <!-- docs/_sidebar.md -->
 * [Home](./)
+* [Ideas](./ideas/index)
 * [Algo](./coding/index)
 * [System Design](./sysde/index)
 * [Behavorial](./behavorial/index)
