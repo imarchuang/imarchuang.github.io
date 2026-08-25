@@ -3,6 +3,7 @@ import {
   mkdir,
   readFile,
   rm,
+  stat,
   symlink,
   writeFile,
 } from "node:fs/promises";
@@ -38,8 +39,27 @@ afterEach(async () => {
 });
 
 describe("assemble-static", () => {
-  test("copies declared legacy assets, preserves filenames, and writes .nojekyll", async () => {
+  test("public assembly derives the repository root from the module location", async () => {
     const { assembleStatic } = await loadAssemblyModule();
+    const outsideRoot = await makeTempDir("task-5-public-root-");
+
+    await writeFixtureFile(
+      path.join(outsideRoot, "docs", "drops", "orbit-sketch", "index.html"),
+      "<!doctype html><title>outside</title>\n",
+    );
+
+    await expect(
+      assembleStatic({
+        docsDir: path.join(outsideRoot, "docs"),
+        distDir: path.join(outsideRoot, "site", "dist"),
+      }),
+    ).rejects.toThrow(/outside the repository root/i);
+  });
+
+  test("copies declared legacy assets, preserves filenames, and writes .nojekyll", async () => {
+    const {
+      __testOnly: { assembleStaticWithRepoRoot },
+    } = await loadAssemblyModule();
     const repoRoot = await makeTempDir("task-5-repo-");
     const docsDir = path.join(repoRoot, "docs");
     const distDir = path.join(repoRoot, "site", "dist");
@@ -59,7 +79,7 @@ describe("assemble-static", () => {
       "download",
     );
 
-    await assembleStatic({ docsDir, distDir, repoRoot });
+    await assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot });
 
     await expect(readFile(path.join(distDir, "drops", "orbit-sketch", "index.html"), "utf8"))
       .resolves.toContain("orbit");
@@ -79,7 +99,9 @@ describe("assemble-static", () => {
   });
 
   test("skips declared asset directories that are absent", async () => {
-    const { assembleStatic } = await loadAssemblyModule();
+    const {
+      __testOnly: { assembleStaticWithRepoRoot },
+    } = await loadAssemblyModule();
     const repoRoot = await makeTempDir("task-5-missing-assets-");
     const docsDir = path.join(repoRoot, "docs");
     const distDir = path.join(repoRoot, "site", "dist");
@@ -89,15 +111,46 @@ describe("assemble-static", () => {
       "<!doctype html><title>orbit</title>\n",
     );
 
-    await expect(assembleStatic({ docsDir, distDir, repoRoot })).resolves.toMatchObject({
+    await expect(assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot })).resolves.toMatchObject({
       copied: ["drops"],
       skipped: expect.arrayContaining(["images", "_media", "downloads"]),
     });
     await expect(readFile(path.join(distDir, ".nojekyll"), "utf8")).resolves.toBe("");
   });
 
-  test("rejects source or destination paths outside the repository root", async () => {
-    const { assembleStatic } = await loadAssemblyModule();
+  test("removes stale legacy subtree files without touching unrelated dist output", async () => {
+    const {
+      __testOnly: { assembleStaticWithRepoRoot },
+    } = await loadAssemblyModule();
+    const repoRoot = await makeTempDir("task-5-repeat-run-");
+    const docsDir = path.join(repoRoot, "docs");
+    const distDir = path.join(repoRoot, "site", "dist");
+
+    await writeFixtureFile(
+      path.join(docsDir, "drops", "orbit-sketch", "index.html"),
+      "<!doctype html><title>orbit</title>\n",
+    );
+    await writeFixtureFile(path.join(docsDir, "images", "cover.jpg"), "cover");
+
+    await assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot });
+
+    await writeFixtureFile(path.join(distDir, "index.html"), "<!doctype html><title>astro</title>\n");
+    await writeFixtureFile(path.join(distDir, "drops", "stale.html"), "stale");
+    await writeFixtureFile(path.join(distDir, "downloads", "stale.pdf"), "stale-download");
+
+    await assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot });
+
+    await expect(readFile(path.join(distDir, "drops", "orbit-sketch", "index.html"), "utf8"))
+      .resolves.toContain("orbit");
+    await expect(readFile(path.join(distDir, "index.html"), "utf8")).resolves.toContain("astro");
+    await expect(stat(path.join(distDir, "drops", "stale.html"))).rejects.toThrow();
+    await expect(stat(path.join(distDir, "downloads"))).rejects.toThrow();
+  });
+
+  test("test-only helper rejects source or destination paths outside the repository root", async () => {
+    const {
+      __testOnly: { assembleStaticWithRepoRoot },
+    } = await loadAssemblyModule();
     const repoRoot = await makeTempDir("task-5-repo-root-");
     const outsideRoot = await makeTempDir("task-5-outside-root-");
 
@@ -111,7 +164,7 @@ describe("assemble-static", () => {
     );
 
     await expect(
-      assembleStatic({
+      assembleStaticWithRepoRoot({
         docsDir: path.join(outsideRoot, "docs"),
         distDir: path.join(repoRoot, "site", "dist"),
         repoRoot,
@@ -119,7 +172,7 @@ describe("assemble-static", () => {
     ).rejects.toThrow(/outside the repository root/i);
 
     await expect(
-      assembleStatic({
+      assembleStaticWithRepoRoot({
         docsDir: path.join(repoRoot, "docs"),
         distDir: path.join(outsideRoot, "site", "dist"),
         repoRoot,
@@ -127,8 +180,10 @@ describe("assemble-static", () => {
     ).rejects.toThrow(/outside the repository root/i);
   });
 
-  test("rejects symlinked asset sources that escape the repository root", async () => {
-    const { assembleStatic } = await loadAssemblyModule();
+  test("test-only helper rejects symlinked asset sources that escape the repository root", async () => {
+    const {
+      __testOnly: { assembleStaticWithRepoRoot },
+    } = await loadAssemblyModule();
     const repoRoot = await makeTempDir("task-5-symlink-repo-");
     const outsideRoot = await makeTempDir("task-5-symlink-outside-");
     const docsDir = path.join(repoRoot, "docs");
@@ -142,7 +197,7 @@ describe("assemble-static", () => {
     );
     await symlink(path.join(outsideRoot, "drops"), path.join(docsDir, "drops"));
 
-    await expect(assembleStatic({ docsDir, distDir, repoRoot })).rejects.toThrow(
+    await expect(assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot })).rejects.toThrow(
       /outside the repository root/i,
     );
   });

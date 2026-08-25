@@ -4,6 +4,7 @@ import {
   mkdir,
   readdir,
   realpath,
+  rm,
   stat,
   writeFile,
 } from "node:fs/promises";
@@ -11,6 +12,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const STATIC_DIRS = ["drops", "images", "_media", "downloads"];
+const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const productionRepoRoot = path.resolve(siteRoot, "..");
 
 function isWithinRoot(rootPath, candidatePath) {
   const relativePath = path.relative(rootPath, candidatePath);
@@ -166,7 +169,7 @@ async function validateCopyTree(repoRoot, sourcePath, label, visitedPaths = new 
   }
 }
 
-export async function assembleStatic({ docsDir, distDir, repoRoot = path.resolve(docsDir, "..") }) {
+async function assembleStaticWithRepoRoot({ docsDir, distDir, repoRoot }) {
   const canonicalRepoRoot = await resolveRepoRoot(repoRoot);
   const canonicalDocsDir = await resolveExistingPathWithinRepo(
     canonicalRepoRoot,
@@ -187,6 +190,16 @@ export async function assembleStatic({ docsDir, distDir, repoRoot = path.resolve
 
   for (const directoryName of STATIC_DIRS) {
     const sourcePath = path.join(canonicalDocsDir, directoryName);
+    const destinationPath = await resolvePlannedPathWithinRepo(
+      canonicalRepoRoot,
+      path.join(resolvedDistDir, directoryName),
+      `${directoryName} destination`,
+    );
+
+    if (await pathExists(destinationPath)) {
+      await rm(destinationPath, { recursive: true, force: true });
+    }
+
     if (!(await pathExists(sourcePath))) {
       skipped.push(directoryName);
       continue;
@@ -199,12 +212,6 @@ export async function assembleStatic({ docsDir, distDir, repoRoot = path.resolve
     );
     await validateDirectory(canonicalSourcePath, `${directoryName} source`);
     await validateCopyTree(canonicalRepoRoot, sourcePath, `${directoryName} source`);
-
-    const destinationPath = await resolvePlannedPathWithinRepo(
-      canonicalRepoRoot,
-      path.join(resolvedDistDir, directoryName),
-      `${directoryName} destination`,
-    );
 
     await cp(canonicalSourcePath, destinationPath, {
       recursive: true,
@@ -244,10 +251,20 @@ export async function assembleStatic({ docsDir, distDir, repoRoot = path.resolve
   };
 }
 
+export async function assembleStatic({ docsDir, distDir }) {
+  return assembleStaticWithRepoRoot({
+    repoRoot: productionRepoRoot,
+    docsDir,
+    distDir,
+  });
+}
+
+export const __testOnly = {
+  assembleStaticWithRepoRoot,
+};
+
 export async function runCli(overrides = {}) {
-  const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const result = await assembleStatic({
-    repoRoot: overrides.repoRoot ?? path.resolve(siteRoot, ".."),
     docsDir: overrides.docsDir ?? path.resolve(siteRoot, "../docs"),
     distDir: overrides.distDir ?? path.resolve(siteRoot, "dist"),
   });

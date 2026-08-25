@@ -47,7 +47,6 @@ export async function buildAll({
     cwd: siteRoot,
   });
   await assemble({
-    repoRoot,
     docsDir: path.join(repoRoot, "docs"),
     distDir: path.join(siteRoot, "dist"),
   });

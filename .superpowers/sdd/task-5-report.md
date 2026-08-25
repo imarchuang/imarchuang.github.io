@@ -37,3 +37,21 @@ Completed.
 
 - The current repository has no `docs/downloads` directory, so assembly skips it when absent and copies it when present.
 - The whiteboard production build still emits Vite chunk-size warnings for large bundles, but the build succeeds and writes to `site/dist/draw` as required.
+
+## Verification results update
+
+- `npm test -- assemble-static.test.ts build-all.test.ts`
+  - PASS: `2` files, `8` tests
+  - Includes a real two-run composed-build assertion with hashed `dist` snapshot equality
+- `npm test` in `site`
+  - PASS: `7` files, `25` tests
+- `npm test` in `whiteboard`
+  - PASS: `3` files, `25` tests
+- `npm run build` in `site`
+  - PASS
+  - `prebuild` migrated `164` notes, excluded `15`, accounted `174`, issues `60`
+- Artifact assertions
+  - PASS: `dist/index.html`
+  - PASS: `dist/draw/index.html`
+  - PASS: `dist/drops/orbit-sketch/index.html`
+  - PASS: `dist/.nojekyll`
