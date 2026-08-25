@@ -1,7 +1,26 @@
+import { isThemePreference } from "./theme";
+
 const DB_NAME = "marc-personal-whiteboard";
 const DB_VERSION = 1;
 const STORE_NAME = "scenes";
 const CURRENT_SCENE = "current";
+const SUPPORTED_PERSISTED_ELEMENT_TYPES = new Set([
+  // Excalidraw 0.18.1 persisted scene element types from
+  // `dist/types/excalidraw/element/types.d.ts`, excluding the internal
+  // "selection" helper element.
+  "rectangle",
+  "diamond",
+  "ellipse",
+  "embeddable",
+  "iframe",
+  "image",
+  "frame",
+  "magicframe",
+  "text",
+  "line",
+  "arrow",
+  "freedraw",
+]);
 const SAFE_APP_STATE_KEYS = [
   "theme",
   "viewBackgroundColor",
@@ -55,7 +74,16 @@ function isPersistedElement(value) {
     typeof value.id === "string" &&
     value.id.trim().length > 0 &&
     typeof value.type === "string" &&
-    value.type.trim().length > 0
+    SUPPORTED_PERSISTED_ELEMENT_TYPES.has(value.type.trim())
+  );
+}
+
+function isPersistedMetadata(value) {
+  return (
+    value === undefined ||
+    (isPlainObject(value) &&
+      (value.themePreference === undefined ||
+        isThemePreference(value.themePreference)))
   );
 }
 
@@ -69,7 +97,8 @@ function validateScene(scene) {
     !Array.isArray(scene.elements) ||
     !scene.elements.every(isPersistedElement) ||
     !isPlainObject(scene.appState) ||
-    !isPlainObject(scene.files)
+    !isPlainObject(scene.files) ||
+    !isPersistedMetadata(scene.metadata)
   ) {
     return null;
   }
@@ -85,13 +114,22 @@ export function selectPersistedAppState(appState = {}) {
   );
 }
 
-export function saveScene({ elements, appState, files }) {
+export function selectPersistedMetadata(metadata = {}) {
+  return Object.fromEntries(
+    ["themePreference"]
+      .filter((key) => metadata[key] !== undefined)
+      .map((key) => [key, metadata[key]]),
+  );
+}
+
+export function saveScene({ elements, appState, files, metadata }) {
   return transact("readwrite", (store) =>
     store.put(
       {
         elements,
         appState: selectPersistedAppState(appState),
         files,
+        metadata: selectPersistedMetadata(metadata),
       },
       CURRENT_SCENE,
     ),
@@ -110,66 +148,112 @@ export function clearScene() {
 
 export function debounce(fn, delay) {
   let timer = null;
-  let latestArgs = null;
-  let pendingPromise = null;
-  let resolvePending = null;
-  let rejectPending = null;
+  let queuedArgs = null;
+  let queuedPromise = null;
+  let resolveQueued = null;
+  let rejectQueued = null;
+  let inFlightPromise = null;
 
-  function clearPending() {
-    pendingPromise = null;
-    resolvePending = null;
-    rejectPending = null;
-    latestArgs = null;
-  }
-
-  function invoke() {
-    timer = null;
-
-    const run = Promise.resolve().then(() => fn(...latestArgs));
-
-    run.then(
-      (value) => {
-        resolvePending?.(value);
-        clearPending();
-      },
-      (error) => {
-        rejectPending?.(error);
-        clearPending();
-      },
-    );
-
-    return run;
-  }
-
-  const debounced = (...args) => {
-    latestArgs = args;
-
-    if (!pendingPromise) {
-      pendingPromise = new Promise((resolve, reject) => {
-        resolvePending = resolve;
-        rejectPending = reject;
+  function ensureQueuedPromise() {
+    if (!queuedPromise) {
+      queuedPromise = new Promise((resolve, reject) => {
+        resolveQueued = resolve;
+        rejectQueued = reject;
       });
     }
 
+    return queuedPromise;
+  }
+
+  async function invokeNext() {
+    if (!queuedArgs) {
+      return null;
+    }
+
+    timer = null;
+
+    if (inFlightPromise) {
+      try {
+        await inFlightPromise;
+      } catch {
+        // Allow the newest queued scene to retry after a failed save.
+      }
+
+      if (!queuedArgs) {
+        return null;
+      }
+    }
+
+    const args = queuedArgs;
+    const resolve = resolveQueued;
+    const reject = rejectQueued;
+    queuedArgs = null;
+    queuedPromise = null;
+    resolveQueued = null;
+    rejectQueued = null;
+
+    const run = Promise.resolve().then(() => fn(...args));
+    inFlightPromise = run;
+
+    try {
+      const value = await run;
+      resolve?.(value);
+      return value;
+    } catch (error) {
+      reject?.(error);
+      throw error;
+    } finally {
+      if (inFlightPromise === run) {
+        inFlightPromise = null;
+      }
+    }
+  }
+
+  const debounced = (...args) => {
+    queuedArgs = args;
+    const pending = ensureQueuedPromise();
+
     clearTimeout(timer);
-    timer = setTimeout(invoke, delay);
-    return pendingPromise;
+    timer = setTimeout(() => {
+      void invokeNext().catch(() => {});
+    }, delay);
+    return pending;
   };
 
-  debounced.flush = () => {
-    if (!pendingPromise) {
-      return Promise.resolve(null);
+  debounced.flush = async () => {
+    if (!queuedArgs && !inFlightPromise) {
+      return null;
     }
 
-    if (timer) {
-      clearTimeout(timer);
-      return invoke();
+    clearTimeout(timer);
+    timer = null;
+
+    let latestError = null;
+    let latestValue = null;
+
+    while (queuedArgs || inFlightPromise) {
+      try {
+        if (queuedArgs) {
+          latestValue = await invokeNext();
+        } else {
+          latestValue = await inFlightPromise;
+        }
+      } catch (error) {
+        latestError = error;
+      }
     }
 
-    return pendingPromise;
+    if (latestError) {
+      throw latestError;
+    }
+
+    return latestValue;
   };
 
-  debounced.pending = () => pendingPromise !== null;
+  debounced.pending = () =>
+    queuedArgs !== null || timer !== null || inFlightPromise !== null;
 
   return debounced;
 }
+
+export { SUPPORTED_PERSISTED_ELEMENT_TYPES };

@@ -6,7 +6,9 @@ import {
   loadScene,
   saveScene,
   selectPersistedAppState,
+  SUPPORTED_PERSISTED_ELEMENT_TYPES,
 } from "./persistence";
+import { THEME_PREFERENCE } from "./theme";
 
 const DB_NAME = "marc-personal-whiteboard";
 const STORE_NAME = "scenes";
@@ -48,6 +50,7 @@ describe("scene persistence", () => {
         collaborators: new Map([["private", {}]]),
       },
       files: { image: { id: "image", dataURL: "data:image/png;base64,AA==" } },
+      metadata: { themePreference: THEME_PREFERENCE.SYSTEM },
     };
 
     await saveScene(scene);
@@ -59,6 +62,7 @@ describe("scene persistence", () => {
         viewBackgroundColor: "#111111",
       },
       files: scene.files,
+      metadata: { themePreference: THEME_PREFERENCE.SYSTEM },
     });
   });
 
@@ -105,6 +109,17 @@ describe("scene persistence", () => {
     }
   });
 
+  it("returns null when persisted elements use unsupported types", async () => {
+    await putRawScene({
+      elements: [{ id: "box", type: "sticky-note" }],
+      appState: { theme: "dark" },
+      files: {},
+      metadata: { themePreference: THEME_PREFERENCE.SYSTEM },
+    });
+
+    expect(await loadScene()).toBeNull();
+  });
+
   it("keeps only restorable app-state fields", () => {
     expect(
       selectPersistedAppState({
@@ -114,6 +129,25 @@ describe("scene persistence", () => {
         collaborators: new Map(),
       }),
     ).toEqual({ theme: "light", gridSize: 20 });
+  });
+
+  it("keeps only supported metadata fields", async () => {
+    await saveScene({
+      elements: [{ id: "box", type: "rectangle" }],
+      appState: { theme: "light" },
+      files: {},
+      metadata: {
+        themePreference: THEME_PREFERENCE.EXPLICIT,
+        ignored: "value",
+      },
+    });
+
+    expect(await loadScene()).toEqual({
+      elements: [{ id: "box", type: "rectangle" }],
+      appState: { theme: "light" },
+      files: {},
+      metadata: { themePreference: THEME_PREFERENCE.EXPLICIT },
+    });
   });
 
   it("debounces writes", async () => {
@@ -140,6 +174,59 @@ describe("scene persistence", () => {
     await expect(pending).resolves.toBe("saved");
     expect(fn).toHaveBeenCalledOnce();
     expect(fn).toHaveBeenCalledWith("second");
+  });
+
+  it("serializes overlapping async batches and persists the newest scene last", async () => {
+    vi.useFakeTimers();
+    const deferredRuns = [];
+    const fn = vi.fn().mockImplementation(
+      (value) =>
+        new Promise((resolve) => {
+          deferredRuns.push({ value, resolve });
+        }),
+    );
+    const run = debounce(fn, 250);
+
+    const firstBatch = run("first");
+    await vi.advanceTimersByTimeAsync(250);
+    expect(fn).toHaveBeenNthCalledWith(1, "first");
+
+    const secondBatch = run("second");
+    const thirdBatch = run("third");
+    const flushed = run.flush();
+    expect(fn).toHaveBeenCalledOnce();
+
+    deferredRuns[0].resolve("saved-first");
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(fn).toHaveBeenCalledTimes(2);
+    expect(fn).toHaveBeenNthCalledWith(2, "third");
+
+    deferredRuns[1].resolve("saved-third");
+
+    await expect(flushed).resolves.toBe("saved-third");
+    await expect(firstBatch).resolves.toBe("saved-first");
+    await expect(secondBatch).resolves.toBe("saved-third");
+    await expect(thirdBatch).resolves.toBe("saved-third");
+  });
+
+  it("exports the documented supported persisted element types", () => {
+    expect([...SUPPORTED_PERSISTED_ELEMENT_TYPES].sort()).toEqual([
+      "arrow",
+      "diamond",
+      "ellipse",
+      "embeddable",
+      "frame",
+      "freedraw",
+      "iframe",
+      "image",
+      "line",
+      "magicframe",
+      "rectangle",
+      "text",
+    ]);
   });
 
   it("rejects when IndexedDB is unavailable", async () => {

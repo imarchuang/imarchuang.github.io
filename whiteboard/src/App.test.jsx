@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { navigateTo } from "./navigation";
 import * as persistence from "./persistence";
+import { THEME_PREFERENCE } from "./theme";
 
 let excalidrawApi;
 let onChangeHandler;
@@ -143,15 +144,17 @@ describe("App", () => {
     expect(persistence.saveScene).toHaveBeenCalledTimes(1);
     expect(navigateTo).not.toHaveBeenCalled();
 
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(navigateTo).not.toHaveBeenCalled();
+
+    vi.useRealTimers();
     resolveSave();
 
-    await Promise.resolve();
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(navigateTo).toHaveBeenCalledWith(
-      expect.stringMatching(/\/#\/ideas\/index$/),
-    );
+    await waitFor(() => {
+      expect(navigateTo).toHaveBeenCalledWith(
+        expect.stringMatching(/\/#\/ideas\/index$/),
+      );
+    });
   });
 
   it("flushes a pending save when the page becomes hidden", async () => {
@@ -171,39 +174,76 @@ describe("App", () => {
     await Promise.resolve();
 
     expect(persistence.saveScene.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(persistence.saveScene).toHaveBeenCalledWith(
+      expect.objectContaining({
+        metadata: { themePreference: THEME_PREFERENCE.SYSTEM },
+      }),
+    );
   });
 
-  it("updates with system theme changes only when no explicit theme is restored", async () => {
+  it("restores system-following scenes with the current OS theme and keeps following changes", async () => {
     vi.mocked(persistence.loadScene).mockResolvedValue({
       elements: [],
-      appState: {},
+      appState: { theme: "light" },
       files: {},
+      metadata: { themePreference: THEME_PREFERENCE.SYSTEM },
     });
+    setSystemTheme("dark");
 
     render(<App />);
-    await screen.findByTestId("excalidraw");
 
-    emitSystemTheme("dark");
+    expect(
+      (await screen.findByTestId("excalidraw")).getAttribute("data-theme"),
+    ).toBe("dark");
+
+    emitSystemTheme("light");
 
     await waitFor(() => {
       expect(excalidrawApi.updateScene).toHaveBeenCalledWith({
-        appState: { theme: "dark" },
+        appState: { theme: "light" },
       });
     });
   });
 
-  it("preserves an explicitly restored theme across system theme changes", async () => {
+  it("treats legacy scenes with a stored theme as explicit after reload", async () => {
     vi.mocked(persistence.loadScene).mockResolvedValue({
       elements: [],
       appState: { theme: "dark" },
       files: {},
     });
+    setSystemTheme("light");
 
     render(<App />);
-    await screen.findByTestId("excalidraw");
+
+    expect(
+      (await screen.findByTestId("excalidraw")).getAttribute("data-theme"),
+    ).toBe("dark");
 
     emitSystemTheme("light");
 
     expect(excalidrawApi.updateScene).not.toHaveBeenCalled();
+  });
+
+  it("persists an explicit theme preference after a user toggle", async () => {
+    render(<App />);
+    await screen.findByTestId("excalidraw");
+    vi.useFakeTimers();
+
+    onChangeHandler([{ id: "box", type: "rectangle" }], { theme: "dark" }, {});
+
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "hidden",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(persistence.saveScene).toHaveBeenCalledWith(
+      expect.objectContaining({
+        metadata: { themePreference: THEME_PREFERENCE.EXPLICIT },
+      }),
+    );
   });
 });

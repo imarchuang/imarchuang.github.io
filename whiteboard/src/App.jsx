@@ -2,13 +2,19 @@ import { Excalidraw } from "@excalidraw/excalidraw";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { navigateTo } from "./navigation";
 import { debounce, loadScene, saveScene } from "./persistence";
-import { DARK_MEDIA_QUERY, getSystemTheme } from "./theme";
+import {
+  DARK_MEDIA_QUERY,
+  getSystemTheme,
+  isThemePreference,
+  THEME_PREFERENCE,
+} from "./theme";
 
 function createEmptyScene(theme = getSystemTheme()) {
   return {
     elements: [],
     appState: { theme },
     files: {},
+    metadata: { themePreference: THEME_PREFERENCE.SYSTEM },
   };
 }
 
@@ -22,31 +28,59 @@ function applyTheme(scene, theme) {
   };
 }
 
+function setThemePreference(scene, themePreference) {
+  return {
+    ...scene,
+    metadata: {
+      ...scene.metadata,
+      themePreference,
+    },
+  };
+}
+
+function getThemePreference(scene) {
+  if (isThemePreference(scene?.metadata?.themePreference)) {
+    return scene.metadata.themePreference;
+  }
+
+  // Legacy scenes stored the effective theme but not whether it was explicit.
+  return scene?.appState?.theme
+    ? THEME_PREFERENCE.EXPLICIT
+    : THEME_PREFERENCE.SYSTEM;
+}
+
 export default function App() {
   const [initialData, setInitialData] = useState(null);
   const [status, setStatus] = useState("Loading local sketch...");
   const excalidrawApiRef = useRef(null);
   const latestSceneRef = useRef(null);
-  const themePreferenceRef = useRef("system");
+  const themePreferenceRef = useRef(THEME_PREFERENCE.SYSTEM);
 
   useEffect(() => {
     loadScene()
       .then((scene) => {
         const theme = getSystemTheme();
-        const nextScene = scene
-          ? scene.appState.theme
-            ? scene
-            : applyTheme(scene, theme)
+        const themePreference = scene
+          ? getThemePreference(scene)
+          : THEME_PREFERENCE.SYSTEM;
+        const baseScene = scene
+          ? setThemePreference(scene, themePreference)
           : createEmptyScene(theme);
+        const nextScene =
+          themePreference === THEME_PREFERENCE.SYSTEM
+            ? applyTheme(baseScene, theme)
+            : baseScene.appState.theme
+              ? baseScene
+              : applyTheme(baseScene, theme);
 
-        themePreferenceRef.current = scene?.appState.theme ? "explicit" : "system";
+        themePreferenceRef.current = themePreference;
         latestSceneRef.current = nextScene;
         setInitialData(nextScene);
         setStatus(scene ? "Restored locally" : "Saved in this browser");
       })
       .catch(() => {
         const fallbackScene = createEmptyScene();
-        themePreferenceRef.current = "system";
+        themePreferenceRef.current = THEME_PREFERENCE.SYSTEM;
         latestSceneRef.current = fallbackScene;
         setInitialData(fallbackScene);
         setStatus("Local autosave unavailable");
@@ -56,26 +90,34 @@ export default function App() {
   const persist = useMemo(
     () =>
       debounce((scene) => {
-        saveScene(scene)
+        return saveScene(scene)
           .then(() => setStatus("Saved in this browser"))
-          .catch(() => setStatus("Local autosave unavailable"));
+          .catch((error) => {
+            setStatus("Local autosave unavailable");
+            throw error;
+          });
       }, 600),
     [],
   );
 
   const handleChange = useCallback(
     (elements, appState, files) => {
-      const scene = { elements, appState, files };
-      latestSceneRef.current = scene;
+      let themePreference = themePreferenceRef.current;
 
       if (
-        themePreferenceRef.current === "system" &&
+        themePreference === THEME_PREFERENCE.SYSTEM &&
         appState.theme &&
         appState.theme !== getSystemTheme()
       ) {
-        themePreferenceRef.current = "explicit";
+        themePreference = THEME_PREFERENCE.EXPLICIT;
+        themePreferenceRef.current = themePreference;
       }
 
+      const scene = setThemePreference(
+        { elements, appState, files },
+        themePreference,
+      );
+      latestSceneRef.current = scene;
       setStatus("Saving...");
       persist(scene);
     },
@@ -120,14 +162,17 @@ export default function App() {
 
     const mediaQuery = window.matchMedia(DARK_MEDIA_QUERY);
     const applySystemTheme = () => {
-      if (themePreferenceRef.current !== "system") {
+      if (themePreferenceRef.current !== THEME_PREFERENCE.SYSTEM) {
         return;
       }
 
       const theme = mediaQuery.matches ? "dark" : "light";
       const currentScene =
         latestSceneRef.current || createEmptyScene(theme);
-      const themedScene = applyTheme(currentScene, theme);
+      const themedScene = setThemePreference(
+        applyTheme(currentScene, theme),
+        THEME_PREFERENCE.SYSTEM,
+      );
 
       latestSceneRef.current = themedScene;
       setInitialData((previousScene) =>
