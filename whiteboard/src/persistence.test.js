@@ -68,6 +68,16 @@ describe("scene persistence", () => {
     expect(await loadScene()).toBeNull();
   });
 
+  it("returns null when persisted elements contain non-object entries", async () => {
+    await putRawScene({
+      elements: [{ id: "box" }, "bad-entry", null],
+      appState: { theme: "dark" },
+      files: {},
+    });
+
+    expect(await loadScene()).toBeNull();
+  });
+
   it("keeps only restorable app-state fields", () => {
     expect(
       selectPersistedAppState({

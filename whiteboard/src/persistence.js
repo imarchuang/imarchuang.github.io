@@ -44,6 +44,10 @@ function isPersistedObject(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+function isPersistedElement(value) {
+  return typeof value === "object" && value !== null;
+}
+
 function validateScene(scene) {
   if (scene === null) {
     return null;
@@ -52,6 +56,7 @@ function validateScene(scene) {
   if (
     !isPersistedObject(scene) ||
     !Array.isArray(scene.elements) ||
+    !scene.elements.every(isPersistedElement) ||
     !isPersistedObject(scene.appState) ||
     !isPersistedObject(scene.files)
   ) {
