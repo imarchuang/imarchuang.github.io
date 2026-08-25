@@ -1,0 +1,13 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": [
+    "src",
+    "tests",
+    "astro.config.mjs",
+    "playwright.config.ts",
+    "vitest.config.ts"
+  ]
+}
