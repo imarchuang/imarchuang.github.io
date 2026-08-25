@@ -65,3 +65,11 @@ Post-generation responsive regression check:
 - Fresh browser check: active slide count=1, active display=grid, viewport height=758px, slide client/scroll height=756px, no horizontal overflow.
 - Keyboard navigation and answer reveal rechecked after regeneration.
 - Final result: PASS.
+
+2026-08-25 full web rendering regression:
+- Audited all 81 slides at 1440x900, 1024x768, 768x1024, 390x844, 320x568, and 844x390 (486 rendered cases).
+- Found shared mobile toolbar controls forced into four full-width rows (261px tall); changed them to compact two-row grids (96px tall at 390px).
+- Found long mobile slide content could overflow its shrunken grid track and sit beneath the footer, intercepting answer-button clicks.
+- Responsive slides now use intrinsic grid rows and `.slide-main` restores intrinsic height before scrolling the slide container.
+- Final automated result: 0 horizontal overflows, 0 clipped text checks, 0 content/footer overlaps, 0 toolbar failures.
+- Interaction result across all nine decks: 45/45 passed for keyboard navigation, previous/next buttons, answer reveal, and notes toggle.

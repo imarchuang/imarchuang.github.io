@@ -1634,9 +1634,11 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
       .slide{
         padding:18px;
         overflow-y:auto;
+        grid-template-rows:auto auto auto auto;
       }
       .slide-main{
         grid-template-columns:1fr;
+        min-height:auto;
       }
       .content-grid.two-up,
       .practice-grid{
@@ -1654,13 +1656,32 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
         padding:12px 10px 24px;
       }
       .deck-topbar{
+        display:grid;
         gap:8px;
-      }
-      .toolbar-link,.toolbar-button,.nav-button{
-        width:100%;
+        margin-bottom:10px;
       }
       .topbar-group{
         width:100%;
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:8px;
+      }
+      .topbar-group:last-child{
+        grid-template-columns:1.2fr 1fr 1fr;
+      }
+      .toolbar-link,.toolbar-button{
+        width:auto;
+        padding:8px 10px;
+        font-size:13px;
+      }
+      .deck-badge{
+        min-height:var(--touch);
+        justify-content:center;
+        padding:8px 10px;
+      }
+      .nav-button{
+        width:auto;
+        flex:1;
       }
       .stage-frame{
         padding:10px;
