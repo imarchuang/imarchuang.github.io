@@ -202,3 +202,69 @@ Tests       10 passed (10)
 - `site/tests/navigation.test.ts`
 - `site/vitest.config.ts`
 - `site/content-known-issues.json`
+
+## Review Follow-Up Fixes
+
+Addressed the review gaps in one pass:
+
+1. Relative Docsify `?id=` anchors now normalize through route lookup and are rewritten as preserved route fragments with safe `encodeURIComponent()` handling, including non-ASCII headings.
+2. Root navigation now merges matching subsection sidebars into their top-level sections, preserving root order and deduping by `href` across the whole section subtree.
+3. Migration tests now cover relative `?id=` links, nested section sidebar merge/dedupe, and a deterministic real-docs accounting assertion for the `174` source Markdown files.
+
+### Follow-Up Test/Verification Commands
+
+Focused migration suite after adding the new red-phase coverage:
+
+```bash
+npm test -- migrate-content.test.ts
+```
+
+Final result after fixes:
+
+```bash
+Test Files  1 passed (1)
+Tests       5 passed (5)
+```
+
+Real migration after fixes:
+
+```bash
+node scripts/migrate-content.mjs
+```
+
+Observed:
+
+```json
+{
+  "migratedCount": 164,
+  "excludedCount": 15,
+  "accountedCount": 174,
+  "supportExcludedCount": 10,
+  "generatedDirSkippedCount": 5,
+  "issuesCount": 60
+}
+```
+
+Full site Vitest suite after regenerating content:
+
+```bash
+npm test
+```
+
+Observed:
+
+```bash
+Test Files  4 passed (4)
+Tests       11 passed (11)
+```
+
+### Follow-Up Result Notes
+
+- The previously false-stale link `coding/bfs/shortest.md -> ./coding/bfs/levels?id=二叉树的最小深度` is no longer present in `site/content-known-issues.json`.
+- Real merged navigation now includes populated subsection items for:
+  - `/coding/` (`12` items)
+  - `/system/` (`10` items)
+  - `/products/` (`3` items)
+  - `/python/` (`11` items)
+  - `/sysde/` (`3` items)
+- Remaining `?id=` entries in known issues dropped to `13`, indicating the valid relative-anchor cases covered by this fix are no longer being misclassified.

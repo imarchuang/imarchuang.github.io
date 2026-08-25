@@ -1,11 +1,6 @@
 [
   {
     "kind": "stale-link",
-    "source": "coding/bfs/shortest.md",
-    "target": "./coding/bfs/levels?id=二叉树的最小深度"
-  },
-  {
-    "kind": "stale-link",
     "source": "coding/binsearch/index.md",
     "target": "./coding/binsearch/half.md"
   },
@@ -21,11 +16,6 @@
   },
   {
     "kind": "stale-link",
-    "source": "coding/classic/barchart.md",
-    "target": "./coding/memo/index?id=编辑距离"
-  },
-  {
-    "kind": "stale-link",
     "source": "coding/classic/intervals.md",
     "target": "./coding/dp/sebusequence?id=最长公共子序列"
   },
@@ -33,16 +23,6 @@
     "kind": "stale-link",
     "source": "coding/classic/intervals.md",
     "target": "./coding/dp/sebusequence?id=编辑距离"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/classic/intervals.md",
-    "target": "./coding/memo/index?id=编辑距离"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/classic/monoq.md",
-    "target": "./coding/classic/strings?id=去重重复字母"
   },
   {
     "kind": "stale-link",
@@ -62,11 +42,6 @@
   {
     "kind": "stale-link",
     "source": "coding/classic/recursion.md",
-    "target": "./coding/dp/indices?id=最长公共子串"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/classic/recursion.md",
     "target": "./coding/dp/sebusequence?id=最长公共子序列"
   },
   {
@@ -83,16 +58,6 @@
     "kind": "stale-link",
     "source": "coding/classic/recursion.md",
     "target": "./coding/dp/sebusequence?id=编辑距离"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/classic/recursion.md",
-    "target": "./coding/memo/index?id=编辑距离"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/classic/recursion.md",
-    "target": "./coding/tree/index?id=什么是穷举遍历二叉树"
   },
   {
     "kind": "stale-link",
@@ -102,11 +67,6 @@
   {
     "kind": "stale-link",
     "source": "coding/classic/strings.md",
-    "target": "./coding/dp/indices?id=最长公共子串"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/classic/strings.md",
     "target": "./coding/dp/sebusequence?id=最长公共子序列"
   },
   {
@@ -126,11 +86,6 @@
   },
   {
     "kind": "stale-link",
-    "source": "coding/classic/strings.md",
-    "target": "./coding/memo/index?id=编辑距离"
-  },
-  {
-    "kind": "stale-link",
     "source": "coding/design/index.md",
     "target": "./coding/binsearch/half.md"
   },
@@ -178,11 +133,6 @@
     "kind": "stale-link",
     "source": "coding/design/unionfind.md",
     "target": "./coding/binsearch/ooxx.md"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/dfs/backtracking.md",
-    "target": "./coding/memo/index?id=#K站中转内最便宜的航班"
   },
   {
     "kind": "stale-link",
@@ -206,51 +156,11 @@
   },
   {
     "kind": "stale-link",
-    "source": "coding/dp/indices.md",
-    "target": "./coding/dp/subsequence?id=#最长公共子序"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/dp/indices.md",
-    "target": "./coding/dp/subsequence?id=#最长递增子序"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/dp/knapsack.md",
-    "target": "./coding/memo/index?id=目标和"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/dp/subsequence.md",
-    "target": "./coding/memo/index?id=正则表达式匹配"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/dp/subsequence.md",
-    "target": "./coding/memo/index?id=编辑距离"
-  },
-  {
-    "kind": "stale-link",
     "source": "coding/memo/index.md",
     "target": "../snippets/example.js \":include\""
   },
   {
     "kind": "stale-link",
-    "source": "coding/memo/index.md",
-    "target": "./coding/dp/subsequence?id=#最长递增子序"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/memo/index.md",
-    "target": "./coding/dp/subsequence?id=编辑距离"
-  },
-  {
-    "kind": "stale-link",
-    "source": "coding/tree/reconstruct.md",
-    "target": "./coding/tree/postorder?id=二叉树最大乘积分割"
-  },
-  {
-    "kind": "stale-link",
     "source": "devops/index.md",
     "target": "./cloud/index.md"
   },
@@ -308,5 +218,85 @@
     "kind": "stale-link",
     "source": "system/index.md",
     "target": "./tomcat/index.md"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "coding/_sidebar.md",
+    "target": "./coding/binsearch/half"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "coding/_sidebar.md",
+    "target": "./coding/binsearch/ooxx"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "coding/_sidebar.md",
+    "target": "./coding/linkedlist/kgroupreverse"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "coding/_sidebar.md",
+    "target": "./coding/twopointer/inward"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "coding/_sidebar.md",
+    "target": "./coding/twopointer/outward"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "coding/_sidebar.md",
+    "target": "./coding/twopointer/twosum"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "python/_sidebar.md",
+    "target": "./python/adv/index"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "python/_sidebar.md",
+    "target": "./python/laziness"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "python/_sidebar.md",
+    "target": "./python/memorize"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "sysde/_sidebar.md",
+    "target": "./sysde/linkedlist/kgroupreverse"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "sysde/_sidebar.md",
+    "target": "./sysde/tree/bst"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "sysde/_sidebar.md",
+    "target": "./sysde/tree/index"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "sysde/_sidebar.md",
+    "target": "./sysde/tree/postorder"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "sysde/_sidebar.md",
+    "target": "./sysde/tree/reconstruct"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "sysde/_sidebar.md",
+    "target": "./sysde/tree/traversal"
+  },
+  {
+    "kind": "stale-sidebar-link",
+    "source": "system/_sidebar.md",
+    "target": "./system/codes/async_await"
   }
 ]

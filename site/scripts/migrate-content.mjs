@@ -275,8 +275,24 @@ function normalizePathForLookup(value) {
   return trimSlashes(normalized.replace(/^\.\//, ""));
 }
 
+function parseTargetParts(rawTarget) {
+  const [pathAndQuery, hash = ""] = rawTarget.split("#");
+  const queryIndex = pathAndQuery.indexOf("?");
+  const rawPath =
+    queryIndex === -1 ? pathAndQuery : pathAndQuery.slice(0, queryIndex);
+  const query = queryIndex === -1 ? "" : pathAndQuery.slice(queryIndex + 1);
+  const queryParams = new URLSearchParams(query);
+  const idAnchor = queryParams.get("id");
+  const anchor = hash || (idAnchor ? encodeURIComponent(idAnchor) : "");
+
+  return {
+    rawPath,
+    anchor,
+  };
+}
+
 function resolveInternalReference(rawTarget, currentRelativePath, routeReferences) {
-  const [rawPath, anchor = ""] = rawTarget.split("#");
+  const { rawPath, anchor } = parseTargetParts(rawTarget);
 
   if (!rawPath || rawPath === ".") {
     const currentRoute = trimSlashes(routeFor(currentRelativePath));
@@ -485,6 +501,145 @@ function parseSidebar(sidebarMarkdown, routeReferences, issues, source = "_sideb
   return root;
 }
 
+function cloneNavigationItems(items) {
+  return items.map((item) => ({
+    title: item.title,
+    href: item.href,
+    children: cloneNavigationItems(item.children),
+  }));
+}
+
+function findNavigationItemByHref(items, href) {
+  for (const item of items) {
+    if (item.href === href) {
+      return item;
+    }
+
+    const nested = findNavigationItemByHref(item.children, href);
+    if (nested) {
+      return nested;
+    }
+  }
+
+  return null;
+}
+
+function mergeNavigationItems(existingItems, incomingItems) {
+  const merged = cloneNavigationItems(existingItems);
+  const indexByHref = new Map(merged.map((item, index) => [item.href, index]));
+
+  for (const incoming of incomingItems) {
+    const existingAnywhere = findNavigationItemByHref(merged, incoming.href);
+    if (existingAnywhere) {
+      existingAnywhere.children = mergeNavigationItems(
+        existingAnywhere.children,
+        incoming.children,
+      );
+      continue;
+    }
+
+    const existingIndex = indexByHref.get(incoming.href);
+
+    if (existingIndex === undefined) {
+      merged.push({
+        title: incoming.title,
+        href: incoming.href,
+        children: cloneNavigationItems(incoming.children),
+      });
+      indexByHref.set(incoming.href, merged.length - 1);
+      continue;
+    }
+
+    merged[existingIndex] = {
+      ...merged[existingIndex],
+      children: mergeNavigationItems(
+        merged[existingIndex].children,
+        incoming.children,
+      ),
+    };
+  }
+
+  return merged;
+}
+
+function flattenSectionSidebarItems(items, sectionHref) {
+  const flattened = [];
+
+  for (const item of items) {
+    if (item.href === "/" || item.href === sectionHref) {
+      flattened.push(...flattenSectionSidebarItems(item.children, sectionHref));
+      continue;
+    }
+
+    flattened.push({
+      title: item.title,
+      href: item.href,
+      children: flattenSectionSidebarItems(item.children, sectionHref),
+    });
+  }
+
+  return flattened;
+}
+
+async function mergeSectionSidebars({
+  navigation,
+  sourceDir,
+  routeReferences,
+  issues,
+}) {
+  const mergedNavigation = navigation.map((section) => ({
+    title: section.title,
+    href: section.href,
+    items: cloneNavigationItems(section.items),
+  }));
+
+  const sectionDirs = mergedNavigation
+    .map((section) => trimSlashes(section.href))
+    .filter((sectionDir) => sectionDir.length > 0);
+
+  for (const sectionDir of sectionDirs) {
+    const sidebarPath = path.join(sourceDir, sectionDir, SIDEBAR_NAME);
+
+    try {
+      const sidebarStats = await stat(sidebarPath);
+      if (!sidebarStats.isFile()) {
+        continue;
+      }
+
+      const sectionIndex = mergedNavigation.findIndex(
+        (section) => section.href === `/${sectionDir}/`,
+      );
+
+      if (sectionIndex === -1) {
+        continue;
+      }
+
+      const parsedItems = parseSidebar(
+        await readFile(sidebarPath, "utf8"),
+        routeReferences,
+        issues,
+        `${sectionDir}/${SIDEBAR_NAME}`,
+      );
+      const flattenedItems = flattenSectionSidebarItems(
+        parsedItems,
+        mergedNavigation[sectionIndex].href,
+      );
+
+      mergedNavigation[sectionIndex] = {
+        ...mergedNavigation[sectionIndex],
+        items: mergeNavigationItems(
+          mergedNavigation[sectionIndex].items,
+          flattenedItems,
+        ),
+      };
+    } catch {
+      continue;
+    }
+  }
+
+  return mergedNavigation;
+}
+
 function deepSortIssues(issues) {
   return [...issues].sort((left, right) => {
     return (
@@ -615,6 +770,12 @@ export async function migrateContent({
       navigation = toNavigationSections(
         parseSidebar(sidebar, routeReferences, issues, SIDEBAR_NAME),
       );
+      navigation = await mergeSectionSidebars({
+        navigation,
+        sourceDir,
+        routeReferences,
+        issues,
+      });
     }
   } catch {
     navigation = [];

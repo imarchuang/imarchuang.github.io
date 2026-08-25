@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, test } from "vitest";
 
 const fixtureRoot = path.resolve("tests/fixtures/docs");
+const realDocsRoot = path.resolve("../docs");
 const tempPaths: string[] = [];
 
 async function makeTempDir(prefix: string) {
@@ -60,7 +61,7 @@ describe("migrate-content", () => {
     );
   });
 
-  test("migrates fixture docs, rewrites links with source context, and records stale links", async () => {
+  test("migrates fixture docs, rewrites links with source context, and merges nested sidebars", async () => {
     const { migrateContent } = await loadMigrationModule();
     const sourceDir = path.join(fixtureRoot, "basic");
     const workspaceDir = await makeTempDir("task-2-basic-");
@@ -75,7 +76,7 @@ describe("migrate-content", () => {
       knownIssuesFile,
     });
 
-    expect(result.migratedCount).toBe(4);
+    expect(result.migratedCount).toBe(5);
     expect(result.excludedCount).toBe(6);
     expect(result.navigation).toEqual([
       {
@@ -97,6 +98,11 @@ describe("migrate-content", () => {
                 children: [],
               },
             ],
+          },
+          {
+            title: "Advanced",
+            href: "/guides/advanced/",
+            children: [],
           },
         ],
       },
@@ -120,6 +126,9 @@ describe("migrate-content", () => {
 
     expect(guideIndex).toContain('title: "Guides Home"');
     expect(gettingStarted).toContain("[deep dive](/guides/nested/child/#details)");
+    expect(gettingStarted).toContain(
+      "[overview](/guides/advanced/#%E4%B8%AD%E6%96%87%20%E6%A0%87%E9%A2%98)",
+    );
     expect(gettingStarted).toContain("[home](/)");
     expect(gettingStarted).toContain("[sketch](/draw/)");
     expect(gettingStarted).toContain("[drop](/drops/demo/)");
@@ -183,11 +192,59 @@ describe("migrate-content", () => {
         knownIssuesFile,
       }),
     ).resolves.toMatchObject({
-      migratedCount: 4,
+      migratedCount: 5,
       excludedCount: 6,
     });
 
     const guide = await readFile(path.join(notesDir, "guides", "getting-started.md"), "utf8");
     expect(guide).toContain("[deep dive](/guides/nested/child/#details)");
+    expect(guide).toContain(
+      "[overview](/guides/advanced/#%E4%B8%AD%E6%96%87%20%E6%A0%87%E9%A2%98)",
+    );
+  });
+
+  test("accounts for all real docs markdown and clears valid relative id links from known issues", async () => {
+    const { migrateContent } = await loadMigrationModule();
+    const workspaceDir = await makeTempDir("task-2-real-");
+    const notesDir = path.join(workspaceDir, "notes");
+    const navigationFile = path.join(workspaceDir, "navigation.json");
+    const knownIssuesFile = path.join(workspaceDir, "content-known-issues.json");
+
+    const result = await migrateContent({
+      sourceDir: realDocsRoot,
+      notesDir,
+      navigationFile,
+      knownIssuesFile,
+    });
+
+    expect(result.accountedCount).toBe(174);
+    expect(result.supportExcludedCount).toBe(10);
+    expect(result.generatedDirSkippedCount).toBe(5);
+
+    const sectionTitles = result.navigation.map((section) => section.title);
+    expect(sectionTitles).toEqual(
+      expect.arrayContaining(["Algo", "System Pattern", "Product Pattern", "Python", "System Design"]),
+    );
+
+    const algoSection = result.navigation.find((section) => section.href === "/coding/");
+    expect(algoSection?.items.length).toBeGreaterThan(0);
+    expect(algoSection?.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          title: "二叉树",
+          href: "/coding/tree/",
+        }),
+      ]),
+    );
+
+    const issues = JSON.parse(await readFile(knownIssuesFile, "utf8"));
+    expect(issues).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: "coding/bfs/shortest.md",
+          target: "./coding/bfs/levels?id=二叉树的最小深度",
+        }),
+      ]),
+    );
   });
 });
