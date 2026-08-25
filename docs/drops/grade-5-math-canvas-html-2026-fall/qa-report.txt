@@ -1,0 +1,79 @@
+Output directory: /Users/marc.huang/shadow-marc/.superpowers/grade5-math-html-decks
+HTML file count: 10
+Deck file count: 9
+Root README present: True
+
+Root index checks:
+- Start links found: 9
+- PPT links found: 0
+- Root link ./decimals-add-subtract/ -> decimals-add-subtract/index.html exists=True
+- Root link ./triangles/ -> triangles/index.html exists=True
+- Root link ./decimal-multiply/ -> decimal-multiply/index.html exists=True
+- Root link ./letters-1/ -> letters-1/index.html exists=True
+- Root link ./polygon-area/ -> polygon-area/index.html exists=True
+- Root link ./position-movement/ -> position-movement/index.html exists=True
+- Root link ./factors-multiples/ -> factors-multiples/index.html exists=True
+- Root link ./probability/ -> probability/index.html exists=True
+- Root link ./review/ -> review/index.html exists=True
+
+Per-deck checks:
+- decimal-multiply/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+- decimals-add-subtract/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+- factors-multiples/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+- letters-1/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+- polygon-area/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+- position-movement/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+- probability/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+- review/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+- triangles/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=12 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=0 placeholders=0
+
+Remote PPT URL checks:
+- Removed. HTML decks no longer link to PPTX. The published PPT drop is deleted.
+
+Manual runtime QA:
+- Local server: python3 -m http.server 8766 from the output directory
+- Desktop viewport tested: 1440x1024
+- Mobile viewport tested: 390x844
+- Root index loaded with 0 console errors after favicon fix
+- Chapter tested live: decimals-add-subtract/index.html
+- Keyboard tested: ArrowRight, ArrowLeft, PageDown, PageUp, Home, End, Space
+- Answer toggles tested live: diagnostic slide, worked example slide, guided practice slide, challenge slide
+- Notes drawer tested live: hide/show state toggle
+- Hash deep-link tested live: direct reload to #slide-4 persisted correctly
+- Fullscreen tested live: entered successfully and button label changed to 退出全屏
+- Root navigation tested live: 返回总目录 link returned to root index
+- Mobile viewport metrics: window.innerWidth=390, documentElement.scrollWidth=390, body.scrollWidth=390, stage height=780
+
+Math content fix applied during generation:
+- decimals-add-subtract diagnostic[2].a corrected from “更接近8，也可先判断不可能接近9。” to “更接近9，因为 6.2 + 1.89 = 8.09，离 9 更近。”
+
+Overall result: PASS
+- All scripted checks passed.
+
+Post-generation responsive regression check:
+- Initial live check found `.slides-viewport` collapsed to 2px below 900px because `height:100%` had no definite parent height.
+- Generator fixed: responsive `.stage-frame` now uses definite 720px/780px heights and `.slide` uses vertical overflow scrolling.
+- Regenerated all nine decks.
+- Fresh browser check: active slide count=1, active display=grid, viewport height=758px, slide client/scroll height=756px, no horizontal overflow.
+- Keyboard navigation and answer reveal rechecked after regeneration.
+- Final result: PASS.
+
+2026-08-25 full web rendering regression:
+- Audited all 81 slides at 1440x900, 1024x768, 768x1024, 390x844, 320x568, and 844x390 (486 rendered cases).
+- Found shared mobile toolbar controls forced into four full-width rows (261px tall); changed them to compact two-row grids (96px tall at 390px).
+- Found long mobile slide content could overflow its shrunken grid track and sit beneath the footer, intercepting answer-button clicks.
+- Responsive slides now use intrinsic grid rows and `.slide-main` restores intrinsic height before scrolling the slide container.
+- Final automated result: 0 horizontal overflows, 0 clipped text checks, 0 content/footer overlaps, 0 toolbar failures.
+- Interaction result across all nine decks: 45/45 passed for keyboard navigation, previous/next buttons, answer reveal, and notes toggle.
+
+2026-08-25 expanded-answer rendering regression:
+- Reproduced desktop failure: opening a diagnostic answer added about 238px while the fixed content track remained about 294px, placing the panel below the footer and outside the slide canvas.
+- All slide layouts now use intrinsic content rows and internal vertical scrolling, including desktop.
+- Opening an answer automatically scrolls the complete answer panel into view and respects reduced-motion preferences.
+- Tested 486 collapsed slides plus 216 expanded-answer states across six viewport sizes: 702/702 passed with no answer/footer overlap or horizontal overflow.
+- Reported polygon-area diagnostic answer is 100% visible after its smooth reveal.
+
+2026-08-25 HTML-only tutoring pack:
+- Removed all PPTX download links from the chapter toolbar and root index.
+- Deleted the published PPT drop `grade-5-math-chapter-decks-2026-fall`.
+- Added an HTML-only practice section to every chapter: 6 reinforcement items and 2 bonus items, with hints, answers, and completion checkboxes.

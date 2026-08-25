@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Data Structures and Search | Grade 5 Computer Science Interactive Course</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root{--p:#304a6e;--s:#ebf1fa;--a:#ef6a5b;--d:#18283f;--ink:#1e2f3f;--line:#d9e4ec;--paper:#fffefa}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:linear-gradient(180deg,#f3f7fb,#ebf1f7)}
+    .app{max-width:1280px;margin:0 auto;padding:14px}
+    .top{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+    .group{display:flex;gap:8px;flex-wrap:wrap}
+    button,a{font:inherit}
+    .ctl{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;text-decoration:none;color:var(--ink);cursor:pointer}
+    .stage-wrap{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px;min-width:0}
+    .stage{min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:10px;box-shadow:0 12px 26px rgba(15,40,68,.1)}
+    .slides{aspect-ratio:16/9;min-height:0;position:relative;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .slide{position:absolute;inset:0;display:none;padding:16px;overflow:auto}
+    .slide.active{display:grid;grid-template-rows:auto 1fr;gap:12px}
+    .slide-head{display:flex;justify-content:space-between;gap:10px}
+    .kicker{margin:0;color:var(--p);font-weight:700}
+    h1{margin:4px 0 0;font-size:clamp(26px,2.8vw,38px)}
+    .sub{margin:8px 0 0;color:#526171;line-height:1.6}
+    .count{margin:0;color:#667;white-space:nowrap}
+    .slide-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,40%);gap:10px}
+    .panel{background:#fcfefe;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .panel ul{margin:0;padding-left:18px;line-height:1.7}
+    .panel h2{margin:0 0 8px;font-size:18px;color:var(--p)}
+    .panel p{margin:6px 0;line-height:1.65}
+    .explorer-root,.quiz-root,.demo-root{display:grid;gap:8px}
+    .explorer-title{font-weight:700}
+    .explorer-detail,.quiz-feedback{min-height:24px}
+    .quiz-options{display:grid;gap:6px}
+    .demo-status{padding:10px;border:1px dashed #b7c9d9;border-radius:10px;background:#f8fcff}
+    .button-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .button-row button,.pixel-grid .pixel,.program-grid select{min-height:44px}
+    .button-row button,.pixel-grid .pixel{border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 10px;cursor:pointer}
+    .pixel-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .pixel.on{background:var(--d);color:#fff}
+    .program-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .program-grid label{display:grid;gap:4px;font-size:14px}
+    .program-grid select,input,select{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px}
+    .nav{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+    .notes{min-width:0;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 26px rgba(15,40,68,.1);overflow:hidden}
+    .notes h2{margin:0;padding:12px;border-bottom:1px solid var(--line);font-size:18px}
+    .notes .body{padding:12px;display:grid;gap:10px;max-height:75vh;overflow:auto}
+    .note-card{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fbfdff}
+    .note-card h3{margin:0 0 6px;font-size:14px;color:var(--p)}
+    .note-card p,.note-card ul{margin:0;line-height:1.6;padding-left:16px}
+    .note-card p{padding-left:0}
+    .safe-banner{margin-top:14px;padding:12px;border:1px solid #f0cfb4;border-radius:12px;background:#fff7ef}
+    .safe-banner ul{margin:8px 0 0;padding-left:18px;line-height:1.6}
+    .exercise{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff}
+    .exercise h2{margin:0 0 8px;font-size:24px}
+    .exercise-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .exercise-grid.bonus{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .exercise-card{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fcfefe;display:grid;gap:8px}
+    .exercise-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 10px}
+    .exercise-filter{min-height:40px;border:1px solid var(--line);border-radius:999px;background:#fff;padding:6px 12px;cursor:pointer}
+    .exercise-filter.active{background:var(--s);border-color:var(--p);color:var(--p);font-weight:700}
+    .exercise-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+    .question{margin:0;line-height:1.6}
+    details p{margin:6px 0 0}
+    .toggle-answer{border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px 10px;cursor:pointer}
+    .answer{border:1px dashed #b9c9d7;border-radius:10px;background:#f7fbff;padding:8px}
+    .answer p{margin:6px 0;line-height:1.6}
+    .progress-panel{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff}
+    .progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .progress-item{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fbfdff}
+    .progress-item strong{display:block;font-size:20px;color:var(--p)}
+    .live{position:absolute;left:-9999px}
+    .hidden-notes .stage-wrap{grid-template-columns:minmax(0,1fr)}
+    .hidden-notes .notes{display:none}
+    @media (max-width:1024px){.stage-wrap{grid-template-columns:1fr}.slide-main{grid-template-columns:1fr}.slides{aspect-ratio:auto;min-height:620px}.notes .body{max-height:none}.exercise-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:640px){.app{padding:10px}.slides{min-height:620px;aspect-ratio:auto}.exercise-grid,.exercise-grid.bonus,.progress-grid{grid-template-columns:1fr}.top{display:grid}.group{width:100%}.ctl{flex:1}}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}}
+    @media print{body{background:#fff}.top,.notes,.nav,.exercise details,.toggle-answer,.button-row{display:none !important}.app{max-width:none;padding:0}.slides{border:none;aspect-ratio:auto;min-height:0;overflow:visible}.slide{position:static;display:grid !important;page-break-after:always;border:1px solid #d8e2ea;margin-bottom:8mm}.slide:last-child{page-break-after:auto}.slide-main{grid-template-columns:1fr 1fr}.answer{display:block !important}}
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <header class="top">
+      <div class="group">
+        <a class="ctl" href="../index.html">Back to catalog</a>
+        <button class="ctl" id="notesToggle" type="button" aria-expanded="true" aria-controls="notes">Hide notes</button>
+        <button class="ctl" id="fullscreenToggle" type="button">Fullscreen</button>
+      </div>
+      <div class="group"><span class="ctl">Chapter 5 · Data Structures and Search</span></div>
+    </header>
+    <section class="stage-wrap">
+      <section class="stage">
+        <div class="slides" id="slides" tabindex="0" aria-label="Data Structures and Search">
+          <section class="slide active" id="slide-1" data-index="1">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">Chapter 5 · Data Structures and Search</p>
+        <h1>Scenario Mission</h1>
+        <p class="sub">Find book ID 42 quickly</p>
+      </div>
+      <p class="count">1 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>Method A: linear scan.</li><li>Method B: binary elimination.</li><li>First question: is data sorted?</li></ul></section>
+      <section class="panel">
+        <h2>Vocabulary</h2><p>list / table / key-value / linear search / binary search</p><h2>Safety reminder</h2><p>Use fictional library IDs only; no real personal borrowing data.</p>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-2" data-index="2">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">Chapter 5 · Data Structures and Search</p>
+        <h1>Core Concept</h1>
+        <p class="sub">List, table, and key-value roles</p>
+      </div>
+      <p class="count">2 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>List for traversal.</li><li>Table for multi-field records.</li><li>Key-value for direct lookup.</li></ul></section>
+      <section class="panel">
+        <h2>Vocabulary</h2><p>list / table / key-value / linear search / binary search</p><h2>Safety reminder</h2><p>Use fictional library IDs only; no real personal borrowing data.</p>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-3" data-index="3">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">Chapter 5 · Data Structures and Search</p>
+        <h1>Visual Model</h1>
+        <p class="sub">Path comparison of two searches</p>
+      </div>
+      <p class="count">3 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>Linear worst case: n comparisons.</li><li>Binary removes half each round.</li><li>Binary requires sorted order.</li></ul></section>
+      <section class="panel">
+        <div class="explorer-root" data-explorer="chapter-5-data-structures-and-search">
+    <h2>Model Explorer</h2>
+    <p class="explorer-title" data-exp-title>Structure first</p>
+    <p class="explorer-detail" data-exp-detail>Choose structure before choosing algorithm.</p>
+    <div class="button-row">
+      <button type="button" data-exp-action="prev">Previous idea</button>
+      <button type="button" data-exp-action="next">Next idea</button>
+    </div>
+  </div>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-4" data-index="4">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">Chapter 5 · Data Structures and Search</p>
+        <h1>Hands-on Lab</h1>
+        <p class="sub">Run both methods and record counts</p>
+      </div>
+      <p class="count">4 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>Search target 42 with both methods.</li><li>Capture comparison counts.</li><li>Explain why counts differ.</li></ul></section>
+      <section class="panel">
+        <h2>Library Search Lab</h2><p>Compare linear and binary search steps on a sorted shelf.</p><div class="demo-root" data-demo="chapter-5-data-structures-and-search" data-demo-type="library-search">
+    <p class="demo-status" role="status" aria-live="polite">Compare linear and binary search steps on a sorted shelf.</p>
+      <p>Sorted shelf: 12, 18, 23, 30, 35, 42, 47, 53</p>
+      <div class="button-row">
+        <button type="button" data-action="linear">Linear search 42</button>
+        <button type="button" data-action="binary">Binary search 42</button>
+        <button type="button" data-action="reset">Reset choice</button>
+      </div>
+      <p data-steps>No search run yet.</p>
+    </div>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-5" data-index="5">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">Chapter 5 · Data Structures and Search</p>
+        <h1>Debug Detective</h1>
+        <p class="sub">Why unsorted binary search fails</p>
+      </div>
+      <p class="count">5 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>Unsorted data breaks binary assumptions.</li><li>Sort first or switch method.</li><li>Always check preconditions.</li></ul></section>
+      <section class="panel">
+        <div class="quiz-root" data-quiz="chapter-5-data-structures-and-search">
+    <h2>Quick Check</h2>
+    <p>When should you NOT use binary search immediately?</p>
+    <div class="quiz-options">
+      <label><input type="radio" name="quiz-chapter-5-data-structures-and-search" value="0"> <span>Data is sorted</span></label><label><input type="radio" name="quiz-chapter-5-data-structures-and-search" value="1"> <span>Data is unsorted</span></label><label><input type="radio" name="quiz-chapter-5-data-structures-and-search" value="2"> <span>Dataset is large</span></label>
+    </div>
+    <div class="button-row">
+      <button type="button" data-quiz-action="check">Check answer</button>
+      <button type="button" data-quiz-action="reset">Reset choice</button>
+    </div>
+    <p class="quiz-feedback" data-quiz-feedback aria-live="polite"></p>
+  </div><h2>Misconception Fixes</h2><ul><li><strong>Binary search is always better.</strong><br>It works only when data is consistently sorted.</li><li><strong>Data structure only stores data.</strong><br>Structure directly impacts performance and maintenance.</li><li><strong>No need to track comparisons.</strong><br>Comparison count is key evidence of efficiency.</li></ul>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-6" data-index="6">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">Chapter 5 · Data Structures and Search</p>
+        <h1>Application Challenge</h1>
+        <p class="sub">Design a class library lookup flow</p>
+      </div>
+      <p class="count">6 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>Define shelf numbering rules.</li><li>Handle not-found outcomes.</li><li>Track efficiency metrics.</li></ul></section>
+      <section class="panel">
+        <h2>Vocabulary</h2><p>list / table / key-value / linear search / binary search</p><h2>Safety reminder</h2><p>Use fictional library IDs only; no real personal borrowing data.</p>
+      </section>
+    </div>
+  </section><section class="slide" id="slide-7" data-index="7">
+    <header class="slide-head">
+      <div>
+        <p class="kicker">Chapter 5 · Data Structures and Search</p>
+        <h1>Summary &amp; Self-check</h1>
+        <p class="sub">Can I choose methods by conditions?</p>
+      </div>
+      <p class="count">7 / 7</p>
+    </header>
+    <div class="slide-main">
+      <section class="panel"><ul><li>I can check preconditions.</li><li>I can compare search efficiency.</li><li>I can design data organization.</li></ul></section>
+      <section class="panel">
+        <h2>Vocabulary</h2><p>list / table / key-value / linear search / binary search</p><h2>Safety reminder</h2><p>Use fictional library IDs only; no real personal borrowing data.</p>
+      </section>
+    </div>
+  </section>
+        </div>
+        <div class="nav">
+          <button class="ctl" id="prevButton" type="button">Previous</button>
+          <button class="ctl" id="nextButton" type="button">Next</button>
+        </div>
+      </section>
+      <aside class="notes" id="notes"><h2>Teacher Notes</h2><div class="body" id="notesBody"></div></aside>
+    </section>
+    <section class="safe-banner"><strong>Child Online Safety Reminders</strong><ul><li>Do not enter real name, school, address, phone number, passwords, OTP codes, or real photos.</li><li>If a link asks for personal information or feels unsafe, stop and tell a trusted adult.</li><li>HTTPS and lock icons help, but they do not guarantee trustworthy content.</li></ul><p>Use fictional library IDs only; no real personal borrowing data.</p></section>
+    <section class="exercise" id="exercise">
+      <h2>After-class Practice</h2><p>Each chapter includes 6 reinforcement tasks and 2 bonus tasks. Completion is stored locally.</p>
+      <div class="exercise-toolbar">
+        <button class="exercise-filter active" type="button" data-filter="all">All tasks</button>
+        <button class="exercise-filter" type="button" data-filter="reinforcement">Reinforcement</button>
+        <button class="exercise-filter" type="button" data-filter="bonus">Bonus Challenges</button>
+      </div>
+      <h3>Reinforcement</h3>
+      <div class="exercise-grid"><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>Reinforcement 1</strong>
+      <label><input type="checkbox" data-check="chapter-5-data-structures-and-search-reinforcement-1"> Done</label>
+    </div>
+    <p class="question">Linear search worst-case comparisons for n items?</p>
+    <details><summary>Hint</summary><p>Target may be last.</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-5-data-structures-and-search-reinforcement-1-answer" aria-expanded="false">Show answer</button>
+    <div id="chapter-5-data-structures-and-search-reinforcement-1-answer" class="answer" hidden>
+      <p><strong>Answer:</strong> n.</p>
+      <p><strong>Why:</strong> Worst case scans all items.</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>Reinforcement 2</strong>
+      <label><input type="checkbox" data-check="chapter-5-data-structures-and-search-reinforcement-2"> Done</label>
+    </div>
+    <p class="question">Binary search precondition?</p>
+    <details><summary>Hint</summary><p>Data organization first.</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-5-data-structures-and-search-reinforcement-2-answer" aria-expanded="false">Show answer</button>
+    <div id="chapter-5-data-structures-and-search-reinforcement-2-answer" class="answer" hidden>
+      <p><strong>Answer:</strong> Data must be sorted by one consistent rule.</p>
+      <p><strong>Why:</strong> Without order, elimination logic fails.</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>Reinforcement 3</strong>
+      <label><input type="checkbox" data-check="chapter-5-data-structures-and-search-reinforcement-3"> Done</label>
+    </div>
+    <p class="question">Sorted [10,20,30,40,50], first compare for target 40?</p>
+    <details><summary>Hint</summary><p>Pick middle.</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-5-data-structures-and-search-reinforcement-3-answer" aria-expanded="false">Show answer</button>
+    <div id="chapter-5-data-structures-and-search-reinforcement-3-answer" class="answer" hidden>
+      <p><strong>Answer:</strong> 30.</p>
+      <p><strong>Why:</strong> Binary search starts from midpoint.</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>Reinforcement 4</strong>
+      <label><input type="checkbox" data-check="chapter-5-data-structures-and-search-reinforcement-4"> Done</label>
+    </div>
+    <p class="question">Why is studentID-&gt;name good for key-value?</p>
+    <details><summary>Hint</summary><p>Unique key idea.</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-5-data-structures-and-search-reinforcement-4-answer" aria-expanded="false">Show answer</button>
+    <div id="chapter-5-data-structures-and-search-reinforcement-4-answer" class="answer" hidden>
+      <p><strong>Answer:</strong> Student IDs are usually unique keys.</p>
+      <p><strong>Why:</strong> Key-value fits unique lookup patterns.</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>Reinforcement 5</strong>
+      <label><input type="checkbox" data-check="chapter-5-data-structures-and-search-reinforcement-5"> Done</label>
+    </div>
+    <p class="question">Can binary search miss targets on unsorted data?</p>
+    <details><summary>Hint</summary><p>True/false.</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-5-data-structures-and-search-reinforcement-5-answer" aria-expanded="false">Show answer</button>
+    <div id="chapter-5-data-structures-and-search-reinforcement-5-answer" class="answer" hidden>
+      <p><strong>Answer:</strong> Yes.</p>
+      <p><strong>Why:</strong> Broken ordering leads to wrong elimination.</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="reinforcement">
+    <div class="exercise-head">
+      <strong>Reinforcement 6</strong>
+      <label><input type="checkbox" data-check="chapter-5-data-structures-and-search-reinforcement-6"> Done</label>
+    </div>
+    <p class="question">How should search handle not-found?</p>
+    <details><summary>Hint</summary><p>Need termination and feedback.</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-5-data-structures-and-search-reinforcement-6-answer" aria-expanded="false">Show answer</button>
+    <div id="chapter-5-data-structures-and-search-reinforcement-6-answer" class="answer" hidden>
+      <p><strong>Answer:</strong> Stop when interval is empty and return not found.</p>
+      <p><strong>Why:</strong> Fallback behavior is part of algorithm quality.</p>
+    </div>
+  </article></div>
+      <h3>Bonus Challenges</h3>
+      <div class="exercise-grid bonus"><article class="exercise-card" data-ex-type="bonus">
+    <div class="exercise-head">
+      <strong>Bonus Challenges 1</strong>
+      <label><input type="checkbox" data-check="chapter-5-data-structures-and-search-bonus-1"> Done</label>
+    </div>
+    <p class="question">In 16 sorted books, binary search worst-case comparisons?</p>
+    <details><summary>Hint</summary><p>Half each round.</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-5-data-structures-and-search-bonus-1-answer" aria-expanded="false">Show answer</button>
+    <div id="chapter-5-data-structures-and-search-bonus-1-answer" class="answer" hidden>
+      <p><strong>Answer:</strong> About 4.</p>
+      <p><strong>Why:</strong> Halving quickly reduces search space.</p>
+    </div>
+  </article><article class="exercise-card" data-ex-type="bonus">
+    <div class="exercise-head">
+      <strong>Bonus Challenges 2</strong>
+      <label><input type="checkbox" data-check="chapter-5-data-structures-and-search-bonus-2"> Done</label>
+    </div>
+    <p class="question">How to keep binary search valid with daily inserts?</p>
+    <details><summary>Hint</summary><p>Maintain invariant.</p></details>
+    <button class="toggle-answer" type="button" data-target="chapter-5-data-structures-and-search-bonus-2-answer" aria-expanded="false">Show answer</button>
+    <div id="chapter-5-data-structures-and-search-bonus-2-answer" class="answer" hidden>
+      <p><strong>Answer:</strong> Insert by rule and keep collection sorted.</p>
+      <p><strong>Why:</strong> Algorithm validity depends on maintained preconditions.</p>
+    </div>
+  </article></div>
+    </section>
+    <section class="progress-panel" id="progressPanel">
+      <h3>Learning Progress Panel</h3>
+      <div class="progress-grid">
+        <div class="progress-item"><span>Exercises Completed</span><strong data-progress-ex>0/8</strong></div>
+        <div class="progress-item"><span>Interaction Milestones</span><strong data-progress-ms>0/3</strong></div>
+        <div class="progress-item"><span>Current Chapter</span><strong>Data Structures and Search</strong></div>
+      </div>
+      <p data-coach-message>Finish 2 reinforcement tasks first, then compare your reasoning with the explanations.</p>
+      <div class="button-row"><button type="button" data-coach-action="next">Generate next challenge</button></div>
+      <p data-coach-challenge>Challenge: transfer one chapter method to a real-life task.</p>
+    </section>
+    <p class="live" id="liveRegion" aria-live="polite"></p>
+  </main>
+  <script>
+    (() => {
+      const locale = "en";
+      const isZh = locale === "zh";
+      const chapterKey = "chapter-5-data-structures-and-search";
+      const chapterSlides = [{"idx":1,"title":"Scenario Mission","notes":{"timing":"4 min","prompts":["Ask for method justification.","Require precondition checks.","Capture metric-based reasoning."],"responses":["Students identify valid method.","Students use evidence from counts.","Students include fallback handling."]}},{"idx":2,"title":"Core Concept","notes":{"timing":"5 min","prompts":["Ask for method justification.","Require precondition checks.","Capture metric-based reasoning."],"responses":["Students identify valid method.","Students use evidence from counts.","Students include fallback handling."]}},{"idx":3,"title":"Visual Model","notes":{"timing":"5 min","prompts":["Ask for method justification.","Require precondition checks.","Capture metric-based reasoning."],"responses":["Students identify valid method.","Students use evidence from counts.","Students include fallback handling."]}},{"idx":4,"title":"Hands-on Lab","notes":{"timing":"8 min","prompts":["Ask for method justification.","Require precondition checks.","Capture metric-based reasoning."],"responses":["Students identify valid method.","Students use evidence from counts.","Students include fallback handling."]}},{"idx":5,"title":"Debug Detective","notes":{"timing":"5 min","prompts":["Ask for method justification.","Require precondition checks.","Capture metric-based reasoning."],"responses":["Students identify valid method.","Students use evidence from counts.","Students include fallback handling."]}},{"idx":6,"title":"Application Challenge","notes":{"timing":"7 min","prompts":["Ask for method justification.","Require precondition checks.","Capture metric-based reasoning."],"responses":["Students identify valid method.","Students use evidence from counts.","Students include fallback handling."]}},{"idx":7,"title":"Summary & Self-check","notes":{"timing":"4 min","prompts":["Ask for method justification.","Require precondition checks.","Capture metric-based reasoning."],"responses":["Students identify valid method.","Students use evidence from counts.","Students include fallback handling."]}}];
+      const explorerData = [{"title":"Structure first","detail":"Choose structure before choosing algorithm."},{"title":"Sorted precondition","detail":"Binary search requires stable ordering."},{"title":"Measure efficiency","detail":"Record comparisons to compare methods objectively."}];
+      const quizData = {"question":"When should you NOT use binary search immediately?","options":["Data is sorted","Data is unsorted","Dataset is large"],"correctIndex":1,"correctFeedback":"Correct: binary search on unsorted data is unreliable.","wrongFeedback":"Check preconditions before selecting an algorithm."};
+      const ui = {"localeLabel":"English","childSafetyTitle":"Child Online Safety Reminders","backToRoot":"Back to portal","switchLocale":"Switch to 中文版","backToCatalog":"Back to catalog","enterChapter":"Open chapter","chapterLabel":"Chapter {{n}}","notesTitle":"Teacher Notes","hideNotes":"Hide notes","showNotes":"Show notes","fullscreen":"Fullscreen","exitFullscreen":"Exit fullscreen","previous":"Previous","next":"Next","exerciseTitle":"After-class Practice","exerciseDesc":"Each chapter includes 6 reinforcement tasks and 2 bonus tasks. Completion is stored locally.","reinforcement":"Reinforcement","bonus":"Bonus Challenges","done":"Done","hint":"Hint","showAnswer":"Show answer","hideAnswer":"Hide answer","answer":"Answer","rationale":"Why","quizTitle":"Quick Check","quizCheck":"Check answer","quizReset":"Reset choice","explorerTitle":"Model Explorer","explorerPrev":"Previous idea","explorerNext":"Next idea"};
+      const demoSuccess = "Success: both methods tested and compared.";
+      const demoReset = "Search lab reset.";
+      const total = chapterSlides.length;
+      const app = document.getElementById("app");
+      const slidesEl = document.getElementById("slides");
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const prevButton = document.getElementById("prevButton");
+      const nextButton = document.getElementById("nextButton");
+      const notesToggle = document.getElementById("notesToggle");
+      const fullscreenToggle = document.getElementById("fullscreenToggle");
+      const notesBody = document.getElementById("notesBody");
+      const live = document.getElementById("liveRegion");
+      const progressExercises = document.querySelector("[data-progress-ex]");
+      const progressMilestones = document.querySelector("[data-progress-ms]");
+      const coachMessage = document.querySelector("[data-coach-message]");
+      const coachChallenge = document.querySelector("[data-coach-challenge]");
+      let current = 1;
+      let touchStartX = null;
+      let touchStartY = null;
+      const milestoneNames = ["demo", "explorer", "quiz"];
+      const challengeBank = isZh
+        ? [
+            "挑战：写一个 3 步检查清单，验证你今天的算法是否可执行。",
+            "挑战：挑 1 道做错题，写“先错在哪里，再怎么改”。",
+            "挑战：把本章方法迁移到家庭任务，并写出成功标准。",
+          ]
+        : [
+            "Challenge: write a 3-step checklist to verify if your algorithm is executable.",
+            "Challenge: pick one wrong answer and write what failed, then how to fix it.",
+            "Challenge: transfer one chapter method to a home task and define success criteria.",
+          ];
+      let challengeIndex = 0;
+
+      function milestoneKey(name) {
+        return "grade5-cs:" + locale + ":" + chapterKey + ":milestone:" + name;
+      }
+      function markMilestone(name) {
+        try { localStorage.setItem(milestoneKey(name), "1"); } catch (err) {}
+        updateProgressPanel();
+      }
+      function updateProgressPanel() {
+        const checks = Array.from(document.querySelectorAll("[data-check]"));
+        const checked = checks.filter((input) => input.checked).length;
+        if (progressExercises) progressExercises.textContent = checked + "/" + checks.length;
+        let msDone = 0;
+        milestoneNames.forEach((name) => {
+          try {
+            if (localStorage.getItem(milestoneKey(name)) === "1") msDone += 1;
+          } catch (err) {}
+        });
+        if (progressMilestones) progressMilestones.textContent = msDone + "/" + milestoneNames.length;
+        if (coachMessage) {
+          if (checked === checks.length) {
+            coachMessage.textContent = isZh ? "练习全完成！请向同伴解释一道题的原因，巩固迁移能力。" : "All tasks completed! Explain one rationale to a peer to strengthen transfer.";
+          } else if (checked >= 5) {
+            coachMessage.textContent = isZh ? "进度很好：优先补完剩余题，再做一题附加挑战。" : "Great progress: finish remaining tasks, then attempt one bonus challenge.";
+          } else if (checked >= 2) {
+            coachMessage.textContent = isZh ? "继续保持：每做完一题，都对照“原因”检查是否真正理解。" : "Keep going: after each answer, compare with the rationale to confirm understanding.";
+          } else {
+            coachMessage.textContent = isZh ? "先完成 2 道强化题，再对照“原因”检查自己的想法。" : "Finish 2 reinforcement tasks first, then compare your reasoning with the explanations.";
+          }
+        }
+      }
+
+      function getHashIndex() {
+        const match = location.hash.match(/^#slide-(\d+)$/);
+        if (!match) return 1;
+        const value = Number(match[1]);
+        return Number.isFinite(value) && value >= 1 && value <= total ? value : 1;
+      }
+      function renderNotes(index) {
+        const note = chapterSlides[index - 1];
+        notesBody.innerHTML = [
+          '<div class="note-card"><h3>' + (isZh ? '页码' : 'Page') + '</h3><p>' + (isZh ? '第 ' + index + ' 页：' : 'Page ' + index + ': ') + note.title + '</p></div>',
+          '<div class="note-card"><h3>' + (isZh ? '建议时长' : 'Suggested time') + '</h3><p>' + note.notes.timing + '</p></div>',
+          '<div class="note-card"><h3>' + (isZh ? '教学提示' : 'Teacher prompts') + '</h3><ul>' + note.notes.prompts.map((p) => '<li>' + p + '</li>').join('') + '</ul></div>',
+          '<div class="note-card"><h3>' + (isZh ? '预期回应' : 'Expected responses') + '</h3><ul>' + note.notes.responses.map((p) => '<li>' + p + '</li>').join('') + '</ul></div>',
+        ].join("");
+      }
+      function updateButtons() {
+        prevButton.disabled = current === 1;
+        nextButton.disabled = current === total;
+      }
+      function setSlide(index, silent = false) {
+        current = index;
+        slides.forEach((slide, slideIndex) => {
+          const active = slideIndex === index - 1;
+          slide.classList.toggle("active", active);
+          slide.setAttribute("aria-hidden", active ? "false" : "true");
+        });
+        updateButtons();
+        renderNotes(index);
+        history.replaceState(null, "", "#slide-" + index);
+        if (!silent) live.textContent = (isZh ? "已切换到第 " : "Switched to page ") + index + (isZh ? " 页。" : ".");
+      }
+      function go(delta) {
+        const next = Math.min(total, Math.max(1, current + delta));
+        if (next !== current) setSlide(next);
+      }
+
+      prevButton.addEventListener("click", () => go(-1));
+      nextButton.addEventListener("click", () => go(1));
+      notesToggle.addEventListener("click", () => {
+        const hidden = app.classList.toggle("hidden-notes");
+        notesToggle.textContent = hidden ? ui.showNotes : ui.hideNotes;
+        notesToggle.setAttribute("aria-expanded", String(!hidden));
+      });
+      fullscreenToggle.addEventListener("click", async () => {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+            fullscreenToggle.textContent = ui.exitFullscreen;
+          } else {
+            await document.exitFullscreen();
+            fullscreenToggle.textContent = ui.fullscreen;
+          }
+        } catch (err) {
+          live.textContent = isZh ? "全屏不可用。" : "Fullscreen unavailable.";
+        }
+      });
+      document.addEventListener("fullscreenchange", () => {
+        fullscreenToggle.textContent = document.fullscreenElement ? ui.exitFullscreen : ui.fullscreen;
+      });
+      document.addEventListener("keydown", (event) => {
+        const target = event.target;
+        const tag = target && target.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (target && target.isContentEditable)) return;
+        if (target && target.closest("button, summary, a[href], [role='button']")) return;
+        if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " " || event.code === "Space") { event.preventDefault(); go(1); }
+        else if (event.key === "ArrowLeft" || event.key === "PageUp") { event.preventDefault(); go(-1); }
+        else if (event.key === "Home") { event.preventDefault(); setSlide(1); }
+        else if (event.key === "End") { event.preventDefault(); setSlide(total); }
+      });
+      const coachButton = document.querySelector('[data-coach-action="next"]');
+      if (coachButton && coachChallenge) {
+        coachButton.addEventListener("click", () => {
+          challengeIndex = (challengeIndex + 1) % challengeBank.length;
+          coachChallenge.textContent = challengeBank[challengeIndex];
+          live.textContent = challengeBank[challengeIndex];
+        });
+      }
+      slidesEl.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+      }, { passive: true });
+      slidesEl.addEventListener("touchend", (event) => {
+        if (touchStartX === null || touchStartY === null) return;
+        const touch = event.changedTouches[0];
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) go(1);
+          if (dx > 0) go(-1);
+        }
+        touchStartX = null;
+        touchStartY = null;
+      }, { passive: true });
+      window.addEventListener("hashchange", () => setSlide(getHashIndex(), true));
+
+      document.querySelectorAll(".toggle-answer").forEach((button) => {
+        button.addEventListener("click", () => {
+          const panel = document.getElementById(button.dataset.target);
+          const open = !panel.hasAttribute("hidden");
+          if (open) {
+            panel.setAttribute("hidden", "");
+            button.textContent = ui.showAnswer;
+            button.setAttribute("aria-expanded", "false");
+          } else {
+            panel.removeAttribute("hidden");
+            button.textContent = ui.hideAnswer;
+            button.setAttribute("aria-expanded", "true");
+          }
+        });
+      });
+      document.querySelectorAll("[data-check]").forEach((input) => {
+        const key = "grade5-cs:" + locale + ":" + chapterKey + ":" + input.dataset.check;
+        try { input.checked = localStorage.getItem(key) === "1"; } catch (err) {}
+        input.addEventListener("change", () => {
+          try { localStorage.setItem(key, input.checked ? "1" : "0"); } catch (err) {}
+          updateProgressPanel();
+        });
+      });
+      document.querySelectorAll("[data-filter]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const mode = button.dataset.filter;
+          document.querySelectorAll("[data-filter]").forEach((item) => item.classList.toggle("active", item === button));
+          document.querySelectorAll(".exercise-card").forEach((card) => {
+            const type = card.dataset.exType;
+            const show = mode === "all" || mode === type;
+            card.style.display = show ? "" : "none";
+          });
+        });
+      });
+
+      document.querySelectorAll("[data-explorer]").forEach((root) => {
+        let idx = 0;
+        const title = root.querySelector("[data-exp-title]");
+        const detail = root.querySelector("[data-exp-detail]");
+        function paint() {
+          const item = explorerData[idx];
+          title.textContent = item.title;
+          detail.textContent = item.detail;
+        }
+        root.querySelector('[data-exp-action="prev"]').addEventListener("click", () => {
+          idx = (idx - 1 + explorerData.length) % explorerData.length;
+          paint();
+          markMilestone("explorer");
+        });
+        root.querySelector('[data-exp-action="next"]').addEventListener("click", () => {
+          idx = (idx + 1) % explorerData.length;
+          paint();
+          markMilestone("explorer");
+        });
+      });
+
+      document.querySelectorAll("[data-quiz]").forEach((root) => {
+        const feedback = root.querySelector("[data-quiz-feedback]");
+        root.querySelector('[data-quiz-action="check"]').addEventListener("click", () => {
+          const picked = root.querySelector("input[type='radio']:checked");
+          if (!picked) {
+            feedback.textContent = isZh ? "请先选择一个选项。" : "Please choose an option first.";
+            return;
+          }
+          const value = Number(picked.value);
+          const correct = value === quizData.correctIndex;
+          feedback.textContent = correct ? quizData.correctFeedback : quizData.wrongFeedback;
+          if (correct) markMilestone("quiz");
+        });
+        root.querySelector('[data-quiz-action="reset"]').addEventListener("click", () => {
+          root.querySelectorAll("input[type='radio']").forEach((input) => { input.checked = false; });
+          feedback.textContent = "";
+        });
+      });
+
+      setupDemo();
+      updateProgressPanel();
+      setSlide(getHashIndex(), true);
+
+      function setupDemo() {
+        const root = document.querySelector(".demo-root");
+        if (!root) return;
+        const type = root.dataset.demoType;
+        const status = root.querySelector(".demo-status");
+        const say = (message) => { status.textContent = message; live.textContent = message; };
+
+        if (type === "robot-breakfast") {
+          const target = ["bowl", "cereal", "milk", "spoon"];
+          const stepName = {
+            bowl: isZh ? "拿碗" : "Get bowl",
+            cereal: isZh ? "倒麦片" : "Add cereal",
+            milk: isZh ? "倒牛奶" : "Pour milk",
+            spoon: isZh ? "放勺子" : "Add spoon",
+          };
+          const selected = [];
+          const programText = root.querySelector("[data-program]");
+          root.querySelectorAll("[data-step]").forEach((button) => {
+            button.addEventListener("click", () => {
+              if (selected.length < target.length) {
+                selected.push(button.dataset.step);
+                programText.textContent = selected.join(" -> ");
+              }
+            });
+          });
+          root.querySelector('[data-action="check"]').addEventListener("click", () => {
+            if (selected.join("|") === target.join("|")) {
+              say(demoSuccess);
+              markMilestone("demo");
+            } else {
+              const mismatch = selected.findIndex((value, index) => value !== target[index]);
+              const step = mismatch === -1 ? selected.length + 1 : mismatch + 1;
+              const expectedKey = target[mismatch === -1 ? selected.length : mismatch];
+              const expected = expectedKey ? stepName[expectedKey] : (isZh ? "结束" : "finish");
+              say(
+                isZh
+                  ? "第 " + step + " 步开始偏离，建议这里应是 " + expected + "。"
+                  : "Mismatch starts at step " + step + ". Expected " + expected + " at this point."
+              );
+            }
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            selected.length = 0;
+            programText.textContent = isZh ? "（空）" : "(empty)";
+            say(demoReset);
+          });
+          return;
+        }
+
+        if (type === "binary-pixel") {
+          const target = "10110010";
+          const bits = Array.from(root.querySelectorAll(".pixel"));
+          const code = root.querySelector("[data-code]");
+          const read = () => bits.map((bit) => bit.textContent.trim()).join("");
+          bits.forEach((bit) => {
+            bit.addEventListener("click", () => {
+              bit.textContent = bit.textContent.trim() === "0" ? "1" : "0";
+              bit.classList.toggle("on", bit.textContent.trim() === "1");
+              code.textContent = read();
+            });
+          });
+          root.querySelector('[data-action="check"]').addEventListener("click", () => {
+            const now = read();
+            if (now === target) {
+              say(demoSuccess);
+              markMilestone("demo");
+            } else {
+              const mismatchBits = [];
+              for (let i = 0; i < target.length; i++) {
+                if (now[i] !== target[i]) mismatchBits.push(i + 1);
+              }
+              say(
+                isZh
+                  ? "第 " + mismatchBits.join("、") + " 位不一致，请先修正这些位。"
+                  : "Bits " + mismatchBits.join(", ") + " mismatch. Fix these first."
+              );
+            }
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            bits.forEach((bit) => { bit.textContent = "0"; bit.classList.remove("on"); });
+            code.textContent = "00000000";
+            say(demoReset);
+          });
+          return;
+        }
+
+        if (type === "maze-debug") {
+          const selects = Array.from(root.querySelectorAll("[data-move]"));
+          const wall = "1,1";
+          const goal = "2,2";
+          root.querySelector('[data-action="run"]').addEventListener("click", () => {
+            let x = 0;
+            let y = 0;
+            for (let i = 0; i < selects.length; i++) {
+              const move = selects[i].value;
+              if (move === "stay") continue;
+              if (move === "right") x += 1;
+              if (move === "left") x -= 1;
+              if (move === "down") y += 1;
+              if (move === "up") y -= 1;
+              if (x < 0 || x > 2 || y < 0 || y > 2) { say(isZh ? "第 " + (i + 1) + " 步越界，当前位置(" + x + "," + y + ")。" : "Step " + (i + 1) + " out of bounds at (" + x + "," + y + ")."); return; }
+              if (x + "," + y === wall) { say(isZh ? "第 " + (i + 1) + " 步撞墙（1,1）。" : "Step " + (i + 1) + " hits wall (1,1)."); return; }
+            }
+            if (x + "," + y === goal) {
+              say(demoSuccess);
+              markMilestone("demo");
+            }
+            else say(isZh ? "未到达终点，请继续调试。" : "Goal not reached yet. Keep debugging.");
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            selects.forEach((select) => { select.value = "stay"; });
+            say(demoReset);
+          });
+          return;
+        }
+
+        if (type === "treasure-program") {
+          const loops = root.querySelector("[data-loops]");
+          const needed = root.querySelector("[data-needed]");
+          const trace = root.querySelector("[data-trace]");
+          root.querySelector('[data-action="run"]').addEventListener("click", () => {
+            const n = Math.max(0, Math.min(8, Number(loops.value) || 0));
+            const k = Math.max(1, Math.min(8, Number(needed.value) || 1));
+            let keys = 0;
+            for (let i = 0; i < n; i++) keys += 1;
+            trace.textContent = (isZh ? "运行结束：" : "Run finished: ") + "loops=" + n + ", keys=" + keys + ", threshold=" + k;
+            if (keys >= k) {
+              say(demoSuccess);
+              markMilestone("demo");
+            }
+            else say(isZh ? "钥匙不足，条件未达成。" : "Not enough keys to pass the condition.");
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            loops.value = "3";
+            needed.value = "3";
+            trace.textContent = isZh ? "等待运行。" : "Waiting to run.";
+            say(demoReset);
+          });
+          return;
+        }
+
+        if (type === "library-search") {
+          const arr = [12, 18, 23, 30, 35, 42, 47, 53];
+          const steps = root.querySelector("[data-steps]");
+          root.querySelector('[data-action="linear"]').addEventListener("click", () => {
+            let count = 0;
+            for (let i = 0; i < arr.length; i++) {
+              count += 1;
+              if (arr[i] === 42) {
+                steps.textContent = isZh ? "顺序搜索比较 " + count + " 次找到 42。" : "Linear search found 42 in " + count + " comparisons.";
+                say(isZh ? "已完成顺序搜索。" : "Linear search completed.");
+                return;
+              }
+            }
+          });
+          root.querySelector('[data-action="binary"]').addEventListener("click", () => {
+            let left = 0;
+            let right = arr.length - 1;
+            let count = 0;
+            while (left <= right) {
+              const mid = Math.floor((left + right) / 2);
+              count += 1;
+              if (arr[mid] === 42) {
+                steps.textContent = isZh ? "二分搜索比较 " + count + " 次找到 42。" : "Binary search found 42 in " + count + " comparisons.";
+                say(demoSuccess + (isZh ? " 二分更高效。" : " Binary search is more efficient."));
+                markMilestone("demo");
+                return;
+              }
+              if (arr[mid] < 42) left = mid + 1; else right = mid - 1;
+            }
+          });
+          root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+            steps.textContent = isZh ? "尚未搜索。" : "No search run yet.";
+            say(demoReset);
+          });
+          return;
+        }
+
+        const msg = root.querySelector("[data-msg]");
+        const route = root.querySelector("[data-route]");
+        root.querySelector('[data-action="send"]').addEventListener("click", () => {
+          if (msg.value === "private") { say(isZh ? "已拦截：不要发送个人信息，请求助可信任大人。" : "Blocked: do not send personal information. Ask a trusted adult."); return; }
+          if (route.value === "risky") { say(isZh ? "路径风险高，请改用安全路由。" : "Route is risky. Choose the safe route."); return; }
+          say(demoSuccess);
+          markMilestone("demo");
+        });
+        root.querySelector('[data-action="reset"]').addEventListener("click", () => {
+          msg.value = "public";
+          route.value = "safe";
+          say(demoReset);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

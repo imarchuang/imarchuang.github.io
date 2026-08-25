@@ -1,0 +1,1976 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>可能性 | 五年级数学互动课件</title>
+  <style>
+    :root{
+
+    --chapter-primary:#A04E62;
+    --chapter-secondary:#F8DFE8;
+    --chapter-accent:#4F86C6;
+    --chapter-dark:#7D3A4C;
+
+      --ink:#20303d;
+      --muted:#5b6a78;
+      --line:#d7e2ea;
+      --paper:#fffdf8;
+      --board:#f6f8fb;
+      --shadow:0 24px 60px rgba(31,58,95,.12);
+      --shadow-soft:0 14px 30px rgba(31,58,95,.10);
+      --stage-radius:28px;
+      --touch:44px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 1px 1px, rgba(90,110,125,.18) 1px, transparent 0) 0 0/18px 18px,
+        linear-gradient(180deg, #f3f7fb 0%, #edf3f7 100%);
+      min-height:100vh;
+    }
+    a,button{font:inherit}
+    button,a.control-link,.toolbar-link{
+      min-height:var(--touch);
+      min-width:var(--touch);
+    }
+    a{color:inherit}
+    .deck-shell{
+      max-width:1400px;
+      margin:0 auto;
+      padding:20px 18px 32px;
+    }
+    .deck-topbar{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+    .topbar-group{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .toolbar-link,.toolbar-button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 16px;
+      background:rgba(255,255,255,.82);
+      text-decoration:none;
+      color:var(--ink);
+      box-shadow:var(--shadow-soft);
+      cursor:pointer;
+    }
+    .toolbar-button{
+      appearance:none;
+    }
+    .toolbar-button:hover,.toolbar-link:hover,.nav-button:hover{
+      border-color:var(--chapter-primary);
+      transform:translateY(-1px);
+    }
+    .toolbar-button:focus-visible,.toolbar-link:focus-visible,.nav-button:focus-visible,.toggle-answer:focus-visible,.self-check-list input:focus-visible{
+      outline:3px solid rgba(243,182,63,.45);
+      outline-offset:3px;
+    }
+    .deck-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.84);
+      border:1px solid var(--line);
+      padding:10px 16px;
+      box-shadow:var(--shadow-soft);
+      color:var(--muted);
+    }
+    .deck-badge strong{color:var(--chapter-primary)}
+    .stage-wrap{
+      position:relative;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 340px;
+      gap:16px;
+      align-items:start;
+    }
+    .stage-column{
+      min-width:0;
+    }
+    .stage-frame{
+      position:relative;
+      aspect-ratio:16/9;
+      width:100%;
+      background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.45));
+      border:1px solid rgba(255,255,255,.8);
+      border-radius:32px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+    }
+    .slides-viewport{
+      position:relative;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      border-radius:var(--stage-radius);
+      background:
+        radial-gradient(circle at 1px 1px, rgba(90,110,125,.16) 1px, transparent 0) 0 0/20px 20px,
+        linear-gradient(135deg, rgba(255,255,255,.94), rgba(247,249,252,.96));
+      border:1px solid rgba(210,220,230,.95);
+    }
+    .slide{
+      position:absolute;
+      inset:0;
+      display:none;
+      padding:26px;
+      grid-template-rows:auto auto auto auto;
+      gap:16px;
+      overflow-y:auto;
+    }
+    .slide.active{
+      display:grid;
+    }
+    .slide-header{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-start;
+    }
+    .slide-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.85);
+      border:1px solid var(--line);
+      color:var(--chapter-primary);
+      font-size:14px;
+      font-weight:700;
+      box-shadow:0 8px 18px rgba(31,58,95,.08);
+    }
+    .slide-title h1{
+      margin:0;
+      font-size:clamp(26px,2.5vw,38px);
+      line-height:1.15;
+      letter-spacing:.01em;
+    }
+    .slide-title p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.65;
+      font-size:15px;
+      max-width:56ch;
+    }
+    .slide-count{
+      font-size:14px;
+      color:var(--muted);
+      text-align:right;
+      white-space:nowrap;
+      padding-top:4px;
+    }
+    .slide-main{
+      display:grid;
+      grid-template-columns:minmax(0,1.06fr) minmax(300px,.94fr);
+      gap:16px;
+      align-items:stretch;
+      min-height:auto;
+    }
+    .text-pane,.visual-pane{
+      min-width:0;
+      min-height:0;
+    }
+    .paper-panel,.hero-block,.visual-card,.practice-card,.mistake-card{
+      position:relative;
+      background:linear-gradient(180deg, rgba(255,253,248,.98), rgba(255,255,255,.94));
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow-soft);
+    }
+    .paper-panel,.hero-block{
+      padding:18px 18px 16px;
+    }
+    .content-grid{
+      display:grid;
+      gap:14px;
+    }
+    .content-grid.two-up{
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    }
+    .hero-block{
+      min-height:100%;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      justify-content:center;
+    }
+    .hero-block h2{
+      margin:0;
+      font-size:clamp(30px,3vw,44px);
+      line-height:1.14;
+    }
+    .eyebrow{
+      color:var(--chapter-primary);
+      font-weight:700;
+      letter-spacing:.04em;
+      font-size:14px;
+    }
+    .tagline{
+      margin:0;
+      font-size:18px;
+      line-height:1.7;
+      color:var(--muted);
+    }
+    .pill-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      color:var(--chapter-primary);
+      font-weight:700;
+    }
+    .pill.alt{
+      background:rgba(255,241,207,.92);
+      color:var(--ink);
+      font-weight:600;
+    }
+    .hero-note{
+      line-height:1.7;
+      color:var(--muted);
+      font-size:15px;
+      background:rgba(255,255,255,.78);
+      border:1px dashed rgba(122,140,154,.35);
+      border-radius:18px;
+      padding:14px 16px;
+    }
+    .mini-label{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 10px;
+      border-radius:999px;
+      background:var(--chapter-secondary);
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+    .slide-intro{
+      margin:0 0 4px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+    .check-list,.model-list,.answer-list,.question-list,.self-check-list{
+      margin:14px 0 0;
+      padding-left:22px;
+    }
+    .check-list li,.model-list li,.answer-list li,.question-list li{
+      margin-bottom:10px;
+      line-height:1.7;
+    }
+    .question-list li{
+      padding-bottom:6px;
+    }
+    .problem-text,.challenge-text,.next-note{
+      margin:14px 0 0;
+      line-height:1.8;
+      font-size:16px;
+    }
+    .challenge-title,.next-lesson{
+      margin:14px 0 0;
+      font-size:26px;
+      line-height:1.25;
+    }
+    .next-note{
+      color:var(--muted);
+    }
+    .quote-list ol{
+      list-style:none;
+      padding:0;
+      margin:14px 0 0;
+      display:grid;
+      gap:12px;
+    }
+    .quote-list li{
+      display:grid;
+      grid-template-columns:34px 1fr;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .order-badge{
+      width:34px;
+      height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      background:rgba(243,182,63,.28);
+      border:1px solid rgba(243,182,63,.62);
+      font-weight:800;
+      color:var(--ink);
+    }
+    .stack-list{
+      display:grid;
+      gap:12px;
+    }
+    .mistake-card{
+      padding:16px 18px 14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(253,248,244,.95));
+    }
+    .mistake-warm{
+      background:linear-gradient(180deg, rgba(255,244,246,.98), rgba(255,252,249,.95));
+    }
+    .mistake-card p{
+      margin:10px 0 0;
+      line-height:1.75;
+    }
+    .mistake-title{
+      font-weight:800;
+      color:var(--chapter-primary);
+      margin-bottom:6px;
+    }
+    .practice-grid{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:12px;
+    }
+    .practice-card{
+      padding:16px;
+      min-height:170px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      justify-content:space-between;
+    }
+    .practice-question{
+      margin:0;
+      font-size:21px;
+      line-height:1.55;
+      text-align:center;
+      font-weight:700;
+    }
+    .answer-area{
+      margin-top:16px;
+      display:grid;
+      gap:10px;
+    }
+    .toggle-answer{
+      appearance:none;
+      border:1px solid rgba(36,74,112,.18);
+      background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(250,250,248,.95));
+      border-radius:16px;
+      padding:11px 16px;
+      font-weight:700;
+      cursor:pointer;
+      color:var(--chapter-primary);
+      box-shadow:0 8px 18px rgba(31,58,95,.06);
+      align-self:start;
+    }
+    .answer-panel{
+      background:rgba(255,241,207,.5);
+      border:1px dashed rgba(179,126,28,.38);
+      border-radius:18px;
+      padding:14px 16px;
+      line-height:1.75;
+    }
+    .answer-title{
+      font-weight:800;
+      margin-bottom:6px;
+      color:var(--ink);
+    }
+    .answer-plain{
+      margin:0;
+    }
+    .practice-extension{
+      position:relative;
+      overflow:hidden;
+      margin-top:44px;
+      padding:clamp(24px,4vw,48px);
+      border:1px solid rgba(36,74,112,.14);
+      border-radius:32px;
+      background:
+        radial-gradient(circle at 92% 5%, rgba(243,182,63,.20), transparent 28%),
+        linear-gradient(145deg, rgba(255,255,255,.97), rgba(247,250,252,.96));
+      box-shadow:var(--shadow);
+    }
+    .practice-extension::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:radial-gradient(circle at 1px 1px, rgba(90,110,125,.10) 1px, transparent 0) 0 0/20px 20px;
+      mask-image:linear-gradient(90deg, transparent, #000 35%, #000);
+    }
+    .practice-extension > *{
+      position:relative;
+    }
+    .practice-extension-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:24px;
+      padding-bottom:28px;
+      border-bottom:1px solid rgba(36,74,112,.12);
+    }
+    .practice-eyebrow{
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .practice-extension h2{
+      margin:8px 0 10px;
+      font-size:clamp(30px,4vw,52px);
+      line-height:1.08;
+      letter-spacing:-.04em;
+    }
+    .practice-extension-head p,.practice-group-title p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+    .practice-summary{
+      flex:0 0 auto;
+      display:grid;
+      grid-template-columns:auto auto;
+      gap:3px 9px;
+      align-items:baseline;
+      min-width:150px;
+      padding:16px 18px;
+      border-radius:22px;
+      background:var(--chapter-primary);
+      color:white;
+      box-shadow:0 14px 30px rgba(31,58,95,.16);
+    }
+    .practice-summary strong{
+      font-size:28px;
+      line-height:1;
+    }
+    .practice-summary span{
+      font-size:13px;
+      opacity:.84;
+    }
+    .practice-group{
+      margin-top:34px;
+    }
+    .practice-group-title{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .practice-group-title > span{
+      display:grid;
+      place-items:center;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:rgba(243,182,63,.22);
+      color:var(--chapter-primary);
+      font-weight:900;
+    }
+    .practice-group-title h3{
+      margin:0 0 4px;
+      font-size:24px;
+    }
+    .practice-card-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    .practice-card-grid.bonus-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .extension-card{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-width:0;
+      min-height:280px;
+      padding:20px;
+      border:1px solid rgba(36,74,112,.13);
+      border-radius:24px;
+      background:rgba(255,255,255,.90);
+      box-shadow:0 12px 26px rgba(31,58,95,.08);
+    }
+    .extension-card.bonus-card{
+      border-color:rgba(179,126,28,.28);
+      background:linear-gradient(155deg, rgba(255,252,241,.98), rgba(255,247,222,.88));
+    }
+    .practice-card-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.04em;
+    }
+    .practice-check{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:var(--muted);
+      font-weight:650;
+      letter-spacing:0;
+      cursor:pointer;
+    }
+    .practice-check input{
+      width:18px;
+      height:18px;
+      accent-color:var(--chapter-primary);
+    }
+    .extension-card h4{
+      margin:0;
+      font-size:19px;
+      line-height:1.65;
+      font-weight:760;
+    }
+    .practice-hint{
+      border-top:1px dashed rgba(36,74,112,.18);
+      padding-top:12px;
+      color:var(--muted);
+    }
+    .practice-hint summary{
+      color:var(--chapter-primary);
+      font-weight:750;
+      cursor:pointer;
+    }
+    .practice-hint p{
+      margin:8px 0 0;
+      line-height:1.65;
+    }
+    .extension-card .answer-area{
+      margin-top:auto;
+    }
+    .visual-pane{
+      display:flex;
+      align-items:stretch;
+      min-height:0;
+    }
+    .visual-card{
+      width:100%;
+      padding:18px 18px 14px;
+      display:grid;
+      grid-template-rows:auto auto 1fr;
+      gap:10px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.95), rgba(248,250,252,.98));
+    }
+    .visual-card::before{
+      content:"";
+      position:absolute;
+      top:10px;
+      right:20px;
+      width:74px;
+      height:18px;
+      border-radius:999px;
+      background:rgba(243,182,63,.24);
+      transform:rotate(-6deg);
+    }
+    .visual-sticker{
+      display:inline-flex;
+      justify-self:start;
+      padding:8px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(151,167,180,.34);
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:800;
+      box-shadow:0 10px 20px rgba(31,58,95,.07);
+    }
+    .visual-caption{
+      color:var(--muted);
+      line-height:1.65;
+      font-size:14px;
+    }
+    .visual-board{
+      min-height:0;
+      border-radius:22px;
+      background:
+        radial-gradient(circle at 1px 1px, rgba(90,110,125,.14) 1px, transparent 0) 0 0/18px 18px,
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(244,247,250,.98));
+      border:1px solid rgba(213,226,236,.85);
+      padding:8px;
+    }
+    .visual-board svg{
+      width:100%;
+      height:100%;
+      display:block;
+    }
+    .slide-footer{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:14px;
+      align-items:center;
+    }
+    .slide-route{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .route-dot{
+      width:16px;
+      height:16px;
+      border-radius:999px;
+      border:2px solid rgba(123,141,155,.6);
+      background:#ffffff;
+      box-shadow:0 2px 6px rgba(31,58,95,.08);
+    }
+    .route-dot.active{
+      background:var(--chapter-accent);
+      border-color:var(--chapter-accent);
+    }
+    .progress{
+      position:relative;
+      height:14px;
+      border-radius:999px;
+      background:rgba(209,220,228,.58);
+      overflow:hidden;
+    }
+    .progress-bar{
+      position:absolute;
+      inset:0 auto 0 0;
+      width:0;
+      background:linear-gradient(90deg, var(--chapter-primary), var(--chapter-accent));
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+    .nav-row{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+    .nav-button{
+      appearance:none;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:11px 16px;
+      background:rgba(255,255,255,.84);
+      box-shadow:var(--shadow-soft);
+      cursor:pointer;
+      color:var(--ink);
+    }
+    .nav-button[disabled]{
+      opacity:.48;
+      cursor:not-allowed;
+      transform:none;
+    }
+    .notes-column{
+      position:sticky;
+      top:20px;
+    }
+    .notes-drawer{
+      background:linear-gradient(180deg, rgba(255,255,255,.93), rgba(250,251,253,.96));
+      border:1px solid rgba(215,226,234,.96);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .notes-header{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      padding:16px 18px;
+      background:rgba(255,255,255,.9);
+      border-bottom:1px solid var(--line);
+    }
+    .notes-header h2{
+      margin:0;
+      font-size:18px;
+    }
+    .notes-body{
+      padding:18px;
+      display:grid;
+      gap:16px;
+      max-height:calc(100vh - 150px);
+      overflow:auto;
+    }
+    .notes-section h3{
+      margin:0 0 8px;
+      font-size:14px;
+      color:var(--chapter-primary);
+    }
+    .notes-section p,.notes-section ul{
+      margin:0;
+      line-height:1.75;
+      color:var(--ink);
+      padding-left:18px;
+    }
+    .notes-section p{padding-left:0}
+    .notes-status{
+      font-size:13px;
+      color:var(--muted);
+    }
+    .notes-hidden .notes-column{
+      display:none;
+    }
+    .notes-hidden .stage-wrap{
+      grid-template-columns:minmax(0,1fr);
+    }
+    .visually-hidden{
+      position:absolute;
+      width:1px;
+      height:1px;
+      padding:0;
+      margin:-1px;
+      overflow:hidden;
+      clip:rect(0,0,0,0);
+      white-space:nowrap;
+      border:0;
+    }
+    .self-check-list{
+      list-style:none;
+      padding:0;
+      display:grid;
+      gap:12px;
+    }
+    .self-check-list label{
+      display:grid;
+      grid-template-columns:28px 1fr;
+      gap:12px;
+      align-items:flex-start;
+      padding:14px 16px;
+      border:1px solid rgba(213,226,236,.92);
+      border-radius:18px;
+      background:rgba(255,255,255,.84);
+      cursor:pointer;
+    }
+    .self-check-list input{
+      width:22px;
+      height:22px;
+      margin:2px 0 0;
+      accent-color:var(--chapter-primary);
+    }
+    .self-check-list span{
+      line-height:1.75;
+    }
+    @media (max-width:1160px){
+      .stage-wrap{
+        grid-template-columns:minmax(0,1fr);
+      }
+      .notes-column{
+        position:static;
+      }
+      .notes-body{
+        max-height:none;
+      }
+    }
+    @media (max-width:900px){
+      .stage-frame{
+        aspect-ratio:auto;
+        height:720px;
+        min-height:0;
+      }
+      .slide{
+        padding:18px;
+        overflow-y:auto;
+        grid-template-rows:auto auto auto auto;
+      }
+      .slide-main{
+        grid-template-columns:1fr;
+        min-height:auto;
+      }
+      .content-grid.two-up,
+      .practice-grid{
+        grid-template-columns:1fr;
+      }
+      .slide-footer{
+        grid-template-columns:1fr;
+      }
+      .slide-count{
+        text-align:left;
+      }
+      .practice-card-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+    }
+    @media (max-width:520px){
+      .deck-shell{
+        padding:12px 10px 24px;
+      }
+      .deck-topbar{
+        display:grid;
+        gap:8px;
+        margin-bottom:10px;
+      }
+      .topbar-group{
+        width:100%;
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:8px;
+      }
+      .topbar-group:last-child{
+        grid-template-columns:1.2fr 1fr 1fr;
+      }
+      .toolbar-link,.toolbar-button{
+        width:auto;
+        padding:8px 10px;
+        font-size:13px;
+      }
+      .deck-badge{
+        min-height:var(--touch);
+        justify-content:center;
+        padding:8px 10px;
+      }
+      .nav-button{
+        width:auto;
+        flex:1;
+      }
+      .stage-frame{
+        padding:10px;
+        height:780px;
+        min-height:0;
+      }
+      .slide-header{
+        flex-direction:column;
+      }
+      .slide-title h1{
+        font-size:28px;
+      }
+      .tagline{
+        font-size:16px;
+      }
+      .challenge-title,.next-lesson{
+        font-size:22px;
+      }
+      .practice-extension{
+        margin-top:28px;
+        padding:22px 16px;
+        border-radius:24px;
+      }
+      .practice-extension-head{
+        align-items:stretch;
+        flex-direction:column;
+      }
+      .practice-summary{
+        grid-template-columns:auto auto auto auto;
+        min-width:0;
+      }
+      .practice-card-grid,
+      .practice-card-grid.bonus-grid{
+        grid-template-columns:1fr;
+      }
+      .extension-card{
+        min-height:0;
+        padding:18px;
+      }
+    }
+    @media (prefers-reduced-motion: reduce){
+      *,*::before,*::after{
+        animation:none !important;
+        transition:none !important;
+        scroll-behavior:auto !important;
+      }
+    }
+    @media print{
+      body{
+        background:#ffffff;
+      }
+      .deck-shell{
+        max-width:none;
+        padding:0;
+      }
+      .deck-topbar,.notes-column,.nav-row{
+        display:none !important;
+      }
+      .stage-frame{
+        aspect-ratio:auto;
+        border:none;
+        box-shadow:none;
+        padding:0;
+        background:none;
+      }
+      .slides-viewport{
+        border:none;
+        background:none;
+        overflow:visible;
+      }
+      .slide{
+        position:static;
+        display:grid !important;
+        min-height:0;
+        page-break-after:always;
+        break-after:page;
+        padding:16mm;
+        border:1px solid #d7e2ea;
+      }
+      .slide:last-child{
+        page-break-after:auto;
+        break-after:auto;
+      }
+      .slide-main{
+        grid-template-columns:1fr 1fr;
+      }
+      .progress,.route-dot{
+        print-color-adjust:exact;
+        -webkit-print-color-adjust:exact;
+      }
+      .practice-extension{
+        box-shadow:none;
+      }
+      .extension-card{
+        break-inside:avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck-shell notes-open" id="deckApp">
+    <div class="deck-topbar">
+      <div class="topbar-group">
+        <a class="toolbar-link" href="../index.html">返回总目录</a>
+        <button class="toolbar-button" id="practiceJump" type="button">强化练习</button>
+      </div>
+      <div class="topbar-group">
+        <div class="deck-badge"><strong>第 8 章</strong><span>1课时</span></div>
+        <button class="toolbar-button" id="notesToggle" type="button" aria-expanded="true" aria-controls="notesDrawer">隐藏教案</button>
+        <button class="toolbar-button" id="fullscreenToggle" type="button">全屏</button>
+      </div>
+    </div>
+    <div class="stage-wrap">
+      <section class="stage-column">
+        <div class="stage-frame" id="stageFrame">
+          <div class="slides-viewport" id="slidesViewport" tabindex="0" aria-label="可能性 课件">
+
+                  <section class="slide active" id="slide-1" data-slide-number="1" aria-roledescription="slide" aria-label="封面，第 1 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>封面</h1>
+                        <p>不是“猜一猜”，而是有依据地比较哪件事更可能发生。</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">1</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <div class="hero-block">
+          <div class="eyebrow">第 8 章 · 2026 秋季五年级数学</div>
+          <h2>可能性</h2>
+          <p class="tagline">不是“猜一猜”，而是有依据地比较哪件事更可能发生。</p>
+          <div class="pill-row">
+            <span class="pill">建议用时：1课时</span>
+            <span class="pill alt">章节聚焦：理解事件发生的可能大小，会用语言、分数或简单统计描述随机事件</span>
+          </div>
+          <div class="hero-note">
+            <strong>九站结构：</strong>封面 -> 学习目标 + 5分钟诊断 -> 核心概念/模型 -> 例题精讲 -> 易错门诊 -> 引导练习 -> 挑战/应用 -> 小结/自检 -> 作业/下节衔接
+          </div>
+        </div>
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">摸球袋</div>
+      <div class="visual-caption">比较结果数，再比较可能性大小。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="可能性摸球模型" xmlns="http://www.w3.org/2000/svg">
+      <path d="M115 72 H305 C302 86 294 102 290 112 L326 220 C334 242 318 254 210 252 C102 254 86 242 94 220 L130 112 C126 102 118 86 115 72 Z" fill="#F8DFE8" stroke="#A04E62" stroke-width="4"/>
+      <rect x="150" y="50" width="120" height="28" rx="12" fill="#A04E62"/>
+      <circle cx="162" cy="128" r="16" fill="#d54b62"/>
+      <circle cx="212" cy="114" r="16" fill="#d54b62"/>
+      <circle cx="258" cy="148" r="16" fill="#d54b62"/>
+      <circle cx="178" cy="176" r="16" fill="#f1c54b"/>
+      <circle cx="238" cy="192" r="16" fill="#f1c54b"/>
+      <circle cx="210" cy="222" r="16" fill="#A04E62"/>
+      <text x="344" y="114" font-size="16" fill="#1f2933">红 3</text><text x="344" y="144" font-size="16" fill="#1f2933">黄 2</text><text x="344" y="174" font-size="16" fill="#1f2933">蓝 1</text>
+    </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot active" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:11.11111111111111%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+                  <section class="slide" id="slide-2" data-slide-number="2" aria-roledescription="slide" aria-label="学习目标 + 5分钟诊断，第 2 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>学习目标 + 5分钟诊断</h1>
+                        <p>先看目标，再用 3 个小问题判断起点。</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">2</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <div class="content-grid two-up">
+          <section class="paper-panel">
+            <div class="mini-label">本章目标</div>
+            <ul class="check-list"><li>会用“一定、可能、不可能”描述事件。</li><li>能比较等可能情境下不同结果的大小。</li><li>会用简单试验结果支持判断。 </li></ul>
+          </section>
+          <section class="paper-panel">
+            <div class="mini-label">5 分钟诊断</div>
+            <ol class="question-list">
+
+                    <li>
+                      <div class="question-text">太阳明天从西边升起，属于哪类事件？</div>
+                    </li>
+
+                    <li>
+                      <div class="question-text">掷一个标准骰子，掷出奇数的可能性是多少？</div>
+                    </li>
+
+                    <li>
+                      <div class="question-text">袋中红球 4 个、蓝球 1 个，摸到红球更可能吗？</div>
+                    </li>
+
+            </ol>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-diagnostic-answer" aria-expanded="false" aria-controls="probability-diagnostic-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-diagnostic-answer" hidden>
+        <div class="answer-title">诊断参考答案</div>
+        <ol class="answer-list"><li><strong>1.</strong> 不可能。</li><li><strong>2.</strong> 3/6，也就是1/2。</li><li><strong>3.</strong> 更可能。</li></ol>
+      </div>
+    </div>
+
+          </section>
+        </div>
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">摸球袋</div>
+      <div class="visual-caption">比较结果数，再比较可能性大小。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="可能性摸球模型" xmlns="http://www.w3.org/2000/svg">
+      <path d="M115 72 H305 C302 86 294 102 290 112 L326 220 C334 242 318 254 210 252 C102 254 86 242 94 220 L130 112 C126 102 118 86 115 72 Z" fill="#F8DFE8" stroke="#A04E62" stroke-width="4"/>
+      <rect x="150" y="50" width="120" height="28" rx="12" fill="#A04E62"/>
+      <circle cx="162" cy="128" r="16" fill="#d54b62"/>
+      <circle cx="212" cy="114" r="16" fill="#d54b62"/>
+      <circle cx="258" cy="148" r="16" fill="#d54b62"/>
+      <circle cx="178" cy="176" r="16" fill="#f1c54b"/>
+      <circle cx="238" cy="192" r="16" fill="#f1c54b"/>
+      <circle cx="210" cy="222" r="16" fill="#A04E62"/>
+      <text x="344" y="114" font-size="16" fill="#1f2933">红 3</text><text x="344" y="144" font-size="16" fill="#1f2933">黄 2</text><text x="344" y="174" font-size="16" fill="#1f2933">蓝 1</text>
+    </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot" aria-hidden="true"></span><span class="route-dot active" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:22.22222222222222%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+                  <section class="slide" id="slide-3" data-slide-number="3" aria-roledescription="slide" aria-label="核心概念/模型，第 3 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>核心概念/模型</h1>
+                        <p>可能性大小来自“结果数比较”，不是凭感觉</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">3</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <p class="slide-intro">先从图像和模型出发，再把规则说清楚。</p>
+        <section class="paper-panel">
+          <div class="mini-label">核心要点</div>
+          <ul class="model-list"><li>先判断事件属于一定、可能还是不可能。</li><li>在等可能的前提下，想要的结果越多，可能性越大。</li><li>试验次数越多，统计结果通常越接近理论判断。 </li></ul>
+        </section>
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">摸球袋</div>
+      <div class="visual-caption">比较结果数，再比较可能性大小。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="可能性摸球模型" xmlns="http://www.w3.org/2000/svg">
+      <path d="M115 72 H305 C302 86 294 102 290 112 L326 220 C334 242 318 254 210 252 C102 254 86 242 94 220 L130 112 C126 102 118 86 115 72 Z" fill="#F8DFE8" stroke="#A04E62" stroke-width="4"/>
+      <rect x="150" y="50" width="120" height="28" rx="12" fill="#A04E62"/>
+      <circle cx="162" cy="128" r="16" fill="#d54b62"/>
+      <circle cx="212" cy="114" r="16" fill="#d54b62"/>
+      <circle cx="258" cy="148" r="16" fill="#d54b62"/>
+      <circle cx="178" cy="176" r="16" fill="#f1c54b"/>
+      <circle cx="238" cy="192" r="16" fill="#f1c54b"/>
+      <circle cx="210" cy="222" r="16" fill="#A04E62"/>
+      <text x="344" y="114" font-size="16" fill="#1f2933">红 3</text><text x="344" y="144" font-size="16" fill="#1f2933">黄 2</text><text x="344" y="174" font-size="16" fill="#1f2933">蓝 1</text>
+    </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot active" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:33.33333333333333%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+                  <section class="slide" id="slide-4" data-slide-number="4" aria-roledescription="slide" aria-label="例题精讲，第 4 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>例题精讲</h1>
+                        <p>完整示范一道典型题，先说思路，再写步骤。</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">4</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <section class="paper-panel">
+          <div class="mini-label">题目</div>
+          <p class="problem-text">袋中有红球 3 个、黄球 2 个、蓝球 1 个，摸 1 个球，哪种颜色最可能？摸到红球的可能性是多少？</p>
+        </section>
+        <section class="paper-panel">
+          <div class="mini-label">示范步骤</div>
+
+    <div class="quote-list">
+      <div class="mini-label">一步一步想</div>
+      <ol>
+        <li><span class="order-badge">1</span><span>总球数是 6 个。</span></li><li><span class="order-badge">2</span><span>红球数量最多，所以最可能摸到红球。</span></li><li><span class="order-badge">3</span><span>摸到红球的可能性是 3/6，也就是 1/2。 </span></li>
+      </ol>
+    </div>
+
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-worked-answer" aria-expanded="false" aria-controls="probability-worked-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-worked-answer" hidden>
+        <div class="answer-title">例题答案</div>
+        <p class="answer-plain">红球最可能；摸到红球的可能性是 1/2。</p>
+      </div>
+    </div>
+
+        </section>
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">摸球袋</div>
+      <div class="visual-caption">比较结果数，再比较可能性大小。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="可能性摸球模型" xmlns="http://www.w3.org/2000/svg">
+      <path d="M115 72 H305 C302 86 294 102 290 112 L326 220 C334 242 318 254 210 252 C102 254 86 242 94 220 L130 112 C126 102 118 86 115 72 Z" fill="#F8DFE8" stroke="#A04E62" stroke-width="4"/>
+      <rect x="150" y="50" width="120" height="28" rx="12" fill="#A04E62"/>
+      <circle cx="162" cy="128" r="16" fill="#d54b62"/>
+      <circle cx="212" cy="114" r="16" fill="#d54b62"/>
+      <circle cx="258" cy="148" r="16" fill="#d54b62"/>
+      <circle cx="178" cy="176" r="16" fill="#f1c54b"/>
+      <circle cx="238" cy="192" r="16" fill="#f1c54b"/>
+      <circle cx="210" cy="222" r="16" fill="#A04E62"/>
+      <text x="344" y="114" font-size="16" fill="#1f2933">红 3</text><text x="344" y="144" font-size="16" fill="#1f2933">黄 2</text><text x="344" y="174" font-size="16" fill="#1f2933">蓝 1</text>
+    </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot active" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:44.44444444444444%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+                  <section class="slide" id="slide-5" data-slide-number="5" aria-roledescription="slide" aria-label="易错门诊，第 5 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>易错门诊</h1>
+                        <p>把常见错误摆出来，练会“哪里错、怎么改”。</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">5</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <section class="stack-list">
+
+                <article class="mistake-card ">
+                  <div class="mistake-title">误区 1</div>
+                  <p><strong>常见说法：</strong>摸过红球后，下次一定不是红球</p>
+                  <p><strong>修正建议：</strong>若每次放回，下一次可能性不变。</p>
+                </article>
+
+                <article class="mistake-card mistake-warm">
+                  <div class="mistake-title">误区 2</div>
+                  <p><strong>常见说法：</strong>结果少就一定不可能</p>
+                  <p><strong>修正建议：</strong>结果少可能只是“较小”，不是“不可能”。</p>
+                </article>
+
+                <article class="mistake-card ">
+                  <div class="mistake-title">误区 3</div>
+                  <p><strong>常见说法：</strong>试验 3 次都没出现，就是不会出现</p>
+                  <p><strong>修正建议：</strong>样本太少，不能代替长期规律。 </p>
+                </article>
+
+        </section>
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">摸球袋</div>
+      <div class="visual-caption">比较结果数，再比较可能性大小。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="可能性摸球模型" xmlns="http://www.w3.org/2000/svg">
+      <path d="M115 72 H305 C302 86 294 102 290 112 L326 220 C334 242 318 254 210 252 C102 254 86 242 94 220 L130 112 C126 102 118 86 115 72 Z" fill="#F8DFE8" stroke="#A04E62" stroke-width="4"/>
+      <rect x="150" y="50" width="120" height="28" rx="12" fill="#A04E62"/>
+      <circle cx="162" cy="128" r="16" fill="#d54b62"/>
+      <circle cx="212" cy="114" r="16" fill="#d54b62"/>
+      <circle cx="258" cy="148" r="16" fill="#d54b62"/>
+      <circle cx="178" cy="176" r="16" fill="#f1c54b"/>
+      <circle cx="238" cy="192" r="16" fill="#f1c54b"/>
+      <circle cx="210" cy="222" r="16" fill="#A04E62"/>
+      <text x="344" y="114" font-size="16" fill="#1f2933">红 3</text><text x="344" y="144" font-size="16" fill="#1f2933">黄 2</text><text x="344" y="174" font-size="16" fill="#1f2933">蓝 1</text>
+    </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot active" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:55.55555555555556%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+                  <section class="slide" id="slide-6" data-slide-number="6" aria-roledescription="slide" aria-label="引导练习，第 6 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>引导练习</h1>
+                        <p>做题时先说方法，再给答案。</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">6</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <div class="practice-grid">
+
+                <section class="practice-card">
+                  <div class="mini-label">练习 1</div>
+                  <p class="practice-question">掷硬币 1 次，正反面谁更可能</p>
+                </section>
+
+                <section class="practice-card">
+                  <div class="mini-label">练习 2</div>
+                  <p class="practice-question">转盘 8 等份中红色 2 份，转到红色概率</p>
+                </section>
+
+                <section class="practice-card">
+                  <div class="mini-label">练习 3</div>
+                  <p class="practice-question">盒中 5 白 5 黑，摸到白球</p>
+                </section>
+
+        </div>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-practice-answer" aria-expanded="false" aria-controls="probability-practice-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-practice-answer" hidden>
+        <div class="answer-title">引导练习答案</div>
+        <ol class="answer-list"><li><strong>1.</strong> 一样可能。</li><li><strong>2.</strong> 2/8=1/4</li><li><strong>3.</strong> 可能性是1/2。</li></ol>
+      </div>
+    </div>
+
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">摸球袋</div>
+      <div class="visual-caption">比较结果数，再比较可能性大小。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="可能性摸球模型" xmlns="http://www.w3.org/2000/svg">
+      <path d="M115 72 H305 C302 86 294 102 290 112 L326 220 C334 242 318 254 210 252 C102 254 86 242 94 220 L130 112 C126 102 118 86 115 72 Z" fill="#F8DFE8" stroke="#A04E62" stroke-width="4"/>
+      <rect x="150" y="50" width="120" height="28" rx="12" fill="#A04E62"/>
+      <circle cx="162" cy="128" r="16" fill="#d54b62"/>
+      <circle cx="212" cy="114" r="16" fill="#d54b62"/>
+      <circle cx="258" cy="148" r="16" fill="#d54b62"/>
+      <circle cx="178" cy="176" r="16" fill="#f1c54b"/>
+      <circle cx="238" cy="192" r="16" fill="#f1c54b"/>
+      <circle cx="210" cy="222" r="16" fill="#A04E62"/>
+      <text x="344" y="114" font-size="16" fill="#1f2933">红 3</text><text x="344" y="144" font-size="16" fill="#1f2933">黄 2</text><text x="344" y="174" font-size="16" fill="#1f2933">蓝 1</text>
+    </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot active" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:66.66666666666666%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+                  <section class="slide" id="slide-7" data-slide-number="7" aria-roledescription="slide" aria-label="挑战/应用，第 7 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>挑战/应用</h1>
+                        <p>把知识带回真实情境，练习会用。</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">7</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <section class="paper-panel">
+          <div class="mini-label">任务</div>
+          <h3 class="challenge-title">游戏公平吗？</h3>
+          <p class="challenge-text">甲掷一个骰子，掷出 1、2、3 算赢；乙掷出 4、5、6 算赢。这个游戏公平吗？如果改成甲赢 1、2，乙赢 3、4、5、6 呢？</p>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-challenge-answer" aria-expanded="false" aria-controls="probability-challenge-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-challenge-answer" hidden>
+        <div class="answer-title">挑战参考答案</div>
+        <p class="answer-plain">前者公平，后者不公平，乙更容易赢。</p>
+      </div>
+    </div>
+
+        </section>
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">公平判断</div>
+      <div class="visual-caption">结果数相同就公平；结果数不同就不公平。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="骰子公平性比较" xmlns="http://www.w3.org/2000/svg">
+              <rect x="48" y="36" width="324" height="208" rx="20" fill="#ffffff" stroke="#d6e2ec" stroke-width="2"/>
+
+                    <text x="86" y="84" font-size="22" font-weight="500" fill="#1f2933">甲赢: 1,2,3</text>
+
+                    <text x="86" y="124" font-size="22" font-weight="500" fill="#1f2933">乙赢: 4,5,6</text>
+
+                    <text x="86" y="164" font-size="22" font-weight="500" fill="#1f2933">各 3 种结果</text>
+
+                    <text x="86" y="204" font-size="24" font-weight="700" fill="#A04E62">所以公平</text>
+
+            </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot active" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:77.77777777777779%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+                  <section class="slide" id="slide-8" data-slide-number="8" aria-roledescription="slide" aria-label="小结/自检，第 8 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>小结/自检</h1>
+                        <p>复盘“我会不会”，形成清晰的收口感。</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">8</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <section class="paper-panel">
+          <div class="mini-label">自检清单</div>
+          <ul class="self-check-list">
+
+                  <li>
+                    <label>
+                      <input type="checkbox" data-check-key="probability-summary-0">
+                      <span>我能区分一定、可能、不可能。</span>
+                    </label>
+                  </li>
+
+                  <li>
+                    <label>
+                      <input type="checkbox" data-check-key="probability-summary-1">
+                      <span>我会比较不同结果对应的可能性大小。</span>
+                    </label>
+                  </li>
+
+                  <li>
+                    <label>
+                      <input type="checkbox" data-check-key="probability-summary-2">
+                      <span>我知道用试验结果来支持判断，但不能迷信少量样本。 </span>
+                    </label>
+                  </li>
+
+          </ul>
+        </section>
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">摸球袋</div>
+      <div class="visual-caption">比较结果数，再比较可能性大小。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="可能性摸球模型" xmlns="http://www.w3.org/2000/svg">
+      <path d="M115 72 H305 C302 86 294 102 290 112 L326 220 C334 242 318 254 210 252 C102 254 86 242 94 220 L130 112 C126 102 118 86 115 72 Z" fill="#F8DFE8" stroke="#A04E62" stroke-width="4"/>
+      <rect x="150" y="50" width="120" height="28" rx="12" fill="#A04E62"/>
+      <circle cx="162" cy="128" r="16" fill="#d54b62"/>
+      <circle cx="212" cy="114" r="16" fill="#d54b62"/>
+      <circle cx="258" cy="148" r="16" fill="#d54b62"/>
+      <circle cx="178" cy="176" r="16" fill="#f1c54b"/>
+      <circle cx="238" cy="192" r="16" fill="#f1c54b"/>
+      <circle cx="210" cy="222" r="16" fill="#A04E62"/>
+      <text x="344" y="114" font-size="16" fill="#1f2933">红 3</text><text x="344" y="144" font-size="16" fill="#1f2933">黄 2</text><text x="344" y="174" font-size="16" fill="#1f2933">蓝 1</text>
+    </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot active" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:88.88888888888889%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+                  <section class="slide" id="slide-9" data-slide-number="9" aria-roledescription="slide" aria-label="作业/下节衔接，第 9 页，共 9 页">
+                    <header class="slide-header">
+                      <div class="slide-title">
+                        <div class="slide-kicker">第 8 章 · 可能性</div>
+                        <h1>作业/下节衔接</h1>
+                        <p>带走可以独立完成的练习，也知道下一章要去哪里。</p>
+                      </div>
+                      <div class="slide-count"><span class="counter-current">9</span> / 9</div>
+                    </header>
+                    <div class="slide-main">
+                      <div class="text-pane">
+        <div class="content-grid two-up">
+          <section class="paper-panel">
+            <div class="mini-label">课后任务</div>
+
+    <div class="quote-list">
+      <div class="mini-label">作业安排</div>
+      <ol>
+        <li><span class="order-badge">1</span><span>设计一个摸球或转盘小游戏，并判断是否公平。</span></li><li><span class="order-badge">2</span><span>完成 2 题分数形式表示可能性。</span></li><li><span class="order-badge">3</span><span>预习总复习：整理本学期最容易错的 3 个知识点。 </span></li>
+      </ol>
+    </div>
+
+          </section>
+          <section class="paper-panel">
+            <div class="mini-label">下节衔接</div>
+            <p class="next-lesson">总复习</p>
+            <p class="next-note">建议先口述“今天最重要的一句话”，再开始预习。</p>
+          </section>
+        </div>
+      </div>
+                      <aside class="visual-pane">
+    <div class="visual-card">
+      <div class="visual-sticker">摸球袋</div>
+      <div class="visual-caption">比较结果数，再比较可能性大小。</div>
+      <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="可能性摸球模型" xmlns="http://www.w3.org/2000/svg">
+      <path d="M115 72 H305 C302 86 294 102 290 112 L326 220 C334 242 318 254 210 252 C102 254 86 242 94 220 L130 112 C126 102 118 86 115 72 Z" fill="#F8DFE8" stroke="#A04E62" stroke-width="4"/>
+      <rect x="150" y="50" width="120" height="28" rx="12" fill="#A04E62"/>
+      <circle cx="162" cy="128" r="16" fill="#d54b62"/>
+      <circle cx="212" cy="114" r="16" fill="#d54b62"/>
+      <circle cx="258" cy="148" r="16" fill="#d54b62"/>
+      <circle cx="178" cy="176" r="16" fill="#f1c54b"/>
+      <circle cx="238" cy="192" r="16" fill="#f1c54b"/>
+      <circle cx="210" cy="222" r="16" fill="#A04E62"/>
+      <text x="344" y="114" font-size="16" fill="#1f2933">红 3</text><text x="344" y="144" font-size="16" fill="#1f2933">黄 2</text><text x="344" y="174" font-size="16" fill="#1f2933">蓝 1</text>
+    </svg></div>
+    </div>
+  </aside>
+                    </div>
+                    <footer class="slide-footer">
+                      <div class="slide-route">
+                        <span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot" aria-hidden="true"></span><span class="route-dot active" aria-hidden="true"></span>
+                      </div>
+                      <div class="progress" aria-hidden="true">
+                        <div class="progress-bar" style="width:100%"></div>
+                      </div>
+                      <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
+                    </footer>
+                  </section>
+
+          </div>
+        </div>
+        <div class="nav-row" aria-label="翻页控制">
+          <button class="nav-button" type="button" id="prevButton" aria-label="上一页">上一页</button>
+          <button class="nav-button" type="button" id="nextButton" aria-label="下一页">下一页</button>
+        </div>
+      </section>
+      <aside class="notes-column" id="notesDrawer">
+        <div class="notes-drawer">
+          <div class="notes-header">
+            <div>
+              <h2>教师提示</h2>
+              <div class="notes-status" id="notesHeading">第 1 页 · 封面</div>
+            </div>
+          </div>
+          <div class="notes-body" id="notesBody">
+    <section class="notes-section">
+      <h3>时间</h3>
+      <p>3分钟</p>
+    </section>
+    <section class="notes-section">
+      <h3>教学提示</h3>
+      <ul><li>请学生先读出《可能性》并说说最先想到的知识点</li><li>用“不是“猜一猜”，而是有依据地比较哪件事更可能发生。”串起本章学习氛围</li><li>提醒本课会按九站结构推进，先诊断再讲解再练习</li></ul>
+    </section>
+    <section class="notes-section">
+      <h3>预期回应</h3>
+      <ul><li>学生能说出与“可能性”有关的生活或旧知场景</li><li>学生知道本章聚焦：理解事件发生的可能大小，会用语言、分数或简单统计描述随机事件</li></ul>
+    </section>
+    <section class="notes-section">
+      <h3>节奏安排</h3>
+      <p>单课时内封面控制在3分钟左右，迅速进入诊断页。</p>
+    </section>
+  </div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="practice-extension" id="practiceExtension" aria-labelledby="practiceTitle">
+      <header class="practice-extension-head">
+        <div>
+          <div class="practice-eyebrow">HTML 专属 · 课后加练</div>
+          <h2 id="practiceTitle">强化练习题 + 附加题</h2>
+          <p>先独立完成，再查看提示；订正后勾选“已完成”。完成状态会保存在当前浏览器。</p>
+        </div>
+        <div class="practice-summary"><strong>6</strong><span>道强化</span><strong>2</strong><span>道附加</span></div>
+      </header>
+      <section class="practice-group" aria-labelledby="reinforcementTitle">
+        <div class="practice-group-title">
+          <span>01</span>
+          <div><h3 id="reinforcementTitle">强化练习题</h3><p>巩固本章核心方法，注意写清关键步骤。</p></div>
+        </div>
+        <div class="practice-card-grid">
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 1</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-1">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>袋中有 5 个红球、3 个蓝球、2 个黄球，任摸一个球，摸到红球的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>用红球数除以球的总数。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-1-answer" aria-expanded="false" aria-controls="probability-reinforcement-1-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-1-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">5/10，即 1/2</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 2</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-2">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>掷一个标准六面骰子，点数大于 4 的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>符合条件的是 5 和 6。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-2-answer" aria-expanded="false" aria-controls="probability-reinforcement-2-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-2-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">2/6，即 1/3</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 3</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-3">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>抛一枚均匀硬币，正面朝上的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>正面和反面是两种等可能结果。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-3-answer" aria-expanded="false" aria-controls="probability-reinforcement-3-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-3-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">1/2</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 4</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-4">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>盒中只有白球。任摸一个球，摸到白球属于“一定”“可能”还是“不可能”？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>盒中没有其他颜色。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-4-answer" aria-expanded="false" aria-controls="probability-reinforcement-4-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-4-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">一定</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 5</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-5">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>一个转盘被平均分成 8 格，其中 3 格是绿色。指针停在绿色区域的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>每一格大小相同。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-5-answer" aria-expanded="false" aria-controls="probability-reinforcement-5-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-5-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">3/8</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 6</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-6">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>摸球试验做了 50 次，其中 31 次摸到红球。红球出现的试验频率是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>用出现次数除以试验总次数。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-6-answer" aria-expanded="false" aria-controls="probability-reinforcement-6-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-6-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">31/50，即 0.62</p>
+      </div>
+    </div>
+
+    </article>
+
+        </div>
+      </section>
+      <section class="practice-group bonus-group" aria-labelledby="bonusTitle">
+        <div class="practice-group-title">
+          <span>02</span>
+          <div><h3 id="bonusTitle">附加题</h3><p>需要多想一步，鼓励画图、列表或尝试不同方法。</p></div>
+        </div>
+        <div class="practice-card-grid bonus-grid">
+
+    <article class="extension-card bonus-card" data-practice-kind="bonus">
+      <div class="practice-card-head">
+        <span>附加题 1</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-bonus-1">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>同时抛两枚均匀硬币，恰好一枚正面朝上的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>列出正正、正反、反正、反反。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-bonus-1-answer" aria-expanded="false" aria-controls="probability-bonus-1-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-bonus-1-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">2/4，即 1/2</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card bonus-card" data-practice-kind="bonus">
+      <div class="practice-card-head">
+        <span>附加题 2</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-bonus-2">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>袋中有 4 个红球和 2 个蓝球。至少再放入多少个蓝球，才能使摸到红球和蓝球的可能性相等？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>两种颜色数量相等时可能性相等。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-bonus-2-answer" aria-expanded="false" aria-controls="probability-bonus-2-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-bonus-2-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">2 个蓝球</p>
+      </div>
+    </div>
+
+    </article>
+
+        </div>
+      </section>
+    </section>
+
+    <div class="visually-hidden" aria-live="polite" id="liveRegion"></div>
+  </main>
+  <script>
+    (() => {
+      const TOTAL = 9;
+      const slideMeta = [{"index":1,"title":"封面","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>3分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>请学生先读出《可能性》并说说最先想到的知识点</li><li>用“不是“猜一猜”，而是有依据地比较哪件事更可能发生。”串起本章学习氛围</li><li>提醒本课会按九站结构推进，先诊断再讲解再练习</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>学生能说出与“可能性”有关的生活或旧知场景</li><li>学生知道本章聚焦：理解事件发生的可能大小，会用语言、分数或简单统计描述随机事件</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>单课时内封面控制在3分钟左右，迅速进入诊断页。</p>\n    </section>\n  "},{"index":2,"title":"学习目标 + 5分钟诊断","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>6分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>先读学习目标，再逐题口答诊断</li><li>每题追问“你为什么这样想”，用错因决定后面讲解节奏</li><li>把学生卡住的地方记在板书角落，后面回看</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>不可能。</li><li>3/6，也就是1/2。</li><li>更可能。</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>目标2分钟，诊断4分钟；若三题错两题以上，本章节奏要放慢。</p>\n    </section>\n  "},{"index":3,"title":"核心概念/模型","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>8分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>围绕“可能性大小来自“结果数比较”，不是凭感觉”先看图再说规则</li><li>至少追问一次“为什么能这样做/这样判断”</li><li>请学生用自己的话复述三个要点</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>先判断事件属于一定、可能还是不可能。</li><li>在等可能的前提下，想要的结果越多，可能性越大。</li><li>试验次数越多，统计结果通常越接近理论判断。 </li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>单课时中本页讲清后立刻进入例题，避免停留过久。</p>\n    </section>\n  "},{"index":4,"title":"例题精讲","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>9分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>先让学生独立想30秒，再展示完整示范</li><li>每一步都对应回模型，不只报算式结果</li><li>答案出来后立刻做一次合理性检查</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>总球数是 6 个。</li><li>红球数量最多，所以最可能摸到红球。</li><li>摸到红球的可能性是 3/6，也就是 1/2。 </li><li>答案：红球最可能；摸到红球的可能性是 1/2。</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>审题3分钟，示范4分钟，复述与检查2分钟。</p>\n    </section>\n  "},{"index":5,"title":"易错门诊","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>7分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>逐条判断“错在概念、步骤还是表达”</li><li>请学生把错误改成正确说法或正确做法</li><li>把最容易混淆的一条写成提醒口令</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>摸过红球后，下次一定不是红球 -&gt; 若每次放回，下一次可能性不变。</li><li>结果少就一定不可能 -&gt; 结果少可能只是“较小”，不是“不可能”。</li><li>试验 3 次都没出现，就是不会出现 -&gt; 样本太少，不能代替长期规律。 </li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>误区1和误区2优先必讲，误区3按学生基础弹性处理。</p>\n    </section>\n  "},{"index":6,"title":"引导练习","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>8分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>每题先给1分钟独立思考，再请学生说方法</li><li>优先听学生是否说出本章关键词或模型</li><li>遇到卡住时只给提示，不直接报答案</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>掷硬币 1 次，正反面谁更可能 -&gt; 一样可能。</li><li>转盘 8 等份中红色 2 份，转到红色概率 -&gt; 2/8=1/4</li><li>盒中 5 白 5 黑，摸到白球 -&gt; 可能性是1/2。</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>三题按“基础 -&gt; 变式 -&gt; 解释”推进，控制好停顿节奏。</p>\n    </section>\n  "},{"index":7,"title":"挑战/应用","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>7分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>先判断这题要调用哪一种方法：理解事件发生的可能大小，会用语言、分数或简单统计描述随机事件</li><li>开放任务优先评价解释是否清楚</li><li>追问“如果数据变化，方法还有效吗”</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>前者公平，后者不公平，乙更容易赢。</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>先口头策略，后落笔解答，最后回看答案表达是否完整。</p>\n    </section>\n  "},{"index":8,"title":"小结/自检","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>5分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>让学生对三条自检逐条打勾或打问号</li><li>如果有“半会”的点，马上说出补救办法</li><li>让学生说出今天最想带走的一句话</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>我能区分一定、可能、不可能。</li><li>我会比较不同结果对应的可能性大小。</li><li>我知道用试验结果来支持判断，但不能迷信少量样本。 </li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>用复盘收口，不再引入新例题；双课时中可作为第二课时结尾页。</p>\n    </section>\n  "},{"index":9,"title":"作业/下节衔接","notesHtml":"\n    <section class=\"notes-section\">\n      <h3>时间</h3>\n      <p>4分钟</p>\n    </section>\n    <section class=\"notes-section\">\n      <h3>教学提示</h3>\n      <ul><li>逐项确认作业要求，特别提醒写出过程或解释</li><li>说明下节将进入《总复习》</li><li>请学生口头总结今天最重要的一句话后结束</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>预期回应</h3>\n      <ul><li>设计一个摸球或转盘小游戏，并判断是否公平。</li><li>完成 2 题分数形式表示可能性。</li><li>预习总复习：整理本学期最容易错的 3 个知识点。 </li><li>下节衔接：总复习</li></ul>\n    </section>\n    <section class=\"notes-section\">\n      <h3>节奏安排</h3>\n      <p>最后1分钟只做收束与预告，不再增加新知识。</p>\n    </section>\n  "}];
+      const app = document.getElementById("deckApp");
+      const viewport = document.getElementById("slidesViewport");
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const prevButton = document.getElementById("prevButton");
+      const nextButton = document.getElementById("nextButton");
+      const notesToggle = document.getElementById("notesToggle");
+      const fullscreenToggle = document.getElementById("fullscreenToggle");
+      const practiceJump = document.getElementById("practiceJump");
+      const notesBody = document.getElementById("notesBody");
+      const notesHeading = document.getElementById("notesHeading");
+      const liveRegion = document.getElementById("liveRegion");
+      const checkboxes = Array.from(document.querySelectorAll("[data-check-key]"));
+      let current = 1;
+      let touchStartX = null;
+      let touchStartY = null;
+
+      function readHash() {
+        const match = window.location.hash.match(/^#slide-(\d+)$/);
+        if (!match) return 1;
+        const num = Number(match[1]);
+        return Number.isFinite(num) && num >= 1 && num <= TOTAL ? num : 1;
+      }
+
+      function writeHash(index) {
+        history.replaceState(null, "", "#slide-" + index);
+      }
+
+      function updateButtons() {
+        prevButton.disabled = current === 1;
+        nextButton.disabled = current === TOTAL;
+      }
+
+      function updateNotes(index) {
+        const meta = slideMeta[index - 1];
+        notesHeading.textContent = "第 " + index + " 页 · " + meta.title;
+        notesBody.innerHTML = meta.notesHtml;
+      }
+
+      function announce(index) {
+        const meta = slideMeta[index - 1];
+        liveRegion.textContent = "已切换到第 " + index + " 页，共 " + TOTAL + " 页：" + meta.title;
+      }
+
+      function setSlide(index, options = {}) {
+        current = index;
+        slides.forEach((slide, slideIndex) => {
+          const active = slideIndex === index - 1;
+          slide.classList.toggle("active", active);
+          slide.setAttribute("aria-hidden", active ? "false" : "true");
+        });
+        updateButtons();
+        updateNotes(index);
+        writeHash(index);
+        if (!options.silent) announce(index);
+      }
+
+      function go(delta) {
+        const next = Math.min(TOTAL, Math.max(1, current + delta));
+        if (next !== current) setSlide(next);
+      }
+
+      function jump(index) {
+        const next = Math.min(TOTAL, Math.max(1, index));
+        if (next !== current) setSlide(next);
+      }
+
+      prevButton.addEventListener("click", () => go(-1));
+      nextButton.addEventListener("click", () => go(1));
+      practiceJump.addEventListener("click", () => {
+        document.getElementById("practiceExtension").scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+        });
+      });
+
+      notesToggle.addEventListener("click", () => {
+        const hidden = app.classList.toggle("notes-hidden");
+        notesToggle.textContent = hidden ? "显示教案" : "隐藏教案";
+        notesToggle.setAttribute("aria-expanded", String(!hidden));
+      });
+
+      fullscreenToggle.addEventListener("click", async () => {
+        try {
+          if (!document.fullscreenElement) {
+            await document.getElementById("stageFrame").requestFullscreen();
+            fullscreenToggle.textContent = "退出全屏";
+          } else {
+            await document.exitFullscreen();
+            fullscreenToggle.textContent = "全屏";
+          }
+        } catch (error) {
+          liveRegion.textContent = "全屏模式当前不可用";
+        }
+      });
+
+      document.addEventListener("fullscreenchange", () => {
+        fullscreenToggle.textContent = document.fullscreenElement ? "退出全屏" : "全屏";
+      });
+
+      document.addEventListener("keydown", (event) => {
+        const tag = event.target && event.target.tagName;
+        const typingTarget = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || event.target.isContentEditable;
+        if (typingTarget) return;
+        if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+          event.preventDefault();
+          go(1);
+        } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+          event.preventDefault();
+          go(-1);
+        } else if (event.key === "Home") {
+          event.preventDefault();
+          jump(1);
+        } else if (event.key === "End") {
+          event.preventDefault();
+          jump(TOTAL);
+        }
+      });
+
+      viewport.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+      }, { passive: true });
+
+      viewport.addEventListener("touchend", (event) => {
+        if (touchStartX === null || touchStartY === null) return;
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+        if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX < 0) go(1);
+          if (deltaX > 0) go(-1);
+        }
+        touchStartX = null;
+        touchStartY = null;
+      }, { passive: true });
+
+      window.addEventListener("hashchange", () => {
+        const index = readHash();
+        setSlide(index, { silent: true });
+      });
+
+      document.querySelectorAll(".toggle-answer").forEach((button) => {
+        button.addEventListener("click", () => {
+          const panel = document.getElementById(button.dataset.target);
+          const isOpen = !panel.hasAttribute("hidden");
+          if (isOpen) {
+            panel.setAttribute("hidden", "");
+            button.textContent = "显示答案";
+            button.setAttribute("aria-expanded", "false");
+          } else {
+            panel.removeAttribute("hidden");
+            button.textContent = "隐藏答案";
+            button.setAttribute("aria-expanded", "true");
+            window.requestAnimationFrame(() => {
+              const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              panel.scrollIntoView({
+                behavior: reduceMotion ? "auto" : "smooth",
+                block: "nearest",
+                inline: "nearest",
+              });
+            });
+          }
+        });
+      });
+
+      checkboxes.forEach((checkbox) => {
+        const key = "grade5-deck-check-" + checkbox.dataset.checkKey;
+        const saved = window.localStorage.getItem(key);
+        checkbox.checked = saved === "1";
+        checkbox.addEventListener("change", () => {
+          window.localStorage.setItem(key, checkbox.checked ? "1" : "0");
+        });
+      });
+
+      setSlide(readHash(), { silent: true });
+    })();
+  </script>
+</body>
+</html>

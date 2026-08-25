@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grade 5 Computer Science Interactive Course</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root{--ink:#1d2b3a;--muted:#5a6c7d;--line:#d8e4ec;--bg:#f5f8fc;--card:#fff}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+    main{max-width:1200px;margin:0 auto;padding:24px 16px}
+    .hero,.card{background:var(--card);border:1px solid var(--line);border-radius:18px}
+    .hero{padding:20px}
+    h1{margin:0 0 8px;font-size:clamp(28px,4vw,42px)}
+    p{margin:0;color:var(--muted);line-height:1.7}
+    .safety{margin-top:12px;padding:10px;border-radius:12px;background:#fff5ea;border:1px solid #f1d3b0}
+    .safety ul{margin:8px 0 0;padding-left:18px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:14px}
+    .card{padding:14px;display:grid;gap:8px}
+    .chip{display:inline-flex;width:fit-content;padding:6px 10px;border-radius:999px;background:#eaf4ff;color:#204d79;font-weight:700}
+    .go,.back,.peer{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border-radius:12px;text-decoration:none;font-weight:700}
+    .go{background:#20507e;color:#fff;padding:10px 14px}
+    .back{margin-top:12px;background:#fff;border:1px solid var(--line);color:var(--ink);padding:10px 14px}
+    .peer{margin-top:10px;background:#eaf4ff;border:1px solid #b7d1ea;color:#1d4b77;padding:10px 14px}
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>Grade 5 Computer Science Interactive Course</h1>
+      <p>Build computational thinking through algorithms, representation, programming logic, search, and online safety.</p>
+      <a class="back" href="../index.html">Back to portal</a>
+      <a class="peer" href="../zh/index.html">Switch to 中文版</a>
+      <div class="safety">
+        <strong>Child Online Safety Reminders</strong>
+        <ul><li>Do not enter real name, school, address, phone number, passwords, OTP codes, or real photos.</li><li>If a link asks for personal information or feels unsafe, stop and tell a trusted adult.</li><li>HTTPS and lock icons help, but they do not guarantee trustworthy content.</li></ul>
+      </div>
+    </section>
+    <section class="grid">
+      <article class="card">
+            <span class="chip">Chapter 1</span>
+            <h2>What Is Computer Science</h2>
+            <p>Turn real problems into executable steps</p>
+            <p>input / process / output / algorithm / debug</p>
+            <a class="go" href="./chapter-1-what-is-cs/index.html">Open chapter</a>
+          </article><article class="card">
+            <span class="chip">Chapter 2</span>
+            <h2>Information, Binary, and Representation</h2>
+            <p>0 and 1 can represent rich media</p>
+            <p>bit / byte / encoding / pixel / protocol</p>
+            <a class="go" href="./chapter-2-binary-and-representation/index.html">Open chapter</a>
+          </article><article class="card">
+            <span class="chip">Chapter 3</span>
+            <h2>Algorithms, Sequence, and Debugging</h2>
+            <p>Correct steps + edge tests + focused fixes</p>
+            <p>flowchart / edge case / stop condition / log / retest</p>
+            <a class="go" href="./chapter-3-algorithms-and-debugging/index.html">Open chapter</a>
+          </article><article class="card">
+            <span class="chip">Chapter 4</span>
+            <h2>Variables, Conditions, and Loops</h2>
+            <p>Programs track state and make decisions</p>
+            <p>variable / assignment / condition / loop / state table</p>
+            <a class="go" href="./chapter-4-variables-conditions-loops/index.html">Open chapter</a>
+          </article><article class="card">
+            <span class="chip">Chapter 5</span>
+            <h2>Data Structures and Search</h2>
+            <p>Organize data first, then search smartly</p>
+            <p>list / table / key-value / linear search / binary search</p>
+            <a class="go" href="./chapter-5-data-structures-and-search/index.html">Open chapter</a>
+          </article><article class="card">
+            <span class="chip">Chapter 6</span>
+            <h2>Networks, Internet, and Safety</h2>
+            <p>Connect confidently and stay safe</p>
+            <p>browser / server / router / packet / phishing</p>
+            <a class="go" href="./chapter-6-networks-and-safety/index.html">Open chapter</a>
+          </article>
+    </section>
+  </main>
+</body>
+</html>

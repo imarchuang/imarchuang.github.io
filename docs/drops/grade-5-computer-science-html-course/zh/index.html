@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>五年级计算机科学互动课程</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root{--ink:#1d2b3a;--muted:#5a6c7d;--line:#d8e4ec;--bg:#f5f8fc;--card:#fff}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+    main{max-width:1200px;margin:0 auto;padding:24px 16px}
+    .hero,.card{background:var(--card);border:1px solid var(--line);border-radius:18px}
+    .hero{padding:20px}
+    h1{margin:0 0 8px;font-size:clamp(28px,4vw,42px)}
+    p{margin:0;color:var(--muted);line-height:1.7}
+    .safety{margin-top:12px;padding:10px;border-radius:12px;background:#fff5ea;border:1px solid #f1d3b0}
+    .safety ul{margin:8px 0 0;padding-left:18px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:14px}
+    .card{padding:14px;display:grid;gap:8px}
+    .chip{display:inline-flex;width:fit-content;padding:6px 10px;border-radius:999px;background:#eaf4ff;color:#204d79;font-weight:700}
+    .go,.back,.peer{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border-radius:12px;text-decoration:none;font-weight:700}
+    .go{background:#20507e;color:#fff;padding:10px 14px}
+    .back{margin-top:12px;background:#fff;border:1px solid var(--line);color:var(--ink);padding:10px 14px}
+    .peer{margin-top:10px;background:#eaf4ff;border:1px solid #b7d1ea;color:#1d4b77;padding:10px 14px}
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>五年级计算机科学互动课程</h1>
+      <p>通过算法、表示、程序、搜索和网络安全，系统建立五年级计算思维。</p>
+      <a class="back" href="../index.html">返回总入口</a>
+      <a class="peer" href="../en/index.html">切换到 English 版</a>
+      <div class="safety">
+        <strong>儿童在线安全提醒</strong>
+        <ul><li>不输入真实姓名、学校、地址、电话、密码、验证码或真实照片。</li><li>遇到陌生链接、索要信息或让你不舒服的内容，先停止并告诉可信任的大人。</li><li>HTTPS 或锁图标有帮助，但不代表内容一定可信。</li></ul>
+      </div>
+    </section>
+    <section class="grid">
+      <article class="card">
+            <span class="chip">第 1 章</span>
+            <h2>什么是计算机科学</h2>
+            <p>把现实问题拆成可执行步骤</p>
+            <p>输入 / 处理 / 输出 / 算法 / 调试</p>
+            <a class="go" href="./chapter-1-what-is-cs/index.html">进入章节</a>
+          </article><article class="card">
+            <span class="chip">第 2 章</span>
+            <h2>信息、二进制与表示</h2>
+            <p>0 和 1 也能表示图片与文字</p>
+            <p>比特 / 字节 / 编码 / 像素 / 协议</p>
+            <a class="go" href="./chapter-2-binary-and-representation/index.html">进入章节</a>
+          </article><article class="card">
+            <span class="chip">第 3 章</span>
+            <h2>算法、顺序与调试</h2>
+            <p>正确步骤 + 边界测试 + 单点修复</p>
+            <p>流程图 / 边界测试 / 终止条件 / 日志 / 复测</p>
+            <a class="go" href="./chapter-3-algorithms-and-debugging/index.html">进入章节</a>
+          </article><article class="card">
+            <span class="chip">第 4 章</span>
+            <h2>变量、条件与循环</h2>
+            <p>程序会记状态、会选择、会重复</p>
+            <p>变量 / 赋值 / 条件 / 循环 / 状态表</p>
+            <a class="go" href="./chapter-4-variables-conditions-loops/index.html">进入章节</a>
+          </article><article class="card">
+            <span class="chip">第 5 章</span>
+            <h2>数据结构与搜索</h2>
+            <p>先组织信息，再提高查找效率</p>
+            <p>列表 / 表格 / 键值 / 顺序搜索 / 二分搜索</p>
+            <a class="go" href="./chapter-5-data-structures-and-search/index.html">进入章节</a>
+          </article><article class="card">
+            <span class="chip">第 6 章</span>
+            <h2>网络、互联网与安全</h2>
+            <p>会连接，也会保护自己</p>
+            <p>浏览器 / 服务器 / 路由 / 数据包 / 钓鱼</p>
+            <a class="go" href="./chapter-6-networks-and-safety/index.html">进入章节</a>
+          </article>
+    </section>
+  </main>
+</body>
+</html>

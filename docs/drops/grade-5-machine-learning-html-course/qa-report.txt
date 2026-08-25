@@ -1,0 +1,100 @@
+Grade 5 Machine Learning HTML Course QA Report
+Date: 2026-08-26
+Path: /Users/marc.huang/shadow-marc/.superpowers/grade5-machine-learning-html-course
+
+1) Generation + static QA
+Commands:
+  node "/Users/marc.huang/shadow-marc/.superpowers/grade5-machine-learning-html-course/generate-course.js"
+  node "/Users/marc.huang/shadow-marc/.superpowers/grade5-machine-learning-html-course/qa.js"
+Result:
+  PASS - "Generated 14 files across zh and en editions."
+  PASS - "QA passed: structure, counts, generated files, static guardrails, keyboard exemption tokens."
+
+2) Bilingual output verification
+Checks:
+  - Chinese edition generated at root (index + 6 chapter pages)
+  - English edition generated at /en (index + 6 chapter pages)
+  - Cross-language chapter links present in both editions
+Result:
+  PASS
+
+3) P1 fix verification (keyboard safety)
+Server command:
+  python3 -m http.server 8799 --directory "/Users/marc.huang/shadow-marc/.superpowers/grade5-machine-learning-html-course"
+
+3.1 Chinese focused-control keyboard behavior
+Page:
+  chapter-02-data-features-labels.html
+Actions:
+  - Focus notes toggle button, press Space
+  - Focus first summary, press Enter
+Observed:
+  - Hash stayed on #slide-1 in both actions
+  - Control activation worked (details expanded on Enter)
+Result:
+  PASS
+
+3.2 English focused-control keyboard behavior
+Page:
+  en/chapter-02-data-features-labels.html
+Actions:
+  - Focus notes toggle button, press Space
+Observed:
+  - Hash stayed on #slide-1
+  - Control activation worked
+Result:
+  PASS
+
+4) P1 fix verification (Chapter 5 real deterministic tree)
+4.1 Chinese tree demo
+Page:
+  chapter-05-simple-decision-tree.html#slide-4
+Actions:
+  - Choose sample W4
+  - Keep root question = rain
+  - Switch second question: wind -> temp
+Observed:
+  - Output includes concrete sample ID (W4)
+  - Full two-step path rendered
+  - Classification output changed with second question
+Result:
+  PASS
+
+4.2 English tree demo
+Page:
+  en/chapter-05-simple-decision-tree.html#slide-4
+Actions:
+  - Choose sample W4
+  - Keep root question = rain
+  - Switch second question: wind -> temp
+Observed:
+  - Output includes concrete sample ID (W4)
+  - Full two-step path rendered
+  - Classification output changed with second question
+Result:
+  PASS
+
+5) Enrichment and interaction checks
+Checks:
+  - 2 interactive labs per chapter (both locales)
+  - 6 reinforcement + 2 bonus exercises per chapter (both locales)
+  - Exercise self-response prompts and feedback hooks present
+  - Notes, answer toggles, completion persistence present
+Result:
+  PASS
+
+6) Constraint conformance summary
+- 6 chapters per edition: PASS
+- >=7 slides/chapter: PASS (current: 8)
+- >=2 interactive moments/chapter: PASS (current: 2)
+- 6 reinforcement + 2 bonus/chapter: PASS
+- standalone self-contained HTML pages: PASS
+- responsive/accessibility/print/navigation/notes/answers/completion persistence: PASS
+- no dependency/network/PPT in generated chapter pages: PASS
+- fictional child-safe data and non-anthropomorphic wording: PASS
+
+7) Local server shutdown
+Action:
+  stopped local server process after browser checks
+Result:
+  PASS

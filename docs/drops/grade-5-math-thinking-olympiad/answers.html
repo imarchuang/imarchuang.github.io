@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="五年级数学思维训练教材：用奥林匹克数学题型训练会想、会说、会检查。">
+  <link rel="icon" href="data:,">
+  <title>答案与解题要点 · 五年级数学思维训练</title>
+  <style>
+    :root {
+      --paper:#f7f4ec;
+      --card:#fffdf8;
+      --ink:#1d2a36;
+      --muted:#5d6a74;
+      --line:#d7d0c3;
+      --accent:#17212B;
+      --grid:rgba(49,92,255,.08);
+      --display:"Iowan Old Style","Palatino Linotype","Songti SC","Noto Serif SC",serif;
+      --body:"Avenir Next","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      color:var(--ink);
+      font:17px/1.72 var(--body);
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        radial-gradient(circle at top left, #fff8ef 0%, var(--paper) 55%);
+      background-size:24px 24px, 24px 24px, auto;
+    }
+    a { color:var(--accent); text-underline-offset:.18em; }
+    .layout {
+      display:grid;
+      grid-template-columns:minmax(240px, 280px) minmax(0, 1fr);
+      min-height:100vh;
+    }
+    .sidebar {
+      position:sticky; top:0; align-self:start;
+      height:100vh; overflow:auto;
+      padding:20px 16px 28px;
+      border-right:1px solid var(--line);
+      background:rgba(255,253,248,.92);
+      backdrop-filter:blur(8px);
+    }
+    .brand {
+      display:block; margin-bottom:18px; text-decoration:none; color:inherit;
+    }
+    .brand strong {
+      display:block; font:700 1.05rem/1.25 var(--display);
+      letter-spacing:-.02em;
+    }
+    .brand small { color:var(--muted); font-size:.82rem; }
+    .nav { display:grid; gap:6px; }
+    .nav a {
+      display:grid; grid-template-columns:10px 1fr; gap:10px; align-items:start;
+      padding:10px 10px; border:1px solid transparent; border-radius:14px;
+      text-decoration:none; color:inherit;
+    }
+    .nav a:hover { border-color:var(--line); background:rgba(255,255,255,.7); }
+    .nav a.active {
+      border-color:color-mix(in srgb, var(--accent) 35%, var(--line));
+      background:color-mix(in srgb, var(--accent) 8%, white);
+    }
+    .nav strong { display:block; font-size:.92rem; line-height:1.3; }
+    .nav small { display:block; color:var(--muted); font-size:.74rem; line-height:1.35; }
+    .dot { width:10px; height:10px; border-radius:50%; margin-top:5px; }
+    main { padding:28px clamp(18px, 4vw, 42px) 48px; }
+    .sheet {
+      max-width:860px;
+      margin:0 auto;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:clamp(22px, 4vw, 36px);
+      box-shadow:0 18px 50px rgba(29,42,54,.08);
+    }
+    .eyebrow {
+      display:inline-flex; align-items:center; gap:.45rem;
+      margin-bottom:14px; padding:.35rem .7rem;
+      border:1px solid var(--line); border-radius:999px;
+      font:700 .72rem var(--mono); letter-spacing:.08em; text-transform:uppercase;
+      color:var(--muted);
+    }
+    .eyebrow::before {
+      content:""; width:.55rem; height:.55rem; border-radius:50%; background:var(--accent);
+    }
+    h1, h2, h3 { font-family:var(--display); line-height:1.2; letter-spacing:-.02em; }
+    h1 { font-size:clamp(2rem, 4vw, 2.8rem); margin:0 0 1rem; }
+    h2 { font-size:clamp(1.35rem, 2.4vw, 1.8rem); margin:2rem 0 .8rem; }
+    h3 { font-size:1.08rem; margin:1.4rem 0 .55rem; }
+    p, ul, ol, blockquote { margin:0 0 1rem; }
+    ul, ol { padding-left:1.25rem; }
+    li + li { margin-top:.35rem; }
+    code {
+      padding:.08rem .35rem; border-radius:.35rem;
+      background:rgba(29,42,54,.06); font:.92em var(--mono);
+    }
+    blockquote {
+      margin:1rem 0; padding:.9rem 1rem;
+      border-left:4px solid var(--accent);
+      background:rgba(49,92,255,.05); color:var(--muted);
+    }
+    hr { border:0; border-top:1px dashed var(--line); margin:1.6rem 0; }
+    .toolbar {
+      display:flex; flex-wrap:wrap; gap:10px; margin:0 0 18px;
+    }
+    .btn {
+      appearance:none; border:1px solid var(--line); border-radius:999px;
+      background:white; color:var(--ink); padding:.55rem .9rem;
+      font:inherit; cursor:pointer;
+    }
+    .btn:hover { border-color:var(--accent); }
+    .answers-hidden .answer-block { display:none; }
+    .answer-block {
+      margin-top:1rem; padding:1rem 1.1rem;
+      border:1px dashed color-mix(in srgb, var(--accent) 40%, var(--line));
+      border-radius:18px; background:rgba(255,255,255,.75);
+    }
+    .mobile-top {
+      display:none; position:sticky; top:0; z-index:5;
+      padding:12px 14px; border-bottom:1px solid var(--line);
+      background:rgba(247,244,236,.95); backdrop-filter:blur(8px);
+    }
+    @media (max-width: 920px) {
+      .layout { grid-template-columns:1fr; }
+      .sidebar { display:none; }
+      .mobile-top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+      .sheet { border-radius:22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior:auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-top">
+    <a href="./index.html"><strong>思维训练教材</strong></a>
+    <a class="btn" href="./index.html">目录</a>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" href="./index.html">
+        <strong>五年级数学思维训练</strong>
+        <small>奥林匹克题型 · 14 单元 · 16 周</small>
+      </a>
+      <nav class="nav" aria-label="章节导航">
+        <a href="./diagnostic.html"><span class="dot" style="background:#2E6B9E"></span><span><strong>学前诊断</strong><small>课前定位起点</small></span></a><a href="./unit-01.html"><span class="dot" style="background:#315CFF"></span><span><strong>第一单元</strong><small>线段图与数量关系</small></span></a><a href="./unit-02.html"><span class="dot" style="background:#2FBF8F"></span><span><strong>第二单元</strong><small>分类列举</small></span></a><a href="./unit-03.html"><span class="dot" style="background:#7357FF"></span><span><strong>第三单元</strong><small>找规律与递推</small></span></a><a href="./unit-04.html"><span class="dot" style="background:#FF6846"></span><span><strong>第四单元</strong><small>倒推与逆运算</small></span></a><a href="./unit-05.html"><span class="dot" style="background:#9A4A20"></span><span><strong>第五单元</strong><small>鸡兔同笼类问题</small></span></a><a href="./unit-06.html"><span class="dot" style="background:#006A78"></span><span><strong>第六单元</strong><small>因数倍数与周期</small></span></a><a href="./unit-07.html"><span class="dot" style="background:#7A2048"></span><span><strong>第七单元</strong><small>份数法与单位1</small></span></a><a href="./unit-08.html"><span class="dot" style="background:#1F4F8A"></span><span><strong>第八单元</strong><small>分步与排除</small></span></a><a href="./unit-09.html"><span class="dot" style="background:#245A3D"></span><span><strong>第九单元</strong><small>等积变形</small></span></a><a href="./unit-10.html"><span class="dot" style="background:#6A3FA0"></span><span><strong>第十单元</strong><small>体积与涂色块</small></span></a><a href="./unit-11.html"><span class="dot" style="background:#315CFF"></span><span><strong>第十一单元</strong><small>奇偶与不变量</small></span></a><a href="./unit-12.html"><span class="dot" style="background:#2FBF8F"></span><span><strong>第十二单元</strong><small>最不利情况</small></span></a><a href="./unit-13.html"><span class="dot" style="background:#FF6846"></span><span><strong>第十三单元</strong><small>天平与逻辑</small></span></a><a href="./unit-14.html"><span class="dot" style="background:#7357FF"></span><span><strong>第十四单元</strong><small>建模与方案比较</small></span></a><a href="./tests.html"><span class="dot" style="background:#17212B"></span><span><strong>四次混合检测</strong><small>4次阶段检测</small></span></a><a href="./hints.html"><span class="dot" style="background:#5A666E"></span><span><strong>挑战题提示索</strong><small>分级提示</small></span></a><a href="./answers.html" class="active"><span class="dot" style="background:#17212B"></span><span><strong>答案与解题要</strong><small>教师与家长参考</small></span></a><a href="./schedule.html"><span class="dot" style="background:#315CFF"></span><span><strong>16 周教学</strong><small>周计划</small></span></a><a href="./questions.html"><span class="dot" style="background:#2FBF8F"></span><span><strong>教师提问句库</strong><small>课堂提问</small></span></a><a href="./mistakes.html"><span class="dot" style="background:#FF6846"></span><span><strong>错题记录模板</strong><small>复盘模板</small></span></a><a href="./references.html"><span class="dot" style="background:#5A666E"></span><span><strong>编写依据与延</strong><small>参考来源</small></span></a><a href="./notes.html"><span class="dot" style="background:#5A666E"></span><span><strong>使用提醒</strong><small>使用说明</small></span></a>
+      </nav>
+    </aside>
+    <main>
+      <article class="sheet" id="content">
+        <div class="eyebrow">Math Thinking</div>
+        <div class="toolbar"><button class="btn" id="toggle-answers" type="button">显示答案与要点</button></div><div class="answer-block"><h2>学前诊断答案</h2>
+<ol>
+<li>3700。把 25 与 4 先结合。</li>
+<li>60 米。最后 20 米是第一次剪后余数的 <code>2/3</code>；倒推 <code>20÷2×3=30</code>，再乘 2。</li>
+<li>12 个。个位固定为 2 或 4，各有 <code>3×2=6</code> 个。</li>
+<li>甲 51，乙 33。移多补少或 <code>(84±18)÷2</code>。</li>
+<li>21 平方厘米。增加部分是长 3、宽 7 的长方形。</li>
+<li>7 个。最不利时每种 2 个，共 6 个；再取 1 个。</li>
+<li>95。每项乘 2 加 1。</li>
+<li>2 次。按 3、3、3 分组。</li>
+</ol>
+<h2>第一单元</h2>
+<ol>
+<li>43 个、31 个。<code>(74+12)÷2=43</code>。</li>
+<li>12 元。两人相差 24 元，移动一半。</li>
+<li>25、27、29。中间数是 <code>81÷3=27</code>。</li>
+<li>12 本。移动 6 本会使差减少 12 本。</li>
+<li>甲 58 枚、乙 48 枚、丙 43 枚。把乙看作基准，三人的总数相当于 <code>3×乙+10-5</code>，所以乙有 <code>(149-10+5)÷3=48</code> 枚。</li>
+</ol>
+<h2>第二单元</h2>
+<ol>
+<li>9 个。十位可选 1、2、3，个位从剩余 3 个数字中选。</li>
+<li>6 种。<code>3×2</code>。</li>
+<li>4 种：1+9、2+8、3+7、4+6。</li>
+<li>12 种。去程 <code>3×2=6</code> 种；对每一种去程，返回的 C—B 段有 1 条不同路线，B—A 段有 2 条不同路线，所以每种去程有 2 种回程，共 <code>6×2=12</code> 种。</li>
+<li>10 个。任取 3 个不同数字，按从大到小排列只有 1 种；从 5 个数字选 3 个的有 10 组，可列表验证。</li>
+</ol>
+<h2>第三单元</h2>
+<ol>
+<li>16、19，每次加 3。</li>
+<li>22，依次加 1、2、3、4、5、6。</li>
+<li>15 枚，<code>1+2+3+4+5</code>。</li>
+<li>6.4 毫米，<code>0.1×2×2×2×2×2×2</code>。</li>
+<li>13 种。设走到第 n 级的方法数为前两级方法数之和：1、2、3、5、8、13。</li>
+</ol>
+<h2>第四单元</h2>
+<ol>
+<li>10。<code>100÷4-15</code>。</li>
+<li>50。<code>(18+7)×2</code>。</li>
+<li>120 页。倒推两次乘 2。</li>
+<li>26 个。<code>(5+1)×2=12</code>，再 <code>(12+1)×2=26</code>。</li>
+<li>28 枚。倒推：丙拿完前有 4 枚；乙拿前有 <code>(4+2)×2=12</code> 枚；甲拿前有 <code>(12+2)×2=28</code> 枚。</li>
+</ol>
+<h2>第五单元</h2>
+<ol>
+<li>兔 7 只，鸡 8 只。全按鸡算多出 14 条腿，每只兔多 2 条腿。</li>
+<li>大票 8 张，小票 12 张。全按小票收入 120 元，差 32 元，每换一张多 4 元。</li>
+<li>答对 9 题。若 12 题全对可得 60 分，实际少 21 分；每有一题由对变错，总分少 <code>5+2=7</code> 分，所以错 <code>21÷7=3</code> 题，答对 9 题。</li>
+<li>大盒 7 个，小盒 7 个。全按小盒装 70 个，差 21 个，每换一个多 3 个。</li>
+<li>6 组。共有 <code>70÷5=14</code> 组；每个特殊组多植 2 棵，<code>(82-70)÷2=6</code>。</li>
+</ol>
+<h2>第六单元</h2>
+<ol>
+<li>1、2、3、4、6、9、12、18、36。</li>
+<li>0、3、6、9。已有数字和为 9。</li>
+<li>12 名。48 和 36 的最大公因数是 12。</li>
+<li>9:36。12 和 18 的最小公倍数是 36。</li>
+<li>36。两位数中 18 的倍数为 18、36、54、72、90，只有 36 满足十位比个位小 3。</li>
+</ol>
+<h2>第七单元</h2>
+<ol>
+<li>40 米。25 米占 <code>5/8</code>。</li>
+<li>40 人。</li>
+<li>36 千克。用去 <code>1/4</code> 后又用 9 千克，剩 <code>1/2</code>；9 千克对应原数的 <code>1/4</code>。</li>
+<li>80 张。最后 48 张占第一次余数的 <code>3/4</code>，第一次余数为 64 张，占原数的 <code>4/5</code>。</li>
+<li>60 米。第一天后剩 <code>3/4</code>，第二天后剩其中 <code>2/3</code>，即全长的 <code>1/2</code>。</li>
+</ol>
+<h2>第八单元</h2>
+<ol>
+<li>12 种。</li>
+<li>24 个，<code>4×3×2</code>。</li>
+<li>30 个。个位为 0：百位 4 种、十位 3 种，共 12；个位为 2 或 4：个位 2 种、百位不能为 0 且不能与个位相同，有 3 种、十位 3 种，共 18；合计 30。</li>
+<li>14 个。1×1 的 9 个，2×2 的 4 个，3×3 的 1 个。</li>
+<li>6 种。和为偶数，要么选 3 个偶数，要么选 1 个偶数、2 个奇数。这里只有 2 个偶数，所以第一种不可能；2 个偶数中选 1 个有 2 种，3 个奇数中选 2 个有 3 种，共 <code>2×3=6</code> 种。</li>
+</ol>
+<h2>第九单元</h2>
+<ol>
+<li>72 平方厘米。</li>
+<li>111 平方厘米，<code>15×8-3×3</code>。</li>
+<li>面积相等，因为三角形面积只由底和对应高决定。</li>
+<li>180 平方米。内框长 <code>20-2=18</code>、宽 <code>12-2=10</code>。</li>
+<li>25 平方厘米。三角形的底为正方形一边的一半，即 5 厘米，高为 10 厘米。</li>
+</ol>
+<h2>第十单元</h2>
+<ol>
+<li>72 立方厘米。</li>
+<li>64 个。</li>
+<li>8 个，都是角块。</li>
+<li>24 个。12 条棱，每条棱除去两个角后有 2 个，<code>12×2=24</code>。</li>
+<li>最少 8 个。正面三列最高分别是 2、3、1 层，所以三列至少各有一摞，共需 <code>2+3+1=6</code> 个；上面看共有 5 个位置，除这 3 摞外还要多占 2 个位置，每个位置至少放 1 个，所以最少 <code>6+2=8</code> 个。一种摆法是：第一列两摞，高 2、1；第二列两摞，高 3、1；第三列一摞，高 1。</li>
+</ol>
+<h2>第十一单元</h2>
+<ol>
+<li>偶数。任意奇数都可写成“成对后的数再加 1”，两个多出的 1 又组成一对。</li>
+<li>一定是。设中间数为若干，前后两数分别少 1、多 1，三数和等于中间数的 3 倍。</li>
+<li>都是奇数。从 1 开始每次加 2，奇偶性不变。</li>
+<li>能。给杯子编号 1～15，依次翻 <code>{1,2,3,15}</code>、<code>{4,5,6,15}</code>、<code>{7,8,9,10}</code>、<code>{11,12,13,14}</code>。前 14 个杯子最终各翻 1 次而朝下，15 号翻 2 次而重新朝上。</li>
+<li>能。前 4 行中，每行分别取走第 1、2 枚和第 3、4 枚；再在第 5 列分别取走第 1、2 行和第 3、4 行的硬币；最后在第 5 行分别取走第 1、2 枚和第 3、4 枚。最终只剩右下角 1 枚。奇偶性没有排除这种结果，但“能做到”还必须由构造证明。</li>
+</ol>
+<h2>第十二单元</h2>
+<ol>
+<li>3 只。</li>
+<li>11 支。最不利时每种 2 支，共 10 支。</li>
+<li>至少 2 人。13 人放入 12 个月。</li>
+<li>能。把数配成 <code>(1,20)、(2,19)、…、(10,11)</code> 共 10 对，选 11 个数必有一对都被选中。</li>
+<li>3 名。若想让每个月的人尽量少，先每月放 2 人，共放 24 人；剩下 8 人无论放到哪些月份，都会使相应月份至少有 3 人。</li>
+</ol>
+<h2>第十三单元</h2>
+<ol>
+<li>1 次。称 1 对 1。</li>
+<li>能。第一次 3 对 3：若平衡，可疑的是余下 2 个，第二次称 1 对 1；若不平衡，可疑的是较轻盘 3 个，第二次取其中 1 对 1。</li>
+<li>最少 3 次。第一次称 4 对 4：若平衡，可疑的是未称的 4 枚；若不平衡，可疑的是较轻盘的 4 枚。第二次从可疑的 4 枚中称 2 对 2，轻币在较轻的一对中；第三次称 1 对 1 即可确定。</li>
+<li>从标“苹果和梨”的盒子取一个。因标签全错，这盒不可能是混合盒；取到什么，它就是什么单一水果盒。再利用另两个标签也错依次确定。</li>
+<li>1 号门。若奖品在 1 号门，甲的话是假，乙的话是假，丙的话是真，恰好只有一句真话。奖品在 2 号门时甲、乙都真；奖品在 3 号门时甲、丙都真，均不符合条件。</li>
+</ol>
+<h2>第十四单元</h2>
+<ol>
+<li>约 4080 元，<code>8×6×85</code>。</li>
+<li>B 组。A 每杯 4.5 元，B 每杯 4.3 元。</li>
+<li>23 张。方桌拼成一列时，1 张坐 4 人，以后每增加 1 张只增加 2 个座位，所以 n 张可坐 <code>2n+2</code> 人。22 张只能坐 46 人，23 张可坐 48 人。</li>
+</ol>
+<ol>
+<li>100 升。净流入每分钟 5 升，10 分钟增加 50 升。</li>
+<li>开放任务。合格答案应有三种实际可购买方案，写明水果、饮品、数量、总价，并至少比较价格、容量或营养中的两个标准。价格必须先实地调查，不能凭空假定。</li>
+</ol>
+<h2>检测一</h2>
+<ol>
+<li>甲 68，乙 42。</li>
+<li>9 个。十位 3 种，个位 3 种。</li>
+<li>42。按相邻两个自然数相乘的规律，各项为 <code>1×2、2×3、3×4、4×5、5×6</code>，下一项 <code>6×7</code>。</li>
+<li>42。<code>9×4+6</code>。</li>
+<li>8 种。</li>
+</ol>
+<h2>检测二</h2>
+<ol>
+<li>兔 9 只，鸡 13 只。</li>
+<li>24 盒。</li>
+<li>40 颗。最后占原数的 <code>4/5×3/4=3/5</code>。</li>
+<li>78、42。</li>
+<li>13 题。若全对可得 <code>16×4=64</code> 分，实际少 15 分；每错一题比答对少 <code>4+1=5</code> 分，所以错 3 题，答对 13 题。</li>
+</ol>
+<h2>检测三</h2>
+<ol>
+<li>12 个。个位 3 种奇数，十位从剩余 4 个数字中选。</li>
+<li>129 平方厘米。</li>
+<li>125 个。</li>
+<li>36 个。12 条棱，每条中间有 <code>5-2=3</code> 个。</li>
+<li>30 个。<code>16+9+4+1</code>。</li>
+</ol>
+<h2>检测四</h2>
+<ol>
+<li>13 个。最不利时每种 3 个，共 12 个。</li>
+<li>3 次。每次三等分：27→9→3→1。</li>
+<li>60 千克。最后占原数的 <code>2/3×1/2=1/3</code>。</li>
+<li>大瓶 7 个，小瓶 11 个。全按小瓶为 36 升，差 21 升，每换一个多 3 升。</li>
+<li>比较可行组合：3 大车 120 座、2400 元；2 大 1 小 105 座、2150 元；1 大 3 小 115 座、2450 元；4 小 100 座、2200 元。因此最低是 2 辆大车加 1 辆小车，共 105 座、2150 元。</li>
+</ol>
+<hr></div>
+      </article>
+    </main>
+  </div>
+  <script>
+    (function () {
+      const page = document.body;
+      const key = "g5-think-hide-answers";
+      const hide = localStorage.getItem(key) !== "off";
+      if (hide) page.classList.add("answers-hidden");
+      const btn = document.getElementById("toggle-answers");
+      if (btn) {
+        const sync = () => {
+          const hidden = page.classList.contains("answers-hidden");
+          btn.textContent = hidden ? "显示答案与要点" : "隐藏答案与要点";
+        };
+        sync();
+        btn.addEventListener("click", () => {
+          page.classList.toggle("answers-hidden");
+          localStorage.setItem(key, page.classList.contains("answers-hidden") ? "on" : "off");
+          sync();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>数据、特征与标签 | 五年级机器学习互动课程（中文）</title>
+  <style>
+    :root{--primary:#245A3D;--secondary:#E9F9EF;--accent:#F29E38;--ink:#1f2a35;--muted:#4c5e72;--line:#d2deea;--touch:44px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--ink);background:radial-gradient(circle at 1px 1px, rgba(80,100,120,.16) 1px, transparent 0) 0 0/18px 18px,linear-gradient(180deg,#f1f5fa,#ecf2f7);min-height:100vh}
+    a,button,input,select,summary{font:inherit} button,a.nav-link{min-height:var(--touch);min-width:var(--touch)}
+    .app{max-width:1200px;margin:0 auto;padding:16px}
+    .top{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .top-group{display:flex;gap:8px;flex-wrap:wrap}
+    .nav-link,.tool-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;text-decoration:none;color:var(--ink);cursor:pointer;box-shadow:0 8px 20px rgba(20,40,70,.08)}
+    .badge{border:1px solid var(--line);padding:10px 14px;border-radius:999px;background:#fff;box-shadow:0 8px 20px rgba(20,40,70,.08);color:var(--muted)}
+    .badge strong{color:var(--primary)}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:12px}
+    .stage{border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:12px;background:rgba(255,255,255,.5);backdrop-filter:blur(8px);box-shadow:0 18px 45px rgba(20,40,70,.12)}
+    .slides{min-height:580px;position:relative;border-radius:18px;background:linear-gradient(180deg,#fff,#f8fbff);border:1px solid var(--line);overflow:hidden}
+    .slide{position:absolute;inset:0;display:none;padding:20px;overflow:auto;grid-template-rows:auto 1fr auto;gap:12px}
+    .slide.active{display:grid}
+    .slide-head h1{margin:6px 0 8px;font-size:clamp(25px,2.8vw,36px)} .slide-head p{margin:0;color:var(--muted);line-height:1.7}
+    .kicker{display:inline-flex;padding:6px 10px;border-radius:999px;background:var(--secondary);color:var(--primary);font-weight:700;font-size:13px}
+    .slide-body{display:grid;gap:12px} .bullet-list{margin:0;padding-left:20px} .bullet-list li{line-height:1.7;margin-bottom:8px}
+    .worked-example{border:1px dashed var(--line);border-radius:12px;padding:10px;background:#fffdf4;line-height:1.7}
+    .slide-foot{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center} .progress-shell{height:12px;background:#d7e2ee;border-radius:999px;overflow:hidden}
+    .progress-bar{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent))} .slide-meta{color:var(--muted);font-size:14px}
+    .nav-row{display:flex;justify-content:flex-end;gap:8px;margin-top:10px} .nav-btn{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 14px;cursor:pointer}
+    .nav-btn[disabled]{opacity:.5;cursor:not-allowed}
+    .notes{border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:0 18px 45px rgba(20,40,70,.1);overflow:hidden}
+    .notes h2{margin:0;font-size:18px} .notes-head{padding:14px 14px 12px;border-bottom:1px solid var(--line)} .notes-body{padding:14px;line-height:1.7;color:var(--ink)}
+    .notes-hidden .layout{grid-template-columns:minmax(0,1fr)} .notes-hidden .notes{display:none}
+    .demo-card{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff;display:grid;gap:10px}
+    .demo-card h3{margin:0} .demo-grid{display:grid;gap:8px} .demo-grid.two{grid-template-columns:1fr 1fr}
+    .demo-card label{display:grid;gap:4px;color:var(--muted)} .demo-card select,.demo-card input[type="range"]{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff}
+    .demo-run,.demo-reset{border:1px solid var(--line);background:var(--secondary);color:var(--ink);border-radius:12px;padding:10px 12px;cursor:pointer}
+    .demo-actions{display:flex;justify-content:flex-start} .demo-status{margin:0;color:var(--primary);font-weight:700} .demo-output{margin:0;color:var(--ink);line-height:1.6;white-space:pre-line}
+    .exercises{margin-top:18px;border:1px solid var(--line);border-radius:22px;padding:14px;background:#fff;box-shadow:0 18px 45px rgba(20,40,70,.1)}
+    .exercises h2{margin:0 0 6px} .exercise-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .exercise-card{border:1px solid var(--line);border-radius:16px;padding:12px;background:linear-gradient(180deg,#fff,#fbfcff);display:grid;gap:8px}
+    .exercise-card[data-kind="bonus"]{background:linear-gradient(180deg,#fffaf0,#fff)} .exercise-head{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+    .exercise-head label{font-size:13px;color:var(--muted)} .q{margin:0;line-height:1.7}
+    .exercise-card textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px;resize:vertical;line-height:1.5}
+    .check-response{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;cursor:pointer;color:var(--ink);justify-self:start}
+    .response-feedback{margin:0;color:var(--muted);line-height:1.6}
+    details p{margin:8px 0 0;color:var(--muted)} .toggle-answer{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;cursor:pointer;color:var(--primary);font-weight:700;justify-self:start}
+    .answer-panel{border:1px dashed rgba(100,120,140,.45);border-radius:12px;padding:10px;background:rgba(255,247,227,.5);line-height:1.7}
+    .live{position:absolute;width:1px;height:1px;clip:rect(0,0,0,0);overflow:hidden}
+    @media (max-width:980px){.layout{grid-template-columns:1fr}.notes{position:static}.exercise-grid{grid-template-columns:1fr}}
+    @media (max-width:640px){.app{padding:10px}.top{display:grid}.top-group{display:grid;grid-template-columns:1fr 1fr}.slides{min-height:660px}.slide{padding:14px}.demo-grid.two{grid-template-columns:1fr}}
+    @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+    @media print{body{background:#fff}.top,.notes,.nav-row{display:none!important}.app{max-width:none;padding:0}.stage{border:none;box-shadow:none;padding:0}.slides{border:none;background:none;overflow:visible}.slide{position:static;display:grid!important;page-break-after:always;break-after:page;border:1px solid var(--line);min-height:0}.slide:last-child{page-break-after:auto;break-after:auto}.exercises{box-shadow:none}}
+  </style>
+</head>
+<body>
+  <main class="app" id="app">
+    <div class="top">
+      <div class="top-group">
+        <a class="nav-link" href="./index.html">返回目录</a>
+        <button type="button" class="tool-btn" id="jumpExercises">跳到练习</button>
+      </div>
+      <div class="top-group">
+        <a class="nav-link" href="./en/chapter-02-data-features-labels.html">English Edition</a>
+        <div class="badge"><strong>第 2章</strong> · 数据、特征与标签</div>
+        <button type="button" class="tool-btn" id="notesToggle" aria-controls="notesPanel" aria-expanded="true">隐藏讲师笔记</button>
+        <button type="button" class="tool-btn" id="fullscreenToggle">全屏</button>
+      </div>
+    </div>
+    <div class="layout">
+      <section class="stage">
+        <div class="slides" id="slides" tabindex="0" aria-label="数据、特征与标签">
+  <section class="slide active" id="slide-1" data-slide-number="1" aria-label="情境任务, 1 / 8">
+    <header class="slide-head">
+      <div class="kicker">第 2章 · 数据、特征与标签</div>
+      <h1>情境任务</h1>
+      <p>整理虚构宠物资料卡给模型训练</p>
+    </header>
+    <div class="slide-body">
+      <ul class="bullet-list"><li>每一行样本都要可读、可比、可追踪。</li><li>特征列输入模型，标签列作为目标。</li><li>仅使用虚构且儿童安全的数据字段。</li></ul>
+      
+      
+    </div>
+    <footer class="slide-foot">
+      <div class="progress-shell"><div class="progress-bar" style="width:12.5%"></div></div>
+      <div class="slide-meta">1 / 8</div>
+    </footer>
+  </section>
+  <section class="slide" id="slide-2" data-slide-number="2" aria-label="核心讲解, 2 / 8">
+    <header class="slide-head">
+      <div class="kicker">第 2章 · 数据、特征与标签</div>
+      <h1>核心讲解</h1>
+      <p>一致格式是数据表的底线</p>
+    </header>
+    <div class="slide-body">
+      <ul class="bullet-list"><li>同一列必须统一单位与格式。</li><li>缺失值需要标记与处理规则，不可硬填。</li><li>标签集合要在训练前固定。</li></ul>
+      
+      
+    </div>
+    <footer class="slide-foot">
+      <div class="progress-shell"><div class="progress-bar" style="width:25%"></div></div>
+      <div class="slide-meta">2 / 8</div>
+    </footer>
+  </section>
+  <section class="slide" id="slide-3" data-slide-number="3" aria-label="例题演示, 3 / 8">
+    <header class="slide-head">
+      <div class="kicker">第 2章 · 数据、特征与标签</div>
+      <h1>例题演示</h1>
+      <p>输入特征列 + 输出标签列</p>
+    </header>
+    <div class="slide-body">
+      <ul class="bullet-list"><li>特征示例：耳朵长度、活动时长、跳跃高度。</li><li>标签示例：昼行 / 夜行。</li><li>错误标签命名会导致同义类被拆分。</li></ul>
+      <div class="worked-example"><strong>例题:</strong> 例：将“2kg、1800g、1.7kg”统一到克后再训练，避免模型误判。</div>
+      
+    </div>
+    <footer class="slide-foot">
+      <div class="progress-shell"><div class="progress-bar" style="width:37.5%"></div></div>
+      <div class="slide-meta">3 / 8</div>
+    </footer>
+  </section>
+  <section class="slide" id="slide-4" data-slide-number="4" aria-label="互动实验 1, 4 / 8">
+    <header class="slide-head">
+      <div class="kicker">第 2章 · 数据、特征与标签</div>
+      <h1>互动实验 1</h1>
+      <p>字段分类器：特征 / 标签 / 不应使用</p>
+    </header>
+    <div class="slide-body">
+      <ul class="bullet-list"><li>逐项选择字段归类并立即检查。</li><li>系统提示错误项与修正方向。</li><li>直到全部正确后记录你的分类规则。</li></ul>
+      
+      <section class="demo-card" data-demo="data-features-labels-1" data-demo-type="feature-label-sorter" data-locale="zh"><h3>互动实验</h3><p class="demo-desc">请操作并观察即时反馈。</p><p>把字段放入正确类别。</p><div class="demo-sorter"></div><button type="button" class="demo-run">检查分类</button><p class="demo-output"></p><div class="demo-actions"><button type="button" class="demo-reset">重置实验</button></div><p class="demo-status" role="status" aria-live="polite">字段分类状态: 等待操作</p></section>
+    </div>
+    <footer class="slide-foot">
+      <div class="progress-shell"><div class="progress-bar" style="width:50%"></div></div>
+      <div class="slide-meta">4 / 8</div>
+    </footer>
+  </section>
+  <section class="slide" id="slide-5" data-slide-number="5" aria-label="互动实验 2, 5 / 8">
+    <header class="slide-head">
+      <div class="kicker">第 2章 · 数据、特征与标签</div>
+      <h1>互动实验 2</h1>
+      <p>数据清洗小实验</p>
+    </header>
+    <div class="slide-body">
+      <ul class="bullet-list"><li>处理单位混写、缺失值、重复标签。</li><li>比较清洗前后质量评分。</li><li>总结哪一步最影响模型结果。</li></ul>
+      
+      <section class="demo-card" data-demo="data-features-labels-2" data-demo-type="data-cleanup" data-locale="zh"><h3>互动实验</h3><p class="demo-desc">请操作并观察即时反馈。</p><div class="demo-grid two"><label>单位修正<select class="demo-unit"><option value="mixed">未统一</option><option value="gram">统一为克</option></select></label><label>缺失值处理<select class="demo-missing"><option value="raw">未处理</option><option value="rule">按规则标记</option></select></label></div><button type="button" class="demo-run">评估质量</button><p class="demo-output"></p><div class="demo-actions"><button type="button" class="demo-reset">重置实验</button></div><p class="demo-status" role="status" aria-live="polite">清洗状态: 等待操作</p></section>
+    </div>
+    <footer class="slide-foot">
+      <div class="progress-shell"><div class="progress-bar" style="width:62.5%"></div></div>
+      <div class="slide-meta">5 / 8</div>
+    </footer>
+  </section>
+  <section class="slide" id="slide-6" data-slide-number="6" aria-label="常见误解纠正, 6 / 8">
+    <header class="slide-head">
+      <div class="kicker">第 2章 · 数据、特征与标签</div>
+      <h1>常见误解纠正</h1>
+      <p>数据越多不一定越好</p>
+    </header>
+    <div class="slide-body">
+      <ul class="bullet-list"><li>误解：缺失值随便填 0 即可。</li><li>误解：标签可以临时改名。</li><li>修正：质量、一致性、可解释性优先。</li></ul>
+      
+      
+    </div>
+    <footer class="slide-foot">
+      <div class="progress-shell"><div class="progress-bar" style="width:75%"></div></div>
+      <div class="slide-meta">6 / 8</div>
+    </footer>
+  </section>
+  <section class="slide" id="slide-7" data-slide-number="7" aria-label="应用挑战, 7 / 8">
+    <header class="slide-head">
+      <div class="kicker">第 2章 · 数据、特征与标签</div>
+      <h1>应用挑战</h1>
+      <p>清洗一张混乱数据小表</p>
+    </header>
+    <div class="slide-body">
+      <ul class="bullet-list"><li>找出至少 3 个数据问题并修正。</li><li>说明哪些列可当特征，哪些不行。</li><li>输出一个可执行的训练前检查步骤。</li></ul>
+      
+      
+    </div>
+    <footer class="slide-foot">
+      <div class="progress-shell"><div class="progress-bar" style="width:87.5%"></div></div>
+      <div class="slide-meta">7 / 8</div>
+    </footer>
+  </section>
+  <section class="slide" id="slide-8" data-slide-number="8" aria-label="小结与自评, 8 / 8">
+    <header class="slide-head">
+      <div class="kicker">第 2章 · 数据、特征与标签</div>
+      <h1>小结与自评</h1>
+      <p>我能先整理数据再谈模型</p>
+    </header>
+    <div class="slide-body">
+      <ul class="bullet-list"><li>我能准确区分特征与标签。</li><li>我能识别并修复关键数据问题。</li><li>我能解释数据质量如何影响预测。</li></ul>
+      
+      
+    </div>
+    <footer class="slide-foot">
+      <div class="progress-shell"><div class="progress-bar" style="width:100%"></div></div>
+      <div class="slide-meta">8 / 8</div>
+    </footer>
+  </section></div>
+        <div class="nav-row">
+          <button type="button" class="nav-btn" id="prevButton">上一页</button>
+          <button type="button" class="nav-btn" id="nextButton">下一页</button>
+        </div>
+      </section>
+      <aside class="notes" id="notesPanel">
+        <div class="notes-head"><h2>讲师笔记</h2><div id="notesTitle">1 · 情境任务</div></div>
+        <div class="notes-body" id="notesBody">开场强调隐私与最小化数据原则。</div>
+      </aside>
+    </div>
+    <section class="exercises" id="exerciseSection">
+      <h2>巩固练习区</h2>
+      <p>共 6 道强化练习 + 2 道附加题。完成状态保存在当前浏览器。</p>
+      <div class="exercise-grid">
+  <article class="exercise-card" data-kind="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 1</strong>
+      <label><input type="checkbox" data-completion-key="grade5-ml:zh:data-features-labels:reinforcement-1"> 已完成</label>
+    </div>
+    <p class="q">体重、活动时长、是否夜行中哪项最可能是标签？</p>
+    <details><summary>提示</summary><p>标签是目标输出。</p></details>
+    <button type="button" class="toggle-answer" data-target="zh-data-features-labels-reinforcement-1-answer" aria-expanded="false" aria-controls="zh-data-features-labels-reinforcement-1-answer">显示答案</button>
+    <div id="zh-data-features-labels-reinforcement-1-answer" class="answer-panel" hidden>
+      <p><strong>答案:</strong> 是否夜行。</p>
+      <p><strong>理由:</strong> 其余通常是输入特征。</p>
+    </div>
+    <label for="zh-data-features-labels-reinforcement-1-prompt">写下你的解题理由</label>
+    <textarea id="zh-data-features-labels-reinforcement-1-prompt" class="self-response" rows="3" placeholder="至少写 1 句，说明你用了哪些样本信息。"></textarea>
+    <button type="button" class="check-response">检查我的理由</button>
+    <p class="response-feedback"></p>
+  </article>
+  <article class="exercise-card" data-kind="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 2</strong>
+      <label><input type="checkbox" data-completion-key="grade5-ml:zh:data-features-labels:reinforcement-2"> 已完成</label>
+    </div>
+    <p class="q">同列出现 kg 和 g，应先做什么？</p>
+    <details><summary>提示</summary><p>单位统一。</p></details>
+    <button type="button" class="toggle-answer" data-target="zh-data-features-labels-reinforcement-2-answer" aria-expanded="false" aria-controls="zh-data-features-labels-reinforcement-2-answer">显示答案</button>
+    <div id="zh-data-features-labels-reinforcement-2-answer" class="answer-panel" hidden>
+      <p><strong>答案:</strong> 先统一单位再训练。</p>
+      <p><strong>理由:</strong> 否则数值不可比。</p>
+    </div>
+    <label for="zh-data-features-labels-reinforcement-2-prompt">写下你的解题理由</label>
+    <textarea id="zh-data-features-labels-reinforcement-2-prompt" class="self-response" rows="3" placeholder="至少写 1 句，说明你用了哪些样本信息。"></textarea>
+    <button type="button" class="check-response">检查我的理由</button>
+    <p class="response-feedback"></p>
+  </article>
+  <article class="exercise-card" data-kind="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 3</strong>
+      <label><input type="checkbox" data-completion-key="grade5-ml:zh:data-features-labels:reinforcement-3"> 已完成</label>
+    </div>
+    <p class="q">缺失值可以默认填 0 吗？</p>
+    <details><summary>提示</summary><p>0 不一定有意义。</p></details>
+    <button type="button" class="toggle-answer" data-target="zh-data-features-labels-reinforcement-3-answer" aria-expanded="false" aria-controls="zh-data-features-labels-reinforcement-3-answer">显示答案</button>
+    <div id="zh-data-features-labels-reinforcement-3-answer" class="answer-panel" hidden>
+      <p><strong>答案:</strong> 不可以随意填。</p>
+      <p><strong>理由:</strong> 应按规则处理并记录。</p>
+    </div>
+    <label for="zh-data-features-labels-reinforcement-3-prompt">写下你的解题理由</label>
+    <textarea id="zh-data-features-labels-reinforcement-3-prompt" class="self-response" rows="3" placeholder="至少写 1 句，说明你用了哪些样本信息。"></textarea>
+    <button type="button" class="check-response">检查我的理由</button>
+    <p class="response-feedback"></p>
+  </article>
+  <article class="exercise-card" data-kind="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 4</strong>
+      <label><input type="checkbox" data-completion-key="grade5-ml:zh:data-features-labels:reinforcement-4"> 已完成</label>
+    </div>
+    <p class="q">样本编号适合当特征吗？</p>
+    <details><summary>提示</summary><p>编号多为标识。</p></details>
+    <button type="button" class="toggle-answer" data-target="zh-data-features-labels-reinforcement-4-answer" aria-expanded="false" aria-controls="zh-data-features-labels-reinforcement-4-answer">显示答案</button>
+    <div id="zh-data-features-labels-reinforcement-4-answer" class="answer-panel" hidden>
+      <p><strong>答案:</strong> 通常不适合。</p>
+      <p><strong>理由:</strong> 常会引入噪声模式。</p>
+    </div>
+    <label for="zh-data-features-labels-reinforcement-4-prompt">写下你的解题理由</label>
+    <textarea id="zh-data-features-labels-reinforcement-4-prompt" class="self-response" rows="3" placeholder="至少写 1 句，说明你用了哪些样本信息。"></textarea>
+    <button type="button" class="check-response">检查我的理由</button>
+    <p class="response-feedback"></p>
+  </article>
+  <article class="exercise-card" data-kind="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 5</strong>
+      <label><input type="checkbox" data-completion-key="grade5-ml:zh:data-features-labels:reinforcement-5"> 已完成</label>
+    </div>
+    <p class="q">标签名称为什么要固定？</p>
+    <details><summary>提示</summary><p>模型学的是稳定映射。</p></details>
+    <button type="button" class="toggle-answer" data-target="zh-data-features-labels-reinforcement-5-answer" aria-expanded="false" aria-controls="zh-data-features-labels-reinforcement-5-answer">显示答案</button>
+    <div id="zh-data-features-labels-reinforcement-5-answer" class="answer-panel" hidden>
+      <p><strong>答案:</strong> 为了保持目标语义一致。</p>
+      <p><strong>理由:</strong> 频繁改名会破坏训练一致性。</p>
+    </div>
+    <label for="zh-data-features-labels-reinforcement-5-prompt">写下你的解题理由</label>
+    <textarea id="zh-data-features-labels-reinforcement-5-prompt" class="self-response" rows="3" placeholder="至少写 1 句，说明你用了哪些样本信息。"></textarea>
+    <button type="button" class="check-response">检查我的理由</button>
+    <p class="response-feedback"></p>
+  </article>
+  <article class="exercise-card" data-kind="reinforcement">
+    <div class="exercise-head">
+      <strong>强化练习 6</strong>
+      <label><input type="checkbox" data-completion-key="grade5-ml:zh:data-features-labels:reinforcement-6"> 已完成</label>
+    </div>
+    <p class="q">某关键特征大面积缺失时怎么办？</p>
+    <details><summary>提示</summary><p>补采或删特征。</p></details>
+    <button type="button" class="toggle-answer" data-target="zh-data-features-labels-reinforcement-6-answer" aria-expanded="false" aria-controls="zh-data-features-labels-reinforcement-6-answer">显示答案</button>
+    <div id="zh-data-features-labels-reinforcement-6-answer" class="answer-panel" hidden>
+      <p><strong>答案:</strong> 评估价值后补采或删除该特征。</p>
+      <p><strong>理由:</strong> 避免在低信息输入上硬训练。</p>
+    </div>
+    <label for="zh-data-features-labels-reinforcement-6-prompt">写下你的解题理由</label>
+    <textarea id="zh-data-features-labels-reinforcement-6-prompt" class="self-response" rows="3" placeholder="至少写 1 句，说明你用了哪些样本信息。"></textarea>
+    <button type="button" class="check-response">检查我的理由</button>
+    <p class="response-feedback"></p>
+  </article>
+  <article class="exercise-card" data-kind="bonus">
+    <div class="exercise-head">
+      <strong>附加题 1</strong>
+      <label><input type="checkbox" data-completion-key="grade5-ml:zh:data-features-labels:bonus-1"> 已完成</label>
+    </div>
+    <p class="q">标签列出现三种同义写法应怎么做？</p>
+    <details><summary>提示</summary><p>做标准映射。</p></details>
+    <button type="button" class="toggle-answer" data-target="zh-data-features-labels-bonus-1-answer" aria-expanded="false" aria-controls="zh-data-features-labels-bonus-1-answer">显示答案</button>
+    <div id="zh-data-features-labels-bonus-1-answer" class="answer-panel" hidden>
+      <p><strong>答案:</strong> 建立映射字典统一到标准标签。</p>
+      <p><strong>理由:</strong> 防止同义类别被拆分。</p>
+    </div>
+    <label for="zh-data-features-labels-bonus-1-prompt">写下你的解题理由</label>
+    <textarea id="zh-data-features-labels-bonus-1-prompt" class="self-response" rows="3" placeholder="至少写 1 句，说明你用了哪些样本信息。"></textarea>
+    <button type="button" class="check-response">检查我的理由</button>
+    <p class="response-feedback"></p>
+  </article>
+  <article class="exercise-card" data-kind="bonus">
+    <div class="exercise-head">
+      <strong>附加题 2</strong>
+      <label><input type="checkbox" data-completion-key="grade5-ml:zh:data-features-labels:bonus-2"> 已完成</label>
+    </div>
+    <p class="q">写一条训练前检查项。</p>
+    <details><summary>提示</summary><p>可选单位/缺失/重复。</p></details>
+    <button type="button" class="toggle-answer" data-target="zh-data-features-labels-bonus-2-answer" aria-expanded="false" aria-controls="zh-data-features-labels-bonus-2-answer">显示答案</button>
+    <div id="zh-data-features-labels-bonus-2-answer" class="answer-panel" hidden>
+      <p><strong>答案:</strong> 检查数值列单位是否一致并记录转换。</p>
+      <p><strong>理由:</strong> 清单化可减少隐藏错误。</p>
+    </div>
+    <label for="zh-data-features-labels-bonus-2-prompt">写下你的解题理由</label>
+    <textarea id="zh-data-features-labels-bonus-2-prompt" class="self-response" rows="3" placeholder="至少写 1 句，说明你用了哪些样本信息。"></textarea>
+    <button type="button" class="check-response">检查我的理由</button>
+    <p class="response-feedback"></p>
+  </article></div>
+    </section>
+    <div class="live" id="liveRegion" aria-live="polite"></div>
+  </main>
+  <script>
+    (() => {
+      const TOTAL = 8;
+      const locale = "zh";
+      const i18n = {"lang":"zh-CN","courseSummary":"共 6 章，每章至少 7 张互动课件页，含 2 个互动环节和 8 道课后练习。","chapterLabel":"第","chapterSuffix":"章","enterChapter":"进入章节","backCatalog":"返回目录","jumpExercises":"跳到练习","hideNotes":"隐藏讲师笔记","showNotes":"显示讲师笔记","fullscreen":"全屏","exitFullscreen":"退出全屏","notesTitle":"讲师笔记","exercisesTitle":"巩固练习区","exercisesDesc":"共 6 道强化练习 + 2 道附加题。完成状态保存在当前浏览器。","prev":"上一页","next":"下一页","revealAnswer":"显示答案","hideAnswer":"隐藏答案","hint":"提示","answer":"答案","rationale":"理由","done":"已完成","reinforcement":"强化练习","bonus":"附加题","interactiveTitle":"互动实验","interactiveDesc":"请操作并观察即时反馈。","resetLab":"重置实验","waiting":"等待操作","unsupportedFullscreen":"当前环境不支持全屏。","languageSwitch":"English Edition","siblingSwitch":"独立 English 目录","indexLangBadge":"中文"};
+      const notesMeta = [{"index":1,"title":"情境任务","note":"开场强调隐私与最小化数据原则。"},{"index":2,"title":"核心讲解","note":"追问：为什么编号通常不该做特征？"},{"index":3,"title":"例题演示","note":"让学生说出“清洗前后”差别。"},{"index":4,"title":"互动实验 1","note":"鼓励先解释再点击。"},{"index":5,"title":"互动实验 2","note":"引导学生建立自己的检查清单。"},{"index":6,"title":"常见误解纠正","note":"再次强调“垃圾进，垃圾出”。"},{"index":7,"title":"应用挑战","note":"要求给出字段级证据。"},{"index":8,"title":"小结与自评","note":"收集每位学生的 1 条检查项。"}];
+      const app = document.getElementById("app");
+      const slidesRoot = document.getElementById("slides");
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const prevButton = document.getElementById("prevButton");
+      const nextButton = document.getElementById("nextButton");
+      const notesToggle = document.getElementById("notesToggle");
+      const fullscreenToggle = document.getElementById("fullscreenToggle");
+      const notesTitle = document.getElementById("notesTitle");
+      const notesBody = document.getElementById("notesBody");
+      const liveRegion = document.getElementById("liveRegion");
+      const jumpExercises = document.getElementById("jumpExercises");
+      let current = 1;
+      let touchStartX = null;
+      let touchStartY = null;
+
+      const safeStorage = {
+        get(key) { try { return window.localStorage.getItem(key); } catch (err) { return null; } },
+        set(key, value) { try { window.localStorage.setItem(key, value); } catch (err) {} }
+      };
+
+      function readHash() {
+        const match = window.location.hash.match(/^#slide-(\d+)$/);
+        if (!match) return 1;
+        const n = Number(match[1]);
+        return Number.isFinite(n) && n >= 1 && n <= TOTAL ? n : 1;
+      }
+
+      function writeHash(n) { history.replaceState(null, "", "#slide-" + n); }
+      function updateButtons() { prevButton.disabled = current === 1; nextButton.disabled = current === TOTAL; }
+      function announce(msg) { liveRegion.textContent = msg; }
+      function updateNotes(n) { const info = notesMeta[n - 1]; notesTitle.textContent = n + " · " + info.title; notesBody.textContent = info.note; }
+
+      function setSlide(n, silent) {
+        current = n;
+        slides.forEach((slide, idx) => {
+          slide.classList.toggle("active", idx === n - 1);
+          slide.setAttribute("aria-hidden", idx === n - 1 ? "false" : "true");
+        });
+        updateButtons();
+        updateNotes(n);
+        writeHash(n);
+        if (!silent) announce(i18n.switchedSlide.replace("{n}", String(n)).replace("{total}", String(TOTAL)));
+      }
+
+      i18n.switchedSlide = locale === "zh" ? "已切换到第 {n} 页，共 {total} 页。" : "Moved to slide {n} of {total}.";
+
+      function go(delta) {
+        const target = Math.max(1, Math.min(TOTAL, current + delta));
+        if (target !== current) setSlide(target, false);
+      }
+
+      function isInteractiveTarget(target) {
+        if (!target || !(target instanceof Element)) return false;
+        return Boolean(
+          target.closest(
+            "button, a, input, select, textarea, summary, details, [role='button'], [role='link'], [contenteditable='true'], [tabindex]:not([tabindex='-1'])"
+          )
+        );
+      }
+
+      function isSpaceKey(event) {
+        return event.key === " " || event.key === "Spacebar" || event.code === "Space";
+      }
+
+      prevButton.addEventListener("click", () => go(-1));
+      nextButton.addEventListener("click", () => go(1));
+
+      document.addEventListener("keydown", (event) => {
+        const t = event.target;
+        const focusTarget = document.activeElement instanceof Element ? document.activeElement : t;
+        const typing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
+        const interactive = isInteractiveTarget(t) || isInteractiveTarget(focusTarget);
+        if (typing) return;
+        if ((isSpaceKey(event) || event.key === "Enter") && interactive) return;
+
+        if (event.key === "ArrowRight" || event.key === "PageDown" || isSpaceKey(event)) {
+          event.preventDefault();
+          go(1);
+        } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+          event.preventDefault();
+          go(-1);
+        } else if (event.key === "Home") {
+          event.preventDefault();
+          setSlide(1, false);
+        } else if (event.key === "End") {
+          event.preventDefault();
+          setSlide(TOTAL, false);
+        }
+      });
+
+      slidesRoot.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+      }, { passive: true });
+
+      slidesRoot.addEventListener("touchend", (event) => {
+        if (touchStartX === null || touchStartY === null) return;
+        const touch = event.changedTouches[0];
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+          if (dx < 0) go(1);
+          if (dx > 0) go(-1);
+        }
+        touchStartX = null;
+        touchStartY = null;
+      }, { passive: true });
+
+      window.addEventListener("hashchange", () => setSlide(readHash(), true));
+
+      notesToggle.addEventListener("click", () => {
+        const hidden = app.classList.toggle("notes-hidden");
+        notesToggle.textContent = hidden ? i18n.showNotes : i18n.hideNotes;
+        notesToggle.setAttribute("aria-expanded", String(!hidden));
+      });
+
+      jumpExercises.addEventListener("click", () => {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        document.getElementById("exerciseSection").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      });
+
+      fullscreenToggle.addEventListener("click", async () => {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+            fullscreenToggle.textContent = i18n.exitFullscreen;
+          } else {
+            await document.exitFullscreen();
+            fullscreenToggle.textContent = i18n.fullscreen;
+          }
+        } catch (err) {
+          announce(i18n.unsupportedFullscreen);
+        }
+      });
+
+      document.addEventListener("fullscreenchange", () => {
+        fullscreenToggle.textContent = document.fullscreenElement ? i18n.exitFullscreen : i18n.fullscreen;
+      });
+
+      document.querySelectorAll(".toggle-answer").forEach((button) => {
+        button.addEventListener("click", () => {
+          const panel = document.getElementById(button.dataset.target);
+          const open = !panel.hasAttribute("hidden");
+          if (open) {
+            panel.setAttribute("hidden", "");
+            button.textContent = i18n.revealAnswer;
+            button.setAttribute("aria-expanded", "false");
+          } else {
+            panel.removeAttribute("hidden");
+            button.textContent = i18n.hideAnswer;
+            button.setAttribute("aria-expanded", "true");
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-completion-key]").forEach((input) => {
+        const key = input.dataset.completionKey;
+        input.checked = safeStorage.get(key) === "1";
+        input.addEventListener("change", () => safeStorage.set(key, input.checked ? "1" : "0"));
+      });
+
+      document.querySelectorAll(".exercise-card").forEach((card) => {
+        const textArea = card.querySelector(".self-response");
+        const check = card.querySelector(".check-response");
+        const feedback = card.querySelector(".response-feedback");
+        if (!textArea || !check || !feedback) return;
+        check.addEventListener("click", () => {
+          const text = (textArea.value || "").trim();
+          const hasLength = text.length >= 30;
+          const evidencePattern = locale === "zh" ? /(样本|特征|因为|路径|错分|测试|数据|规则)/ : /(sample|feature|because|path|error|test|data|rule)/i;
+          const hasEvidenceWord = evidencePattern.test(text);
+          if (hasLength && hasEvidenceWord) {
+            feedback.textContent = locale === "zh"
+              ? "反馈：理由完整，且引用了可检查的证据。下一步可补充一个反例。"
+              : "Feedback: strong reasoning with checkable evidence. Next, add one counter-example.";
+          } else if (text.length === 0) {
+            feedback.textContent = locale === "zh"
+              ? "反馈：先写下你的判断依据，再点击检查。"
+              : "Feedback: write your evidence first, then run the check.";
+          } else {
+            feedback.textContent = locale === "zh"
+              ? "反馈：请再具体一些，至少 30 字，并包含“样本/特征/因为/路径”等证据词。"
+              : "Feedback: be more specific—use at least 30 characters and include evidence words like sample/feature/because/path.";
+          }
+        });
+      });
+
+      function updateDemoStatus(root, text) {
+        const status = root.querySelector(".demo-status");
+        if (status) {
+          const label = status.dataset.statusLabel || status.textContent.split(":")[0];
+          status.textContent = label + ": " + text;
+        }
+      }
+
+      function fillStatusLabels() {
+        document.querySelectorAll(".demo-card").forEach((root) => {
+          const status = root.querySelector(".demo-status");
+          if (!status) return;
+          const label = status.textContent.split(":")[0];
+          status.dataset.statusLabel = label;
+        });
+      }
+
+      function initRulesVsLearning(root) {
+        const samples = [
+          { id: "S1", color: locale === "zh" ? "红" : "Red", weight: 160, sweetness: 8 },
+          { id: "S2", color: locale === "zh" ? "绿" : "Green", weight: 120, sweetness: 4 },
+          { id: "S3", color: locale === "zh" ? "黄" : "Yellow", weight: 140, sweetness: 7 },
+          { id: "S4", color: locale === "zh" ? "红" : "Red", weight: 110, sweetness: 5 }
+        ];
+        const sampleSelect = root.querySelector(".demo-sample");
+        const modeSelect = root.querySelector(".demo-mode");
+        const output = root.querySelector(".demo-output");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+
+        sampleSelect.innerHTML = samples
+          .map((s) => "<option value='" + s.id + "'>" + s.id + " (" + s.color + ", " + s.weight + "g, " + (locale === "zh" ? "甜度" : "sweetness ") + s.sweetness + ")</option>")
+          .join("");
+
+        run.addEventListener("click", () => {
+          const sample = samples.find((s) => s.id === sampleSelect.value) || samples[0];
+          let result = "";
+          if (modeSelect.value === "rule") {
+            result = sample.color === (locale === "zh" ? "红" : "Red") && sample.weight >= 130 ? (locale === "zh" ? "A 箱" : "Box A") : (locale === "zh" ? "B 箱" : "Box B");
+          } else {
+            const score = sample.sweetness * 2 + (sample.weight >= 130 ? 2 : 0);
+            result = score >= 14 ? (locale === "zh" ? "A 箱" : "Box A") : (locale === "zh" ? "B 箱" : "Box B");
+          }
+          output.textContent = (locale === "zh" ? "输出结果：" : "Output: ") + result;
+          updateDemoStatus(root, (locale === "zh" ? "已计算 " : "Computed ") + sample.id + " -> " + result);
+        });
+        reset.addEventListener("click", () => { modeSelect.value = "rule"; sampleSelect.value = "S1"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initStabilityCheck(root) {
+        const samples = [{ id: "S1", score: 15 }, { id: "S2", score: 10 }, { id: "S3", score: 13 }];
+        const sampleSelect = root.querySelector(".demo-sample");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        sampleSelect.innerHTML = samples.map((s) => "<option value='" + s.id + "'>" + s.id + "</option>").join("");
+        run.addEventListener("click", () => {
+          const sample = samples.find((s) => s.id === sampleSelect.value) || samples[0];
+          const result = sample.score >= 12 ? "A" : "B";
+          output.textContent = locale === "zh"
+            ? ("三次输出一致：" + result + ", " + result + ", " + result + "\n解释：同一输入得到相同输出，说明过程稳定；下一步要测试边界样本。")
+            : ("Three identical runs: " + result + ", " + result + ", " + result + "\nWhy it matters: same input gives same output, so computation is stable; next test edge-case samples.");
+          updateDemoStatus(root, locale === "zh" ? "稳定性通过" : "Stability passed");
+        });
+        reset.addEventListener("click", () => { sampleSelect.value = "S1"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initFeatureLabelSorter(root) {
+        const fields = locale === "zh"
+          ? [{ name: "耳朵长度", correct: "feature" }, { name: "活动时长", correct: "feature" }, { name: "是否夜行", correct: "label" }, { name: "样本编号", correct: "ignore" }]
+          : [{ name: "Ear length", correct: "feature" }, { name: "Active minutes", correct: "feature" }, { name: "Night-active", correct: "label" }, { name: "Sample ID", correct: "ignore" }];
+        const sorter = root.querySelector(".demo-sorter");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        const render = () => {
+          sorter.innerHTML = fields.map((f, idx) => {
+            const featureLabel = locale === "zh" ? "特征" : "Feature";
+            const labelLabel = locale === "zh" ? "标签" : "Label";
+            const ignoreLabel = locale === "zh" ? "不应使用" : "Ignore";
+            return "<label>" + f.name + "<select data-i='" + idx + "'><option value='feature'>" + featureLabel + "</option><option value='label'>" + labelLabel + "</option><option value='ignore'>" + ignoreLabel + "</option></select></label>";
+          }).join("");
+        };
+        render();
+        run.addEventListener("click", () => {
+          let score = 0;
+          const mistakes = [];
+          sorter.querySelectorAll("select").forEach((sel, idx) => {
+            if (sel.value === fields[idx].correct) score += 1;
+            else mistakes.push(fields[idx].name);
+          });
+          output.textContent = (locale === "zh" ? "正确 " : "Correct ") + score + " / " + fields.length +
+            (mistakes.length ? (locale === "zh" ? ("；需复查：" + mistakes.join("、")) : ("; review: " + mistakes.join(", "))) : "");
+          updateDemoStatus(root, score === fields.length ? (locale === "zh" ? "全部正确" : "All correct") : (locale === "zh" ? "继续修正" : "Need correction"));
+        });
+        reset.addEventListener("click", () => { render(); output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initDataCleanup(root) {
+        const unit = root.querySelector(".demo-unit");
+        const missing = root.querySelector(".demo-missing");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        run.addEventListener("click", () => {
+          const score = (unit.value === "gram" ? 55 : 25) + (missing.value === "rule" ? 45 : 20);
+          output.textContent = locale === "zh" ? ("数据质量评分: " + score + "/100") : ("Data quality score: " + score + "/100");
+          updateDemoStatus(root, score >= 90 ? (locale === "zh" ? "可进入训练" : "Ready for training") : (locale === "zh" ? "需继续清洗" : "Needs more cleanup"));
+        });
+        reset.addEventListener("click", () => { unit.value = "mixed"; missing.value = "raw"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initBoundaryBoard(root) {
+        const points = [{ x: 2, label: "A" }, { x: 3, label: "A" }, { x: 4, label: "A" }, { x: 6, label: "B" }, { x: 7, label: "B" }, { x: 8, label: "B" }];
+        const testPoint = { x: 5 };
+        const threshold = root.querySelector(".demo-threshold");
+        const thresholdValue = root.querySelector(".demo-threshold-value");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        threshold.addEventListener("input", () => { thresholdValue.textContent = threshold.value; });
+        run.addEventListener("click", () => {
+          const t = Number(threshold.value);
+          let correct = 0;
+          points.forEach((p) => { const pred = p.x < t ? "A" : "B"; if (pred === p.label) correct += 1; });
+          const acc = Math.round((correct / points.length) * 100);
+          const pred = testPoint.x < t ? "A" : "B";
+          const advice = acc >= 83
+            ? (locale === "zh" ? "当前阈值较稳，可继续测试边界点 x=5 附近。" : "This threshold is fairly stable; now test around boundary x=5.")
+            : (locale === "zh" ? "当前阈值造成较多错分，尝试更靠近两类分界。" : "This threshold causes extra errors; move closer to the class boundary.");
+          output.textContent = locale === "zh"
+            ? ("训练准确率 " + acc + "%，测试点预测: " + pred + "。建议：" + advice)
+            : ("Train accuracy " + acc + "%, test prediction: " + pred + ". Next step: " + advice);
+          updateDemoStatus(root, (locale === "zh" ? "阈值已评估: " : "Threshold evaluated: ") + t);
+        });
+        reset.addEventListener("click", () => { threshold.value = "5"; thresholdValue.textContent = "5"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initConfidenceMeter(root) {
+        const testx = root.querySelector(".demo-testx");
+        const testxValue = root.querySelector(".demo-testx-value");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        testx.addEventListener("input", () => { testxValue.textContent = testx.value; });
+        run.addEventListener("click", () => {
+          const x = Number(testx.value);
+          const distance = Math.abs(x - 5);
+          const confidence = Math.max(50, 98 - distance * 12);
+          const review = confidence < 70;
+          output.textContent = locale === "zh"
+            ? ("置信提示: " + confidence + "%，" + (review ? "建议人工复核" : "可自动通过初筛"))
+            : ("Confidence cue: " + confidence + "%, " + (review ? "human review recommended" : "auto pre-screen acceptable"));
+          updateDemoStatus(root, review ? (locale === "zh" ? "高不确定性" : "High uncertainty") : (locale === "zh" ? "不确定性较低" : "Lower uncertainty"));
+        });
+        reset.addEventListener("click", () => { testx.value = "5"; testxValue.textContent = "5"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initTrainTestLab(root) {
+        const model = root.querySelector(".demo-model");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        const table = { simple: { train: 88, test: 85, wrong: 4 }, complex: { train: 98, test: 77, wrong: 9 } };
+        run.addEventListener("click", () => {
+          const row = table[model.value];
+          const recommendation = model.value === "simple"
+            ? (locale === "zh" ? "推荐：先用简单模型，再通过补数据逐步改进。" : "Recommendation: keep the simple model first, then improve with better data.")
+            : (locale === "zh" ? "提醒：训练高分但测试下降，先排查过拟合再上线。" : "Warning: train score is high but test score drops; check overfitting before deployment.");
+          output.textContent = locale === "zh"
+            ? ("训练 " + row.train + "%，测试 " + row.test + "%，错分 " + row.wrong + " 条。\n" + recommendation)
+            : ("Train " + row.train + "%, test " + row.test + "%, misclassified " + row.wrong + ".\n" + recommendation);
+          updateDemoStatus(root, model.value === "simple" ? (locale === "zh" ? "简单模型更稳" : "Simple model is steadier") : (locale === "zh" ? "复杂模型可能过拟合" : "Complex model may overfit"));
+        });
+        reset.addEventListener("click", () => { model.value = "simple"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initErrorAnalysis(root) {
+        const scenario = root.querySelector(".demo-scenario");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        run.addEventListener("click", () => {
+          if (scenario.value === "rain") {
+            output.textContent = locale === "zh" ? "雨天组错误率高，建议补充雨天样本并检查传感字段。": "Rainy group errors are high; add rainy samples and audit weather features.";
+            updateDemoStatus(root, locale === "zh" ? "优先补齐雨天数据" : "Prioritize rainy data coverage");
+          } else {
+            output.textContent = locale === "zh" ? "夜间组错分偏高，建议增加夜间样本并做分组评估。": "Night group has elevated errors; add night samples and run grouped evaluation.";
+            updateDemoStatus(root, locale === "zh" ? "需做夜间专项复查" : "Night-specific review needed");
+          }
+        });
+        reset.addEventListener("click", () => { scenario.value = "rain"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function evaluateTree(sample, rootQuestion, secondQuestion) {
+        const ask = {
+          rain: { zh: "是否降雨", en: "Is it raining?" },
+          temp: { zh: "是否高温", en: "Is it hot?" },
+          wind: { zh: "风力是否强", en: "Is wind strong?" },
+          cloud: { zh: "云量是否高", en: "Is cloud cover high?" }
+        };
+        const valueMap = (key) => (key === "rain" ? sample.rain : key === "temp" ? sample.temp : key === "wind" ? sample.wind : sample.cloud);
+        const fallbackSecond = rootQuestion === "rain" ? "wind" : "rain";
+        const effectiveSecond = secondQuestion === rootQuestion ? fallbackSecond : secondQuestion;
+        const rootValue = valueMap(rootQuestion);
+        const secondValue = valueMap(effectiveSecond);
+        // Deterministic two-level tree: root split then second split controls final class.
+        const output = rootValue
+          ? (secondValue ? "stay" : "go")
+          : (secondValue ? "go" : "stay");
+
+        const yesNo = (v) => (locale === "zh" ? (v ? "是" : "否") : (v ? "Yes" : "No"));
+        const resultLabel = locale === "zh" ? (output === "go" ? "去户外" : "不去户外") : (output === "go" ? "Go outside" : "Stay inside");
+        const expectedLabel = locale === "zh" ? (sample.expected === "go" ? "去户外" : "不去户外") : (sample.expected === "go" ? "Go outside" : "Stay inside");
+        const correctness = output === sample.expected
+          ? (locale === "zh" ? "与样本标签一致" : "matches sample label")
+          : (locale === "zh" ? "与样本标签不一致" : "does not match sample label");
+        const pathText = locale === "zh"
+          ? ("路径: " + ask[rootQuestion].zh + "=" + yesNo(rootValue) + " -> " + ask[effectiveSecond].zh + "=" + yesNo(secondValue) + " -> 输出: " + resultLabel +
+            "；样本标签: " + expectedLabel + "（" + correctness + "）")
+          : ("Path: " + ask[rootQuestion].en + "=" + yesNo(rootValue) + " -> " + ask[effectiveSecond].en + "=" + yesNo(secondValue) + " -> Output: " + resultLabel +
+            "; sample label: " + expectedLabel + " (" + correctness + ")");
+        return { resultLabel, pathText, effectiveSecond };
+      }
+
+      function weatherSamples() {
+        return [
+          { id: "W1", rain: true, temp: false, wind: true, cloud: true, expected: "stay" },
+          { id: "W2", rain: false, temp: true, wind: false, cloud: false, expected: "go" },
+          { id: "W3", rain: false, temp: false, wind: true, cloud: true, expected: "stay" },
+          { id: "W4", rain: true, temp: true, wind: false, cloud: true, expected: "stay" }
+        ];
+      }
+
+      function sampleLabel(s) {
+        return locale === "zh"
+          ? (s.id + " (雨:" + (s.rain ? "是" : "否") + ", 高温:" + (s.temp ? "是" : "否") + ", 风强:" + (s.wind ? "是" : "否") + ", 云高:" + (s.cloud ? "是" : "否") + ")")
+          : (s.id + " (rain:" + (s.rain ? "yes" : "no") + ", hot:" + (s.temp ? "yes" : "no") + ", wind:" + (s.wind ? "yes" : "no") + ", cloud:" + (s.cloud ? "yes" : "no") + ")");
+      }
+
+      function initTreeBuilder(root) {
+        const rootQ = root.querySelector(".demo-root");
+        const secondQ = root.querySelector(".demo-second");
+        const weather = root.querySelector(".demo-weather");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        const samples = weatherSamples();
+        weather.innerHTML = samples.map((s) => "<option value='" + s.id + "'>" + sampleLabel(s) + "</option>").join("");
+
+        run.addEventListener("click", () => {
+          const sample = samples.find((s) => s.id === weather.value) || samples[0];
+          const trace = evaluateTree(sample, rootQ.value, secondQ.value);
+          output.textContent = (locale === "zh" ? ("样本 " + sample.id + " · ") : ("Sample " + sample.id + " · ")) + trace.pathText;
+          if (trace.effectiveSecond !== secondQ.value) {
+            output.textContent += locale === "zh" ? "；提示：第二问题不能与根问题相同，系统已自动替换。" : "; Note: the second question cannot match the root, so it was auto-swapped.";
+          }
+          updateDemoStatus(root, locale === "zh" ? ("已评估 " + sample.id + "，结果: " + trace.resultLabel) : ("Evaluated " + sample.id + ", result: " + trace.resultLabel));
+        });
+        reset.addEventListener("click", () => { rootQ.value = "rain"; secondQ.value = "temp"; weather.value = "W1"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initPathTrace(root) {
+        const weather = root.querySelector(".demo-weather");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        const samples = weatherSamples();
+        weather.innerHTML = samples.map((s) => "<option value='" + s.id + "'>" + sampleLabel(s) + "</option>").join("");
+        run.addEventListener("click", () => {
+          const sample = samples.find((s) => s.id === weather.value) || samples[0];
+          const trace = evaluateTree(sample, "rain", "wind");
+          output.textContent = (locale === "zh" ? ("样本 " + sample.id + " · ") : ("Sample " + sample.id + " · ")) + trace.pathText;
+          updateDemoStatus(root, locale === "zh" ? ("已完成路径追踪: " + sample.id) : ("Path tracing completed: " + sample.id));
+        });
+        reset.addEventListener("click", () => { weather.value = "W1"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initFairnessInspector(root) {
+        const plan = root.querySelector(".demo-plan");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        const plans = { A: { group1: 6, group2: 15, coverageGap: 38 }, B: { group1: 8, group2: 10, coverageGap: 6 } };
+        run.addEventListener("click", () => {
+          const p = plans[plan.value];
+          const fair = Math.abs(p.group1 - p.group2) <= 4 && p.coverageGap <= 10;
+          output.textContent = locale === "zh"
+            ? ("组1错误率 " + p.group1 + "%，组2错误率 " + p.group2 + "%，覆盖差 " + p.coverageGap + "%。")
+            : ("Group1 error " + p.group1 + "%, Group2 error " + p.group2 + "%, coverage gap " + p.coverageGap + "%.");
+          updateDemoStatus(root, fair ? (locale === "zh" ? "方案更公平，仍需人工审核高风险样本" : "Plan is fairer; high-risk samples still need human review") : (locale === "zh" ? "公平风险偏高，建议补数据并复查" : "Fairness risk is high; add data and review"));
+        });
+        reset.addEventListener("click", () => { plan.value = "A"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initRiskTriage(root) {
+        const risk = root.querySelector(".demo-risk");
+        const run = root.querySelector(".demo-run");
+        const reset = root.querySelector(".demo-reset");
+        const output = root.querySelector(".demo-output");
+        run.addEventListener("click", () => {
+          if (risk.value === "high") {
+            output.textContent = locale === "zh" ? "规则: 高风险任务必须人工复核，且记录审核理由。" : "Rule: High-risk outputs require human review with logged rationale.";
+            updateDemoStatus(root, locale === "zh" ? "触发强制人工审核" : "Mandatory human review triggered");
+          } else if (risk.value === "medium") {
+            output.textContent = locale === "zh" ? "规则: 中风险任务先自动建议，再抽样人工复查。" : "Rule: Medium-risk outputs use auto suggestion plus sampled human checks.";
+            updateDemoStatus(root, locale === "zh" ? "触发抽样复查" : "Sampled review triggered");
+          } else {
+            output.textContent = locale === "zh" ? "规则: 低风险任务可自动初筛，但保留追踪日志。" : "Rule: Low-risk outputs may auto pre-screen with audit logs.";
+            updateDemoStatus(root, locale === "zh" ? "低风险自动初筛" : "Low-risk pre-screen enabled");
+          }
+        });
+        reset.addEventListener("click", () => { risk.value = "low"; output.textContent = ""; updateDemoStatus(root, locale === "zh" ? "已重置" : "Reset complete"); });
+      }
+
+      function initDemos() {
+        document.querySelectorAll(".demo-card").forEach((root) => {
+          const type = root.dataset.demoType;
+          if (type === "rules-vs-learning") initRulesVsLearning(root);
+          if (type === "stability-check") initStabilityCheck(root);
+          if (type === "feature-label-sorter") initFeatureLabelSorter(root);
+          if (type === "data-cleanup") initDataCleanup(root);
+          if (type === "boundary-board") initBoundaryBoard(root);
+          if (type === "confidence-meter") initConfidenceMeter(root);
+          if (type === "train-test-lab") initTrainTestLab(root);
+          if (type === "error-analysis") initErrorAnalysis(root);
+          if (type === "tree-builder") initTreeBuilder(root);
+          if (type === "path-trace") initPathTrace(root);
+          if (type === "fairness-inspector") initFairnessInspector(root);
+          if (type === "risk-triage") initRiskTriage(root);
+        });
+      }
+
+      fillStatusLabels();
+      setSlide(readHash(), true);
+      updateButtons();
+      initDemos();
+    })();
+  </script>
+</body>
+</html>
