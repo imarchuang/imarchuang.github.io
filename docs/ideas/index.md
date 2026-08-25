@@ -24,6 +24,7 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Drops
 
+* [grade-5-math-canvas-html-2026-fall](/drops/grade-5-math-canvas-html-2026-fall/ ':ignore') — 五年级上册数学九章互动式 Canvas 风格 HTML 课件，支持翻页、答案、教案、全屏与打印
 * [grade-5-math-chapter-decks-2026-fall](/drops/grade-5-math-chapter-decks-2026-fall/ ':ignore') — 五年级上册数学九章一对一辅导课件（2026秋新版），含9份可下载PPT
 * [kafka-consumer-group-region-affinity](/drops/kafka-consumer-group-region-affinity/ ':ignore') — Kafka consumer group 的 region affinity 方案对比：拆 topic、拆 group、custom assignor 与应用内分派。
 * [orbit-sketch](/drops/orbit-sketch/ ':ignore') — pointer-follow orbit canvas

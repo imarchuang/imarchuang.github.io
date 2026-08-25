@@ -1,0 +1,67 @@
+Output directory: /Users/marc.huang/shadow-marc/.superpowers/grade5-math-html-decks
+HTML file count: 10
+Deck file count: 9
+Root README present: True
+
+Root index checks:
+- Start links found: 9
+- PPT links found: 9
+- Root link ./decimals-add-subtract/ -> decimals-add-subtract/index.html exists=True
+- Root link ./triangles/ -> triangles/index.html exists=True
+- Root link ./decimal-multiply/ -> decimal-multiply/index.html exists=True
+- Root link ./letters-1/ -> letters-1/index.html exists=True
+- Root link ./polygon-area/ -> polygon-area/index.html exists=True
+- Root link ./position-movement/ -> position-movement/index.html exists=True
+- Root link ./factors-multiples/ -> factors-multiples/index.html exists=True
+- Root link ./probability/ -> probability/index.html exists=True
+- Root link ./review/ -> review/index.html exists=True
+
+Per-deck checks:
+- decimal-multiply/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+- decimals-add-subtract/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+- factors-multiples/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+- letters-1/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+- polygon-area/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+- position-movement/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+- probability/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+- review/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+- triangles/index.html: title_ok=True slides=9 visuals=9 notes=9/9 toggles=4 back_link=True fullscreen=True hash_logic=True lang=True ppt_links=1 placeholders=0
+
+Remote PPT URL checks:
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E4%B8%89%E8%A7%92%E5%BD%A2%E7%9A%84%E5%86%8D%E8%AE%A4%E8%AF%86.pptx -> 200
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E5%80%8D%E6%95%B0%E4%B8%8E%E5%9B%A0%E6%95%B0.pptx -> 200
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E5%8F%AF%E8%83%BD%E6%80%A7.pptx -> 200
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E5%9B%BE%E5%BD%A2%E7%9A%84%E4%BD%8D%E7%BD%AE%E4%B8%8E%E8%BF%90%E5%8A%A8%EF%BC%88%E4%B8%80%EF%BC%89.pptx -> 200
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E5%A4%9A%E8%BE%B9%E5%BD%A2%E7%9A%84%E9%9D%A2%E7%A7%AF.pptx -> 200
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E5%B0%8F%E6%95%B0%E4%B9%98%E6%B3%95.pptx -> 200
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E5%B0%8F%E6%95%B0%E7%9A%84%E5%86%8D%E8%AE%A4%E8%AF%86%E5%92%8C%E5%8A%A0%E5%87%8F%E6%B3%95.pptx -> 200
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E6%80%BB%E5%A4%8D%E4%B9%A0.pptx -> 200
+- [HEAD] https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E7%94%A8%E5%AD%97%E6%AF%8D%E8%A1%A8%E7%A4%BA%EF%BC%88%E4%B8%80%EF%BC%89.pptx -> 200
+
+Manual runtime QA:
+- Local server: python3 -m http.server 8766 from the output directory
+- Desktop viewport tested: 1440x1024
+- Mobile viewport tested: 390x844
+- Root index loaded with 0 console errors after favicon fix
+- Chapter tested live: decimals-add-subtract/index.html
+- Keyboard tested: ArrowRight, ArrowLeft, PageDown, PageUp, Home, End, Space
+- Answer toggles tested live: diagnostic slide, worked example slide, guided practice slide, challenge slide
+- Notes drawer tested live: hide/show state toggle
+- Hash deep-link tested live: direct reload to #slide-4 persisted correctly
+- Fullscreen tested live: entered successfully and button label changed to 退出全屏
+- Root navigation tested live: 返回总目录 link returned to root index
+- Mobile viewport metrics: window.innerWidth=390, documentElement.scrollWidth=390, body.scrollWidth=390, stage height=780
+
+Math content fix applied during generation:
+- decimals-add-subtract diagnostic[2].a corrected from “更接近8，也可先判断不可能接近9。” to “更接近9，因为 6.2 + 1.89 = 8.09，离 9 更近。”
+
+Overall result: PASS
+- All scripted checks passed.
+
+Post-generation responsive regression check:
+- Initial live check found `.slides-viewport` collapsed to 2px below 900px because `height:100%` had no definite parent height.
+- Generator fixed: responsive `.stage-frame` now uses definite 720px/780px heights and `.slide` uses vertical overflow scrolling.
+- Regenerated all nine decks.
+- Fresh browser check: active slide count=1, active display=grid, viewport height=758px, slide client/scroll height=756px, no horizontal overflow.
+- Keyboard navigation and answer reveal rechecked after regeneration.
+- Final result: PASS.
