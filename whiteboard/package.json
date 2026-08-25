@@ -1,0 +1,20 @@
+{
+  "name": "marc-personal-whiteboard",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@excalidraw/excalidraw": "0.18.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "6.1.0",
+    "fake-indexeddb": "6.2.5",
+    "vite": "8.2.2",
+    "vitest": "4.1.11"
+  }
+}
