@@ -811,6 +811,7 @@
           appendEvent("state", "human", "Changed surface intent", { intent }, false);
           render();
         }, state.surfaceIntent === intent ? "selected" : "");
+        withFocusKey(control, "compose-intent-" + intent);
         control.setAttribute("aria-pressed", String(state.surfaceIntent === intent));
         intents.append(control);
       });
