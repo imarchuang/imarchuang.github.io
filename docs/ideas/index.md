@@ -31,4 +31,5 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Notes
 
+* [grade-5-math-tutoring-2026-fall](./grade-5-math-tutoring-2026-fall) — 120分钟诊断式全册复习：小数、图形、代数、因数倍数与可能性
 * [example](./example) — Markdown dump template
