@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -210,6 +210,42 @@ describe("migrate-content", () => {
     );
   });
 
+  test("preserves source-language image fallback labels", async () => {
+    const { migrateContent } = await loadMigrationModule();
+    const sourceDir = await makeTempDir("task-4-images-source-");
+    const workspaceDir = await makeTempDir("task-4-images-output-");
+    const notesDir = path.join(workspaceDir, "notes");
+    const navigationFile = path.join(workspaceDir, "navigation.json");
+    const knownIssuesFile = path.join(workspaceDir, "content-known-issues.json");
+
+    await mkdir(path.join(sourceDir, "guides"), { recursive: true });
+    await writeFile(
+      path.join(sourceDir, "guides", "images.md"),
+      [
+        "# 图片回退",
+        "",
+        "![架构图](./missing-diagram.png)",
+        "",
+        "![](./diagram-without-alt.png)",
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    await migrateContent({
+      sourceDir,
+      notesDir,
+      navigationFile,
+      knownIssuesFile,
+    });
+
+    const generated = await readFile(path.join(notesDir, "guides", "images.md"), "utf8");
+    expect(generated).toContain("[架构图](./missing-diagram.png)");
+    expect(generated).toContain("[./diagram-without-alt.png](./diagram-without-alt.png)");
+    expect(generated).not.toContain("Image:");
+    expect(generated).not.toContain("Image asset");
+  });
+
   test("accounts for all real docs markdown and clears valid relative id links from known issues", async () => {
     const { migrateContent } = await loadMigrationModule();
     const workspaceDir = await makeTempDir("task-2-real-");
@@ -260,9 +296,8 @@ describe("migrate-content", () => {
       path.join(notesDir, "products", "federated", "sticky_session_k8s.md"),
       "utf8",
     );
-    expect(stickySession).toContain(
-      "[Image: websocket stick session](../../images/lock_sticky_session.png)",
-    );
     expect(stickySession).not.toContain("![websocket stick session]");
+    expect(stickySession).toContain("[websocket stick session](../../images/lock_sticky_session.png)");
+    expect(stickySession).not.toContain("Image:");
   });
 });

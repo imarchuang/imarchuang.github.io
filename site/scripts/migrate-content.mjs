@@ -271,7 +271,7 @@ function rewriteMarkdownImages(markdown) {
       return match;
     }
 
-    const label = alt.trim() ? `Image: ${alt.trim()}` : "Image asset";
+    const label = alt.trim() || href;
     return `[${label}](${href})`;
   });
 }
