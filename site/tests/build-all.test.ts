@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
@@ -50,7 +50,7 @@ describe("build-all", () => {
   test("runs astro, pagefind, static assembly, and whiteboard build in order", async () => {
     const { buildAll } = await loadBuildModule();
     const calls: Array<{
-      kind: "command" | "assemble";
+      kind: "bootstrap" | "command" | "assemble";
       command?: string;
       args?: string[];
       cwd?: string;
@@ -64,6 +64,12 @@ describe("build-all", () => {
     await buildAll({
       siteRoot,
       repoRoot,
+      bootstrap: async (options: Record<string, string>) => {
+        calls.push({
+          kind: "bootstrap",
+          options,
+        });
+      },
       runCommand: async (command: string, args: string[], options: Record<string, unknown>) => {
         calls.push({
           kind: "command",
@@ -82,6 +88,16 @@ describe("build-all", () => {
     });
 
     expect(calls).toEqual([
+      {
+        kind: "bootstrap",
+        options: {
+          sourceDir: path.join(repoRoot, "docs"),
+          notesDir: path.join(siteRoot, "src", "generated", "notes"),
+          navigationFile: path.join(siteRoot, "src", "generated", "navigation.json"),
+          knownIssuesFile: path.join(siteRoot, "content-known-issues.json"),
+          assetManifestFile: path.join(siteRoot, "src", "generated", "local-assets.json"),
+        },
+      },
       {
         kind: "command",
         command: process.platform === "win32" ? "npm.cmd" : "npm",
@@ -121,6 +137,9 @@ describe("build-all", () => {
     async () => {
       const cwd = process.cwd();
       const distDir = path.join(cwd, "dist");
+      const generatedDir = path.join(cwd, "src", "generated");
+
+      await rm(generatedDir, { recursive: true, force: true });
 
       await execFileAsync("node", ["scripts/build-all.mjs"], {
         cwd,
@@ -130,6 +149,12 @@ describe("build-all", () => {
       await expect(readFile(path.join(distDir, "index.html"), "utf8")).resolves.toContain(
         "<!DOCTYPE html>",
       );
+      await expect(readFile(path.join(generatedDir, "navigation.json"), "utf8")).resolves.toContain(
+        '"href": "/"',
+      );
+      await expect(
+        readFile(path.join(generatedDir, "local-assets.json"), "utf8"),
+      ).resolves.toContain("publicPath");
       await expect(readFile(path.join(distDir, "draw", "index.html"), "utf8")).resolves.toContain(
         "<!doctype html>",
       );

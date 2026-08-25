@@ -975,30 +975,8 @@ export async function migrateContent({
     .map((absolutePath) => toPosix(path.relative(sourceDir, absolutePath)))
     .sort((left, right) => left.localeCompare(right));
 
-  const migrated = [];
-  const excluded = [];
-  const excludedSupport = [];
-  const skippedGeneratedDir = [];
-
-  for (const relativePath of sourceFiles) {
-    if (!isMarkdownFile(relativePath)) {
-      continue;
-    }
-
-    if (isGeneratedDirExcluded(relativePath)) {
-      excluded.push(relativePath);
-      skippedGeneratedDir.push(relativePath);
-      continue;
-    }
-
-    if (isSupportMarkdown(relativePath)) {
-      excluded.push(relativePath);
-      excludedSupport.push(relativePath);
-      continue;
-    }
-
-    migrated.push(relativePath);
-  }
+  const { migrated, excluded, excludedSupport, skippedGeneratedDir } =
+    classifySourceFiles(sourceFiles);
 
   ensureUniqueRoutes(migrated);
 
@@ -1064,12 +1042,46 @@ export async function migrateContent({
   };
 }
 
-export async function runCli(overrides = {}) {
+export function classifySourceFiles(relativePaths) {
+  const migrated = [];
+  const excluded = [];
+  const excludedSupport = [];
+  const skippedGeneratedDir = [];
+
+  for (const relativePath of relativePaths) {
+    if (!isMarkdownFile(relativePath)) {
+      continue;
+    }
+
+    if (isGeneratedDirExcluded(relativePath)) {
+      excluded.push(relativePath);
+      skippedGeneratedDir.push(relativePath);
+      continue;
+    }
+
+    if (isSupportMarkdown(relativePath)) {
+      excluded.push(relativePath);
+      excludedSupport.push(relativePath);
+      continue;
+    }
+
+    migrated.push(relativePath);
+  }
+
+  return {
+    migrated,
+    excluded,
+    excludedSupport,
+    skippedGeneratedDir,
+  };
+}
+
+export async function bootstrapGeneratedContent(overrides = {}) {
   const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const navigationFile =
     overrides.navigationFile ?? path.resolve(siteRoot, "src/generated/navigation.json");
 
-  const result = await migrateContent({
+  return migrateContent({
     sourceDir: overrides.sourceDir ?? path.resolve(siteRoot, "../docs"),
     notesDir: overrides.notesDir ?? path.resolve(siteRoot, "src/generated/notes"),
     navigationFile,
@@ -1079,6 +1091,11 @@ export async function runCli(overrides = {}) {
       overrides.assetManifestFile ??
       path.resolve(path.dirname(navigationFile), "local-assets.json"),
   });
+
+}
+
+export async function runCli(overrides = {}) {
+  const result = await bootstrapGeneratedContent(overrides);
 
   console.log(
     JSON.stringify(

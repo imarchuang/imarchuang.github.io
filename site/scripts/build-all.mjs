@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
 import { assembleStatic } from "./assemble-static.mjs";
+import { bootstrapGeneratedContent } from "./migrate-content.mjs";
 
 const execFileAsync = promisify(execFile);
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
@@ -42,7 +43,15 @@ export async function buildAll({
   repoRoot = path.resolve(siteRoot, ".."),
   runCommand: commandRunner = runCommand,
   assemble = assembleStatic,
+  bootstrap = bootstrapGeneratedContent,
 } = {}) {
+  await bootstrap({
+    sourceDir: path.join(repoRoot, "docs"),
+    notesDir: path.join(siteRoot, "src", "generated", "notes"),
+    navigationFile: path.join(siteRoot, "src", "generated", "navigation.json"),
+    knownIssuesFile: path.join(siteRoot, "content-known-issues.json"),
+    assetManifestFile: path.join(siteRoot, "src", "generated", "local-assets.json"),
+  });
   await commandRunner(npmCommand, ["run", "build:astro"], { cwd: siteRoot });
   await rm(path.join(siteRoot, "dist", "pagefind"), { recursive: true, force: true });
   await commandRunner(npmCommand, ["exec", "--", "pagefind", "--site", "dist"], {

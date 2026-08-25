@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -13,6 +13,25 @@ async function makeTempDir(prefix: string) {
   const dir = await mkdtemp(path.join(tmpdir(), prefix));
   tempPaths.push(dir);
   return dir;
+}
+
+async function listMarkdownFiles(directory: string): Promise<string[]> {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files: string[] = [];
+
+  for (const entry of entries) {
+    const absolutePath = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...(await listMarkdownFiles(absolutePath)));
+      continue;
+    }
+
+    if (entry.isFile() && entry.name.endsWith(".md")) {
+      files.push(absolutePath);
+    }
+  }
+
+  return files;
 }
 
 async function loadMigrationModule() {
@@ -305,11 +324,15 @@ describe("migrate-content", () => {
   });
 
   test("accounts for all real docs markdown and clears valid relative id links from known issues", async () => {
-    const { migrateContent } = await loadMigrationModule();
+    const { classifySourceFiles, migrateContent } = await loadMigrationModule();
     const workspaceDir = await makeTempDir("task-2-real-");
     const notesDir = path.join(workspaceDir, "notes");
     const navigationFile = path.join(workspaceDir, "navigation.json");
     const knownIssuesFile = path.join(workspaceDir, "content-known-issues.json");
+    const sourceFiles = (await listMarkdownFiles(realDocsRoot))
+      .map((absolutePath) => path.posix.normalize(path.relative(realDocsRoot, absolutePath)))
+      .sort((left, right) => left.localeCompare(right));
+    const expectedCounts = classifySourceFiles(sourceFiles);
 
     const result = await migrateContent({
       sourceDir: realDocsRoot,
@@ -320,7 +343,7 @@ describe("migrate-content", () => {
 
     expect(result.accountedCount).toBe(174);
     expect(result.supportExcludedCount).toBe(10);
-    expect(result.generatedDirSkippedCount).toBe(5);
+    expect(result.generatedDirSkippedCount).toBe(expectedCounts.skippedGeneratedDir.length);
 
     const sectionTitles = result.navigation.map((section: { title: string }) => section.title);
     expect(sectionTitles).toEqual(
