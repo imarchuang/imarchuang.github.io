@@ -44,9 +44,10 @@ function renderItems(branches: Array<NavigationSection | NavigationItem>): strin
         .filter(Boolean)
         .join(" ");
       const current = hasCurrent(item.href) ? ' aria-current="page"' : "";
+      const validationContext = ' data-validation-context="sidebar-nav"';
       const nested = children.length > 0 ? renderItems(children) : "";
 
-      return `<li class="${classes}"><a href="${escapeHtml(item.href)}"${current}>${escapeHtml(item.title)}</a>${nested}</li>`;
+      return `<li class="${classes}"><a href="${escapeHtml(item.href)}"${validationContext}${current}>${escapeHtml(item.title)}</a>${nested}</li>`;
     })
     .join("");
 

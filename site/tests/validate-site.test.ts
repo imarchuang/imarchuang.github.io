@@ -142,6 +142,47 @@ describe("validate-site", () => {
     );
   });
 
+  test("reports broken internal script src assets while ignoring inline script bodies", async () => {
+    const {
+      __testOnly: { collectValidationReport },
+    } = await loadValidationModule();
+    const fixture = await createBuiltSiteFixture({
+      files: {
+        "guides/topic/index.html": [
+          "<!doctype html>",
+          '<script src="/assets/missing.js"></script>',
+          "<script>const sample = '<a href=\"/guides/ghost/\">ghost</a>';</script>",
+          "",
+        ].join("\n"),
+      },
+    });
+
+    const report = await collectValidationReport(fixture);
+
+    expect(report.failures).toEqual([
+      expect.stringContaining("/assets/missing.js"),
+    ]);
+  });
+
+  test("accepts existing internal script src assets", async () => {
+    const { validateSite } = await loadValidationModule();
+    const fixture = await createBuiltSiteFixture({
+      files: {
+        "guides/topic/index.html": [
+          "<!doctype html>",
+          '<script src="/assets/app.js"></script>',
+          "<script>const sample = '<a href=\"/guides/ghost/\">ghost</a>';</script>",
+          "",
+        ].join("\n"),
+        "assets/app.js": "console.log('ok');",
+      },
+    });
+
+    await expect(validateSite(fixture)).resolves.toMatchObject({
+      failureCount: 0,
+    });
+  });
+
   test("ignores external, fragment-only, and javascript-free non-local URLs", async () => {
     const { validateSite } = await loadValidationModule();
     const fixture = await createBuiltSiteFixture({
@@ -187,6 +228,30 @@ describe("validate-site", () => {
     expect(report.allowlistedFailures).toHaveLength(1);
     expect(report.failures).toEqual([
       expect.stringContaining("/guides/topic/fresh-break/"),
+    ]);
+  });
+
+  test("allowlists marked sidebar links without suppressing body links to the same target", async () => {
+    const {
+      __testOnly: { collectValidationReport },
+    } = await loadValidationModule();
+    const fixture = await createBuiltSiteFixture({
+      knownIssues: [{ kind: "stale-sidebar-link", source: "guides/_sidebar.md", target: "./missing" }],
+      files: {
+        "guides/topic/index.html": [
+          "<!doctype html>",
+          '<nav><a href="/missing/" data-validation-context="sidebar-nav">Sidebar</a></nav>',
+          '<p><a href="/missing/">Body</a></p>',
+          "",
+        ].join("\n"),
+      },
+    });
+
+    const report = await collectValidationReport(fixture);
+
+    expect(report.allowlistedFailures).toHaveLength(1);
+    expect(report.failures).toEqual([
+      expect.stringContaining('Broken internal link in "/guides/topic/"'),
     ]);
   });
 

@@ -33,16 +33,18 @@ function looksExternal(reference) {
   return /^(?:[a-z][a-z0-9+.-]*:|\/\/)/iu.test(reference);
 }
 
-function stripNonDocumentBlocks(html) {
-  return html.replace(/<(script|style|template|pre|code)\b[\s\S]*?<\/\1>/giu, "");
+function stripNonDocumentBodies(html) {
+  return html
+    .replace(/<script\b([^>]*)>[\s\S]*?<\/script>/giu, "<script$1></script>")
+    .replace(/<(style|template|pre|code)\b([^>]*)>[\s\S]*?<\/\1>/giu, "<$1$2></$1>");
 }
 
 function parseAttributeReferences(html) {
   const references = [];
-  const sanitized = stripNonDocumentBlocks(html);
+  const sanitized = stripNonDocumentBodies(html);
   const tagPattern = /<([a-z][\w:-]*)([\s\S]*?)>/giu;
   const attributePattern =
-    /\b(href|src|srcset)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/giu;
+    /\b([a-z][\w:-]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/giu;
   const validAttributesByTag = new Map([
     ["a", new Set(["href"])],
     ["img", new Set(["src", "srcset"])],
@@ -61,24 +63,30 @@ function parseAttributeReferences(html) {
       continue;
     }
 
+    const parsedAttributes = new Map();
     for (const attributeMatch of attributes.matchAll(attributePattern)) {
       const attribute = attributeMatch[1].toLowerCase();
+      const rawValue = attributeMatch[2] ?? attributeMatch[3] ?? attributeMatch[4] ?? "";
+      parsedAttributes.set(attribute, rawValue);
+    }
+
+    for (const [attribute, rawValue] of parsedAttributes.entries()) {
       if (!validAttributes.has(attribute)) {
         continue;
       }
-      const rawValue = attributeMatch[2] ?? attributeMatch[3] ?? attributeMatch[4] ?? "";
+      const validationContext = parsedAttributes.get("data-validation-context") ?? null;
 
       if (attribute === "srcset") {
         for (const entry of rawValue.split(",")) {
           const candidate = entry.trim().split(/\s+/u)[0];
           if (candidate) {
-            references.push({ tagName, attribute, rawValue: candidate });
+            references.push({ tagName, attribute, rawValue: candidate, validationContext });
           }
         }
         continue;
       }
 
-      references.push({ tagName, attribute, rawValue });
+      references.push({ tagName, attribute, rawValue, validationContext });
     }
   }
 
@@ -252,7 +260,10 @@ function isAllowlistedFailure(failure, allowlist) {
     }
 
     if (entry.kind === "stale-sidebar-link") {
-      return failure.sourceRoute.startsWith(entry.sourcePrefix);
+      return (
+        failure.validationContext === "sidebar-nav" &&
+        failure.sourceRoute.startsWith(entry.sourcePrefix)
+      );
     }
 
     return failure.sourceRoute === entry.sourceRoute;
@@ -411,6 +422,7 @@ export async function collectValidationReport({
           sourceRoute,
           rawReference: reference.rawValue,
           referenceType,
+          validationContext: reference.validationContext,
         });
         continue;
       }
@@ -437,6 +449,7 @@ export async function collectValidationReport({
         rawReference: reference.rawValue,
         resolvedTarget: looksLikeHtmlRoute(pathname) ? routePath : assetPath,
         referenceType,
+        validationContext: reference.validationContext,
       });
     }
   }
