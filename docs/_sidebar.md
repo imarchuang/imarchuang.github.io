@@ -1,6 +1,7 @@
 <!-- docs/_sidebar.md -->
 * [Home](./)
 * [Ideas](./ideas/index)
+* [Whiteboard](/draw/ ':ignore')
 * [Algo](./coding/index)
 * [System Design](./sysde/index)
 * [Behavorial](./behavorial/index)
