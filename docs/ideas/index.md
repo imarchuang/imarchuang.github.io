@@ -24,6 +24,7 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Drops
 
+* [grade-5-machine-learning-html-course](/drops/grade-5-machine-learning-html-course/ ':ignore') — 五年级 Machine Learning 中英互动教材：规则与学习、数据特征、分类、训练测试、决策树与负责任 AI
 * [ai-frontend-field-lab](/drops/ai-frontend-field-lab/ ':ignore') — Four AI-native frontend patterns in one transparent, reversible workflow
 * [openui-demo](/drops/openui-demo/ ':ignore') — Interactive walkthrough of prompt → OpenUI Lang → trusted streamed UI
 * [grade-5-math-canvas-html-2026-fall](/drops/grade-5-math-canvas-html-2026-fall/ ':ignore') — 五年级上册数学九章互动式 HTML 课件，含强化练习、附加题、答案与教案
