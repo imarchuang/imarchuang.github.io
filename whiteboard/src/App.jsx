@@ -100,6 +100,22 @@ export default function App() {
     [],
   );
 
+  const excalidrawUIOptions = useMemo(
+    () => ({
+      canvasActions: {
+        loadScene: true,
+        export: { saveFileToDisk: true },
+        saveAsImage: true,
+        toggleTheme: true,
+      },
+    }),
+    [],
+  );
+
+  const captureExcalidrawAPI = useCallback((api) => {
+    excalidrawApiRef.current = api;
+  }, []);
+
   const handleChange = useCallback(
     (elements, appState, files) => {
       let themePreference = themePreferenceRef.current;
@@ -215,19 +231,10 @@ export default function App() {
       </a>
       <section className="editor" aria-label="Personal whiteboard">
         <Excalidraw
-          excalidrawAPI={(api) => {
-            excalidrawApiRef.current = api;
-          }}
+          excalidrawAPI={captureExcalidrawAPI}
           initialData={initialData}
           onChange={handleChange}
-          UIOptions={{
-            canvasActions: {
-              loadScene: true,
-              export: { saveFileToDisk: true },
-              saveAsImage: true,
-              toggleTheme: true,
-            },
-          }}
+          UIOptions={excalidrawUIOptions}
         />
       </section>
     </main>

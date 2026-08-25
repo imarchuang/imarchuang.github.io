@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { useEffect, useRef } from "react";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
@@ -10,13 +11,33 @@ import { THEME_PREFERENCE } from "./theme";
 let excalidrawApi;
 let onChangeHandler;
 let mediaQueryList;
+let simulatePropTriggeredChange;
 const mediaQueryListeners = new Set();
 
 vi.mock("@excalidraw/excalidraw", () => ({
-  Excalidraw: ({ excalidrawAPI, initialData, onChange }) => {
+  Excalidraw: ({ excalidrawAPI, initialData, onChange, UIOptions }) => {
+    const previousPropsRef = useRef(null);
     onChangeHandler = onChange;
     excalidrawApi ||= { updateScene: vi.fn() };
     excalidrawAPI?.(excalidrawApi);
+
+    useEffect(() => {
+      const previousProps = previousPropsRef.current;
+      if (
+        simulatePropTriggeredChange &&
+        previousProps &&
+        (previousProps.UIOptions !== UIOptions ||
+          previousProps.excalidrawAPI !== excalidrawAPI)
+      ) {
+        onChange(
+          initialData.elements,
+          initialData.appState,
+          initialData.files,
+        );
+      }
+
+      previousPropsRef.current = { UIOptions, excalidrawAPI };
+    }, [UIOptions, excalidrawAPI, initialData, onChange]);
 
     return (
       <div
@@ -56,6 +77,7 @@ describe("App", () => {
   beforeEach(() => {
     excalidrawApi = undefined;
     onChangeHandler = undefined;
+    simulatePropTriggeredChange = false;
     mediaQueryListeners.clear();
     mediaQueryList = {
       matches: false,
@@ -140,6 +162,28 @@ describe("App", () => {
     expect(unhandledRejection).not.toHaveBeenCalled();
 
     window.removeEventListener("unhandledrejection", unhandledRejection);
+  });
+
+  it("keeps autosave settled when prop-sensitive rerenders occur", async () => {
+    simulatePropTriggeredChange = true;
+
+    render(<App />);
+    await screen.findByTestId("excalidraw");
+    vi.useFakeTimers();
+
+    onChangeHandler([], { theme: "light" }, {});
+    await vi.advanceTimersByTimeAsync(600);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(screen.getByText("Saved in this browser")).toBeTruthy();
+
+    const settledSaveCount = persistence.saveScene.mock.calls.length;
+
+    await vi.advanceTimersByTimeAsync(5000);
+
+    expect(screen.getByText("Saved in this browser")).toBeTruthy();
+    expect(persistence.saveScene.mock.calls.length).toBe(settledSaveCount);
   });
 
   it("flushes a pending save before navigating away", async () => {
