@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kafka consumer group · region affinity</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <style>
+    :root {
+      --us: #0d6efd;
+      --sg: #fd7e14;
+      --hk: #6f42c1;
+      --warn: #dc3545;
+      --coord: #ffc107;
+    }
+    body {
+      background: #f8f9fa;
+      color: #212529;
+    }
+    .hero {
+      background: #0d6efd;
+      color: #fff;
+      padding: 3.5rem 0 3rem;
+    }
+    .hero h1 {
+      font-weight: 700;
+      letter-spacing: -.035em;
+      max-width: 14ch;
+    }
+    .kicker {
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: .75rem;
+      opacity: .8;
+    }
+    .lede { max-width: 58ch; opacity: .85; }
+    .boundary {
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: var(--bs-border-radius-lg);
+    }
+    .boundary strong { color: #ffe69c; }
+    .nav-pills {
+      --bs-nav-pills-border-radius: var(--bs-border-radius-pill);
+      gap: .5rem;
+    }
+    .nav-pills .nav-link { border: 1px solid var(--bs-border-color); color: var(--bs-secondary-color); }
+    .nav-pills .nav-link.active { border-color: var(--bs-primary); }
+    canvas {
+      width: 100%;
+      height: 460px;
+      background: #fff;
+      display: block;
+      border-radius: var(--bs-border-radius);
+    }
+    dl { display: grid; grid-template-columns: 92px 1fr; gap: .6rem 1rem; }
+    dt { color: var(--bs-secondary-color); font-family: var(--bs-font-monospace); font-size: .8rem; }
+    dd { margin: 0; }
+    .code {
+      padding: 1rem;
+      background: #212529;
+      white-space: pre-wrap;
+      color: #f8f9fa;
+      font-family: var(--bs-font-monospace);
+      font-size: .8rem;
+      border-radius: var(--bs-border-radius);
+    }
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      color: var(--bs-secondary-color);
+      font-size: .875rem;
+    }
+    .sw { display: inline-block; width: .65rem; height: .65rem; margin-right: .35rem; border-radius: 50%; }
+    .section-label { letter-spacing: .1em; font-size: .72rem; text-transform: uppercase; color: var(--bs-secondary-color); }
+    @media (max-width: 900px) {
+      canvas { height: 380px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand bg-body border-bottom">
+    <div class="container">
+      <span class="navbar-brand fw-semibold mb-0">Kafka affinity lab</span>
+      <span class="navbar-text small">Consumer group assignment</span>
+    </div>
+  </nav>
+  <header class="hero">
+    <div class="container">
+      <div class="row g-4 align-items-end">
+        <div class="col-lg-8">
+          <div class="kicker mb-2">Consumer group assignment</div>
+          <h1 class="display-4 mb-3">Region 能力不是默认 group 语义</h1>
+          <p class="lede lead mb-0">同一 group 默认把订阅了同一 topic 的 member 当成可互换。异构 region consumer 要自己用订阅集合、group 边界、或 custom assignor 把能力表达出来。</p>
+        </div>
+        <div class="col-lg-4">
+          <div class="boundary p-3">
+            <strong>不是协议硬拦</strong><br />
+            <span class="small">Kafka 不会因为 US 进程「不会处理 SG」而拒绝分配。硬限制只有：一个 group 里，一个 partition 同一时刻最多一个 owner。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="container py-4 py-lg-5">
+    <div class="section-label mb-2">选择 assignment 模型</div>
+    <div class="nav nav-pills mb-3" role="tablist">
+      <button class="tab nav-link active" role="tab" aria-selected="true" data-id="mismatch">0 同 topic 默认组</button>
+      <button class="tab nav-link" role="tab" aria-selected="false" data-id="split-shared">1 拆 topic · 同 group</button>
+      <button class="tab nav-link" role="tab" aria-selected="false" data-id="split-isolated">2 拆 topic · 拆 group</button>
+      <button class="tab nav-link" role="tab" aria-selected="false" data-id="custom">3 同 topic · custom assignor</button>
+      <button class="tab nav-link" role="tab" aria-selected="false" data-id="app">4 同质 consumer · 应用分派</button>
+    </div>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+      <div class="legend">
+        <span><i class="sw" style="background:var(--us)"></i>US</span>
+        <span><i class="sw" style="background:var(--sg)"></i>SG</span>
+        <span><i class="sw" style="background:var(--hk)"></i>HK</span>
+        <span><i class="sw" style="background:var(--coord)"></i>coordinator</span>
+        <span><i class="sw" style="background:var(--warn)"></i>错配 / rebalance 波及</span>
+      </div>
+      <button class="btn btn-outline-danger btn-sm" id="kill" type="button" data-on="false">模拟 US-2 宕机</button>
+    </div>
+    <div class="row g-3 align-items-stretch">
+      <div class="col-xl-8">
+        <div class="card h-100">
+          <div class="card-header bg-body fw-semibold">Live topology</div>
+          <div class="card-body p-2">
+            <canvas id="topo" width="1100" height="460" aria-label="Topology canvas"></canvas>
+          </div>
+        </div>
+      </div>
+      <aside class="col-xl-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h4" id="title"></h2>
+            <div class="alert alert-primary py-2 small" id="verdict"></div>
+            <dl class="mb-3">
+              <dt>group.id</dt><dd id="groups"></dd>
+              <dt>subscribe</dt><dd id="subs"></dd>
+              <dt>assignment</dt><dd id="assign"></dd>
+              <dt>rebalance</dt><dd id="rebalance"></dd>
+            </dl>
+            <div class="code" id="code"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+    <section class="mt-5">
+      <div class="section-label mb-2">方案对比</div>
+      <h2 class="h3 mb-3">选择能力边界与故障域</h2>
+      <div class="card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+        <tr>
+          <th>方案</th>
+          <th>能力匹配</th>
+          <th>故障域</th>
+          <th>代价</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>0 同一 topic + 默认 assignor</td>
+          <td>不保证。US 实例可能吃到 SG partition。</td>
+          <td>全体一起 rebalance</td>
+          <td>零配置，语义错</td>
+        </tr>
+        <tr>
+          <td>1 拆 topic，同一 group.id</td>
+          <td>官方支持。订阅列表就是 capability。</td>
+          <td>assignment 隔离，rebalance 仍共用</td>
+          <td>topic 变多；SG 发布会碰 US 一轮 Join/Sync</td>
+        </tr>
+        <tr>
+          <td>2 拆 topic，拆 group.id</td>
+          <td>匹配，且运维隔离</td>
+          <td>独立 coordinator、独立 rebalance</td>
+          <td>两套消费应用；offset / 监控按 group 看</td>
+        </tr>
+        <tr>
+          <td>3 同 topic + custom assignor</td>
+          <td>partition→region 映射写进 assignor</td>
+          <td>仍是一个 group</td>
+          <td>要自己保证每个 region 有兼容实例；新 consumer protocol 不支持客户端 custom assignor</td>
+        </tr>
+        <tr>
+          <td>4 所有实例都能处理全部 region</td>
+          <td>不需要异构。收到记录后走 handler</td>
+          <td>标准 sticky / static membership 即可</td>
+          <td>代码必须真的全能；无法按 region 隔离部署能力</td>
+        </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const COLORS = { us: "#0d6efd", sg: "#fd7e14", hk: "#6f42c1", warn: "#dc3545", coord: "#ffc107", paper: "#212529", mute: "#6c757d", line: "#dee2e6" };
+    const copy = {
+      mismatch: {
+        title: "默认组：同质假设",
+        verdict: "合法，但会错配。协议不理解 partition 的 region。",
+        groups: "orders-processors（一个 coordinator）",
+        subs: "所有 member 都 subscribe(orders)",
+        assign: "Range/Sticky 把 US/SG/HK partition 当可互换槽位",
+        rebalance: "任何 member 进出，全组停或 cooperative 一轮",
+        code: `props.put("group.id", "orders-processors");\nconsumer.subscribe(List.of("orders"));\n// US 与 SG 进程配置相同\n// 默认 assignor 可能把 orders-1(SG) 分给 US pod`
+      },
+      "split-shared": {
+        title: "拆 topic，共用 group",
+        verdict: "能力匹配。订阅集合表达 region。rebalance 仍跨 region。",
+        groups: "orders-processors（仍一个 coordinator）",
+        subs: "US → orders.us　SG → orders.sg　HK → orders.hk",
+        assign: "每人只拿到自己订阅的 topic；不会跨 region 抢 partition",
+        rebalance: "SG 重启时 US 也会 Join/Sync，assignment 通常不变",
+        code: `// US 部署\nprops.put("group.id", "orders-processors");\nconsumer.subscribe(List.of("orders.us"));\n\n// SG 部署\nprops.put("group.id", "orders-processors");\nconsumer.subscribe(List.of("orders.sg"));`
+      },
+      "split-isolated": {
+        title: "拆 topic，拆 group",
+        verdict: "能力 + 故障域都隔离。适合按 region 独立发布。",
+        groups: "orders-processors-us / -sg / -hk（三个 coordinator 映射）",
+        subs: "每个 group 只订本 region topic",
+        assign: "完全不相交",
+        rebalance: "SG 发布碰不到 US group",
+        code: `// US\nprops.put("group.id", "orders-processors-us");\nconsumer.subscribe(List.of("orders.us"));\n\n// SG\nprops.put("group.id", "orders-processors-sg");\nconsumer.subscribe(List.of("orders.sg"));`
+      },
+      custom: {
+        title: "同 topic，custom assignor",
+        verdict: "异构写进 JoinGroup user data。Classic 协议可以，新 consumer protocol 目前不行。",
+        groups: "orders-processors",
+        subs: "都订 orders，但 metadata 声明 capability=US|SG|HK",
+        assign: "partition 0,1→US　2→SG　3→HK，按声明分配",
+        rebalance: "若某 region 没有存活实例，对应 partition 无人消费",
+        code: `// subscription user data: {"region":"US"}\nclass RegionAssignor implements ConsumerPartitionAssignor {\n  // orders-0,1 → members with region=US\n  // orders-2   → region=SG\n}`
+      },
+      app: {
+        title: "同质 consumer，应用内分派",
+        verdict: "最符合 Kafka 默认模型。异构的是 handler，不是 member。",
+        groups: "orders-processors",
+        subs: "所有实例 subscribe(orders)",
+        assign: "任意实例可拥有任意 partition；sticky 保持亲和",
+        rebalance: "标准 cooperative + group.instance.id",
+        code: `consumer.subscribe(List.of("orders"));\nfor (record : consumer.poll(timeout)) {\n  handlerFor(record.region()).handle(record);\n}`
+      }
+    };
+
+    const state = { id: "mismatch", killed: false, hover: null };
+
+    function layout(id, killed) {
+      const us2Alive = !killed;
+      const consumers = {
+        mismatch: [
+          { id: "US-1", region: "us", x: 70, y: 300, parts: killed ? ["orders-0","orders-1","orders-2"] : ["orders-0","orders-2"], bad: true },
+          { id: "US-2", region: "us", x: 250, y: 300, parts: killed ? [] : ["orders-1"], dead: killed, bad: !killed },
+          { id: "SG-1", region: "sg", x: 430, y: 300, parts: ["orders-3"], bad: false },
+          { id: "HK-1", region: "hk", x: 610, y: 300, parts: [], empty: true }
+        ],
+        "split-shared": [
+          { id: "US-1", region: "us", x: 70, y: 300, parts: killed ? ["us-0","us-1","us-2"] : ["us-0","us-1"] },
+          { id: "US-2", region: "us", x: 250, y: 300, parts: killed ? [] : ["us-2"], dead: killed },
+          { id: "SG-1", region: "sg", x: 430, y: 300, parts: ["sg-0","sg-1"], wave: killed },
+          { id: "HK-1", region: "hk", x: 610, y: 300, parts: ["hk-0"], wave: killed }
+        ],
+        "split-isolated": [
+          { id: "US-1", region: "us", x: 70, y: 300, parts: killed ? ["us-0","us-1","us-2"] : ["us-0","us-1"], group: "…-us" },
+          { id: "US-2", region: "us", x: 250, y: 300, parts: killed ? [] : ["us-2"], dead: killed, group: "…-us" },
+          { id: "SG-1", region: "sg", x: 430, y: 300, parts: ["sg-0","sg-1"], group: "…-sg" },
+          { id: "HK-1", region: "hk", x: 610, y: 300, parts: ["hk-0"], group: "…-hk" }
+        ],
+        custom: [
+          { id: "US-1", region: "us", x: 70, y: 300, parts: killed ? ["p0","p1"] : ["p0"] },
+          { id: "US-2", region: "us", x: 250, y: 300, parts: killed ? [] : ["p1"], dead: killed },
+          { id: "SG-1", region: "sg", x: 430, y: 300, parts: ["p2"] },
+          { id: "HK-1", region: "hk", x: 610, y: 300, parts: ["p3"] }
+        ],
+        app: [
+          { id: "c1", region: "us", x: 70, y: 300, parts: killed ? ["p0","p1","p2"] : ["p0","p1"], note: "全能" },
+          { id: "c2", region: "sg", x: 250, y: 300, parts: killed ? [] : ["p2"], dead: killed, note: "全能" },
+          { id: "c3", region: "hk", x: 430, y: 300, parts: ["p3"], note: "全能" }
+        ]
+      };
+      const topics = {
+        mismatch: [{ name: "orders", parts: [
+          { id: "0", region: "us" }, { id: "1", region: "sg" }, { id: "2", region: "us" }, { id: "3", region: "hk" }
+        ]}],
+        "split-shared": [
+          { name: "orders.us", parts: [{ id: "0", region: "us" }, { id: "1", region: "us" }, { id: "2", region: "us" }] },
+          { name: "orders.sg", parts: [{ id: "0", region: "sg" }, { id: "1", region: "sg" }] },
+          { name: "orders.hk", parts: [{ id: "0", region: "hk" }] }
+        ],
+        "split-isolated": [
+          { name: "orders.us", parts: [{ id: "0", region: "us" }, { id: "1", region: "us" }, { id: "2", region: "us" }] },
+          { name: "orders.sg", parts: [{ id: "0", region: "sg" }, { id: "1", region: "sg" }] },
+          { name: "orders.hk", parts: [{ id: "0", region: "hk" }] }
+        ],
+        custom: [{ name: "orders  (p→region 写死)", parts: [
+          { id: "0", region: "us" }, { id: "1", region: "us" }, { id: "2", region: "sg" }, { id: "3", region: "hk" }
+        ]}],
+        app: [{ name: "orders", parts: [
+          { id: "0", region: "us" }, { id: "1", region: "sg" }, { id: "2", region: "hk" }, { id: "3", region: "us" }
+        ]}]
+      };
+      const coords = {
+        mismatch: [{ label: "coordinator · hash(orders-processors)", x: 820, y: 88 }],
+        "split-shared": [{ label: "coordinator · hash(orders-processors)", x: 820, y: 88 }],
+        "split-isolated": [
+          { label: "coord …-us", x: 760, y: 54 },
+          { label: "coord …-sg", x: 760, y: 100 },
+          { label: "coord …-hk", x: 760, y: 146 }
+        ],
+        custom: [{ label: "coordinator · classic assignor on leader", x: 800, y: 88 }],
+        app: [{ label: "coordinator · sticky / static member", x: 800, y: 88 }]
+      };
+      return { consumers: consumers[id], topics: topics[id], coords: coords[id], us2Alive };
+    }
+
+    const canvas = document.getElementById("topo");
+    const ctx = canvas.getContext("2d");
+    const VIEW = { width: 1100, height: 460 };
+
+    function fit() {
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.clientWidth;
+      const scale = w / VIEW.width;
+      const h = VIEW.height * scale;
+      canvas.style.height = `${h}px`;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+      draw();
+    }
+
+    function roundRect(x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function draw() {
+      const w = VIEW.width;
+      const h = VIEW.height;
+      ctx.clearRect(0, 0, w, h);
+      const L = layout(state.id, state.killed);
+
+      ctx.fillStyle = COLORS.mute;
+      ctx.font = "11px 'IBM Plex Mono'";
+      ctx.fillText("log  (topic × partition)", 24, 28);
+
+      L.topics.forEach((t, i) => {
+        const y = 48 + i * 54;
+        ctx.fillStyle = COLORS.mute;
+        ctx.fillText(t.name, 24, y);
+        t.parts.forEach((p, j) => {
+          const x = 24 + j * 54;
+          ctx.fillStyle = COLORS[p.region];
+          ctx.fillRect(x, y + 8, 46, 28);
+          ctx.fillStyle = "#10151c";
+          ctx.fillText("p" + p.id, x + 12, y + 26);
+        });
+      });
+
+      L.coords.forEach((c) => {
+        ctx.fillStyle = COLORS.coord;
+        roundRect(c.x, c.y, 210, 32, 2);
+        ctx.fill();
+        ctx.fillStyle = "#10151c";
+        ctx.fillText(c.label, c.x + 10, c.y + 20);
+      });
+
+      ctx.fillStyle = COLORS.mute;
+      ctx.fillText("consumers", 24, 276);
+
+      L.consumers.forEach((c) => {
+        const x = c.x, y = c.y;
+        ctx.globalAlpha = c.dead ? 0.35 : 1;
+        ctx.strokeStyle = c.wave ? COLORS.warn : COLORS[c.region];
+        ctx.lineWidth = c.wave ? 2 : 1;
+        ctx.fillStyle = "#f8f9fa";
+        roundRect(x, y, 150, 92, 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = COLORS.paper;
+        ctx.font = "500 13px 'IBM Plex Mono'";
+        ctx.fillText(c.id + (c.dead ? "  down" : ""), x + 10, y + 22);
+        ctx.font = "11px 'IBM Plex Mono'";
+        ctx.fillStyle = COLORS.mute;
+        ctx.fillText(c.group || c.note || c.region.toUpperCase() + " process", x + 10, y + 40);
+        const parts = c.parts.length ? c.parts.join("  ") : "—";
+        ctx.fillStyle = c.bad ? COLORS.warn : COLORS.paper;
+        ctx.fillText(parts, x + 10, y + 62);
+        if (c.bad) ctx.fillText("可能跨 region", x + 10, y + 78);
+        if (c.wave) {
+          ctx.fillStyle = COLORS.warn;
+          ctx.fillText("参与 rebalance", x + 10, y + 78);
+        }
+        ctx.globalAlpha = 1;
+      });
+
+      ctx.fillStyle = COLORS.mute;
+      ctx.fillText("点击方案切换 assignment · 右侧是对应代码", 24, h - 16);
+    }
+
+    function renderCopy() {
+      const c = copy[state.id];
+      document.getElementById("title").textContent = c.title;
+      document.getElementById("verdict").textContent = c.verdict;
+      document.getElementById("groups").textContent = c.groups;
+      document.getElementById("subs").textContent = c.subs;
+      document.getElementById("assign").textContent = c.assign;
+      document.getElementById("rebalance").textContent = c.rebalance;
+      document.getElementById("code").textContent = c.code;
+    }
+
+    document.querySelectorAll(".tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((b) => {
+          b.setAttribute("aria-selected", String(b === btn));
+          b.classList.toggle("active", b === btn);
+        });
+        state.id = btn.dataset.id;
+        renderCopy();
+        draw();
+      });
+    });
+
+    document.getElementById("kill").addEventListener("click", (e) => {
+      state.killed = !state.killed;
+      e.currentTarget.dataset.on = String(state.killed);
+      e.currentTarget.textContent = state.killed ? "恢复 US-2" : "模拟 US-2 宕机";
+      e.currentTarget.classList.toggle("btn-danger", state.killed);
+      e.currentTarget.classList.toggle("btn-outline-danger", !state.killed);
+      draw();
+    });
+
+    renderCopy();
+    window.addEventListener("resize", fit);
+    fit();
+  </script>
+</body>
+</html>

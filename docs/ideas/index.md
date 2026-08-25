@@ -24,6 +24,7 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Drops
 
+* [kafka-consumer-group-region-affinity](/drops/kafka-consumer-group-region-affinity/ ':ignore') — Kafka consumer group 的 region affinity 方案对比：拆 topic、拆 group、custom assignor 与应用内分派。
 * [orbit-sketch](/drops/orbit-sketch/ ':ignore') — pointer-follow orbit canvas
 * [example](/drops/example/ ':ignore') — native HTML + canvas
 * [hello](/drops/hello/ ':ignore') — minimal shell
