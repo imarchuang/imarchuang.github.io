@@ -51,6 +51,7 @@
     let lastTrigger = null;
     let searchToken = 0;
     let debounceHandle = null;
+    const recoveryMessage = "没有找到结果，或者本地搜索索引尚未生成。";
 
     const clearResults = () => {
       if (results instanceof HTMLElement) {
@@ -134,22 +135,36 @@
       }
 
       if (!pagefind || typeof pagefind.search !== "function") {
-        showEmptyState("没有找到结果，或者本地搜索索引尚未生成。");
+        showEmptyState(recoveryMessage);
         return;
       }
 
-      const matches = await pagefind.search(trimmed);
+      let matches = null;
+      try {
+        matches = await pagefind.search(trimmed);
+      } catch {
+        showEmptyState(recoveryMessage);
+        return;
+      }
+
       if (token !== searchToken) {
         return;
       }
 
-      if (!matches.results.length) {
+      if (!matches?.results?.length) {
         showEmptyState("没有找到结果。");
         return;
       }
 
       hideEmptyState();
-      const items = await Promise.all(matches.results.slice(0, 8).map((item) => item.data()));
+      let items = null;
+      try {
+        items = await Promise.all(matches.results.slice(0, 8).map((item) => item.data()));
+      } catch {
+        showEmptyState(recoveryMessage);
+        return;
+      }
+
       if (token !== searchToken) {
         return;
       }

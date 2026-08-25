@@ -82,7 +82,8 @@ const showToc = tocHeadings.length >= 2;
       button.setAttribute("aria-label", `复制代码块 ${index + 1}`);
 
       button.addEventListener("click", async () => {
-        const text = block.innerText;
+        const code = block.querySelector("code");
+        const text = code instanceof HTMLElement ? code.innerText : block.innerText;
         try {
           await navigator.clipboard.writeText(text);
           button.textContent = "已复制";

@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import {
   buildArticleRoutes,
+  buildSectionNavigation,
   legacyPathToHref,
   RESERVED_ARTICLE_ROUTES,
 } from "../src/lib/articles";
@@ -128,5 +129,87 @@ describe("article routes", () => {
         [],
       ),
     ).toThrow(/Duplicate article route "\/guides\/intro\/"/);
+  });
+
+  test("builds a notes-only deduplicated section navigation tree", () => {
+    const sections = buildSectionNavigation(
+      [
+        {
+          title: "Home",
+          href: "/",
+          items: [],
+        },
+        {
+          title: "Algo",
+          href: "/coding/",
+          items: [
+            {
+              title: "Tree",
+              href: "/coding/tree/",
+              children: [
+                {
+                  title: "Traversal",
+                  href: "/coding/tree/traversal/",
+                  children: [],
+                },
+              ],
+            },
+            {
+              title: "Tree Alias",
+              href: "/coding/tree/",
+              children: [],
+            },
+          ],
+        },
+        {
+          title: "Products",
+          href: "/products/",
+          items: [
+            {
+              title: "Contact",
+              href: "/contact/",
+              children: [],
+            },
+          ],
+        },
+        {
+          title: "About",
+          href: "/about/",
+          items: [],
+        },
+      ],
+      new Set([
+        "/coding/",
+        "/coding/tree/",
+        "/coding/tree/traversal/",
+        "/products/",
+        "/contact/",
+      ]),
+    );
+
+    expect(sections).toEqual([
+      {
+        title: "Algo",
+        href: "/coding/",
+        items: [
+          {
+            title: "Tree",
+            href: "/coding/tree/",
+            children: [
+              {
+                title: "Traversal",
+                href: "/coding/tree/traversal/",
+                children: [],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: "Products",
+        href: "/products/",
+        items: [],
+      },
+    ]);
   });
 });

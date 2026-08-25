@@ -17,13 +17,15 @@ test("opens the mobile section menu with keyboard and closes on escape", async (
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/python/functions/");
 
-  await page.getByRole("button", { name: "打开章节导航" }).focus();
+  const openButton = page.getByRole("button", { name: "打开章节导航" });
+  await openButton.focus();
   await page.keyboard.press("Enter");
 
   const dialog = page.getByRole("dialog", { name: "章节导航" });
   await expect(dialog).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
+  await expect(openButton).toBeFocused();
 });
 
 test("shows a table of contents on longer articles", async ({ page }) => {
@@ -49,7 +51,23 @@ test("links previous and next articles in generated navigation order", async ({ 
   );
 });
 
-test("adds keyboard-focusable copy buttons to code blocks", async ({ page }) => {
+test("copies only the code block source text", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "__copiedText", {
+      configurable: true,
+      writable: true,
+      value: "",
+    });
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (text: string) => {
+          window.__copiedText = text;
+        },
+      },
+    });
+  });
+
   await page.goto("/python/functions/");
 
   const copyButton = page.getByRole("button", { name: /复制代码/ }).first();
@@ -57,6 +75,11 @@ test("adds keyboard-focusable copy buttons to code blocks", async ({ page }) => 
   await expect(copyButton).toBeEnabled();
   await copyButton.focus();
   await expect(copyButton).toBeFocused();
+  const codeText = await page.locator("pre code").first().innerText();
+  await copyButton.click();
+  await expect
+    .poll(() => page.evaluate(() => window.__copiedText))
+    .toBe(codeText);
 });
 
 test("shows a branded 404 recovery page", async ({ page }) => {
@@ -66,4 +89,23 @@ test("shows a branded 404 recovery page", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toContainText("页面未找到");
   await expect(page.getByRole("link", { name: "去作品页" })).toHaveAttribute("href", "/work/");
   await expect(page.getByRole("link", { name: "去笔记页" })).toHaveAttribute("href", "/notes/");
+});
+
+test("renders comments only on article pages", async ({ page }) => {
+  await page.goto("/python/functions/");
+  await expect(page.getByRole("button", { name: "加载评论" })).toBeVisible();
+
+  await page.goto("/notes/");
+  await expect(page.getByRole("button", { name: "加载评论" })).toHaveCount(0);
+});
+
+test("shows the no-JS section fallback", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+
+  await page.goto("/python/functions/");
+  await expect(page.getByRole("navigation", { name: "章节导航" }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "打开章节导航" })).toBeHidden();
+
+  await context.close();
 });

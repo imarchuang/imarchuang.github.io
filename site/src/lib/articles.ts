@@ -16,6 +16,13 @@ export interface ArticleRoute {
 }
 
 export const RESERVED_ARTICLE_ROUTES = new Set(["/", "/about/"]);
+export const SECTION_NAV_EXCLUDED_ROUTES = new Set([
+  ...RESERVED_ARTICLE_ROUTES,
+  "/contact/",
+  "/work/",
+  "/draw/",
+  "/drops/",
+]);
 
 function trimSlashes(value: string): string {
   return value.replace(/^\/+|\/+$/g, "");
@@ -142,4 +149,64 @@ export function buildArticleRoutes(
         : null,
     };
   });
+}
+
+function filterSectionItems(
+  items: NavigationItem[],
+  noteHrefs: ReadonlySet<string>,
+  seen: Set<string>,
+  excludedRoutes: ReadonlySet<string>,
+): NavigationItem[] {
+  const filtered: NavigationItem[] = [];
+
+  for (const item of items) {
+    const href = normalizeHref(item.href);
+    if (excludedRoutes.has(href) || seen.has(href)) {
+      continue;
+    }
+
+    const children = filterSectionItems(item.children, noteHrefs, seen, excludedRoutes);
+    if (!noteHrefs.has(href) && children.length === 0) {
+      continue;
+    }
+
+    seen.add(href);
+    filtered.push({
+      title: item.title,
+      href,
+      children,
+    });
+  }
+
+  return filtered;
+}
+
+export function buildSectionNavigation(
+  navigation: NavigationSection[],
+  noteHrefs: ReadonlySet<string>,
+  excludedRoutes: ReadonlySet<string> = SECTION_NAV_EXCLUDED_ROUTES,
+): NavigationSection[] {
+  const seen = new Set<string>();
+  const sections: NavigationSection[] = [];
+
+  for (const section of navigation) {
+    const href = normalizeHref(section.href);
+    if (excludedRoutes.has(href) || seen.has(href)) {
+      continue;
+    }
+
+    const items = filterSectionItems(section.items, noteHrefs, seen, excludedRoutes);
+    if (!noteHrefs.has(href) && items.length === 0) {
+      continue;
+    }
+
+    seen.add(href);
+    sections.push({
+      title: section.title,
+      href,
+      items,
+    });
+  }
+
+  return sections;
 }

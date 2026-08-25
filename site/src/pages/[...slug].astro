@@ -2,7 +2,7 @@
 import { getCollection, getEntry, render } from "astro:content";
 
 import ArticleLayout from "../layouts/ArticleLayout.astro";
-import { buildArticleRoutes } from "../lib/articles";
+import { buildArticleRoutes, buildSectionNavigation } from "../lib/articles";
 import { getNavigation } from "../lib/navigation";
 
 export async function getStaticPaths() {
@@ -19,6 +19,12 @@ export async function getStaticPaths() {
 
 const route = Astro.props;
 const entry = await getEntry("notes", route.entryId);
+const navigation = getNavigation();
+const articleRoutes = buildArticleRoutes(await getCollection("notes"), navigation);
+const sectionNavigation = buildSectionNavigation(
+  navigation,
+  new Set(articleRoutes.map((item) => item.href)),
+);
 
 if (!entry) {
   throw new Error(`Missing note entry "${route.entryId}"`);
@@ -30,7 +36,7 @@ const { Content, headings } = await render(entry);
 <ArticleLayout
   title={entry.data.title}
   description={entry.data.description}
-  navigation={getNavigation()}
+  navigation={sectionNavigation}
   currentPath={route.href}
   headings={headings}
   previous={route.previous}
