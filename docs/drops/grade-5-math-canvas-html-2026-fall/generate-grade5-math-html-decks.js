@@ -1143,8 +1143,9 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
       inset:0;
       display:none;
       padding:26px;
-      grid-template-rows:auto auto 1fr auto;
+      grid-template-rows:auto auto auto auto;
       gap:16px;
+      overflow-y:auto;
     }
     .slide.active{
       display:grid;
@@ -1193,7 +1194,7 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
       grid-template-columns:minmax(0,1.06fr) minmax(300px,.94fr);
       gap:16px;
       align-items:stretch;
-      min-height:0;
+      min-height:auto;
     }
     .text-pane,.visual-pane{
       min-width:0;
@@ -1987,6 +1988,14 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
             panel.removeAttribute("hidden");
             button.textContent = "隐藏答案";
             button.setAttribute("aria-expanded", "true");
+            window.requestAnimationFrame(() => {
+              const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+              panel.scrollIntoView({
+                behavior: reduceMotion ? "auto" : "smooth",
+                block: "nearest",
+                inline: "nearest",
+              });
+            });
           }
         });
       });
