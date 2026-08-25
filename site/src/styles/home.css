@@ -30,7 +30,7 @@
 .visual-label { color: var(--aqua); }
 .visual-label p { color: var(--line); }
 .visual-content { display: grid; grid-template-columns: minmax(16rem, .9fr) minmax(18rem, 1.1fr); gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
-.systems-path { min-height: 15rem; background: color-mix(in srgb, var(--cobalt) 14%, var(--ink)); }
+.systems-path { min-height: 15rem; background: var(--cobalt); }
 .systems-path path:first-of-type { stroke-dasharray: 650; animation: draw-path 620ms ease-out both; }
 @keyframes draw-path { from { stroke-dashoffset: 650; } to { stroke-dashoffset: 0; } }
 .visual-copy .kicker { color: var(--aqua); }

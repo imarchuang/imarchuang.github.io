@@ -76,10 +76,20 @@ test("redirects legacy homepage hashes in the browser", async ({ page }) => {
   await expect(page).toHaveURL(/\/about\/$/);
 });
 
-test("serves the social preview and RSS destinations", async ({ request }) => {
+test("serves valid XML social preview and RSS destinations", async ({ page, request }) => {
   const socialPreview = await request.get("/og-default.svg");
   expect(socialPreview.ok()).toBe(true);
   expect(socialPreview.headers()["content-type"]).toContain("image/svg+xml");
+  const svg = await socialPreview.text();
+  expect(svg).toMatch(/^[\x09\x0A\x0D\x20-\x7E]*$/);
+  const parsedSvg = await page.evaluate((source) => {
+    const document = new DOMParser().parseFromString(source, "image/svg+xml");
+    return {
+      root: document.documentElement.localName,
+      parserError: document.querySelector("parsererror")?.textContent ?? null,
+    };
+  }, svg);
+  expect(parsedSvg).toEqual({ root: "svg", parserError: null });
 
   const rss = await request.get("/rss.xml");
   expect(rss.ok()).toBe(true);
