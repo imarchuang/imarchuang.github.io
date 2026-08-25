@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -228,12 +228,14 @@ describe("migrate-content", () => {
     expect(result.supportExcludedCount).toBe(10);
     expect(result.generatedDirSkippedCount).toBe(5);
 
-    const sectionTitles = result.navigation.map((section) => section.title);
+    const sectionTitles = result.navigation.map((section: { title: string }) => section.title);
     expect(sectionTitles).toEqual(
       expect.arrayContaining(["Algo", "System Pattern", "Product Pattern", "Python", "System Design"]),
     );
 
-    const algoSection = result.navigation.find((section) => section.href === "/coding/");
+    const algoSection = result.navigation.find(
+      (section: { href: string; items: unknown[] }) => section.href === "/coding/",
+    );
     expect(algoSection?.items.length).toBeGreaterThan(0);
     expect(algoSection?.items).toEqual(
       expect.arrayContaining([
