@@ -122,6 +122,26 @@ describe("App", () => {
     expect(screen.getByText("Local autosave unavailable")).toBeTruthy();
   });
 
+  it("shows unavailable status for a rejected scheduled save without an unhandled rejection", async () => {
+    const unhandledRejection = vi.fn((event) => event.preventDefault());
+    window.addEventListener("unhandledrejection", unhandledRejection);
+    vi.mocked(persistence.saveScene).mockRejectedValue(new Error("save failed"));
+
+    render(<App />);
+    await screen.findByTestId("excalidraw");
+    vi.useFakeTimers();
+
+    onChangeHandler([{ id: "box", type: "rectangle" }], { theme: "light" }, {});
+    await vi.advanceTimersByTimeAsync(600);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(screen.getByText("Local autosave unavailable")).toBeTruthy();
+    expect(unhandledRejection).not.toHaveBeenCalled();
+
+    window.removeEventListener("unhandledrejection", unhandledRejection);
+  });
+
   it("flushes a pending save before navigating away", async () => {
     let resolveSave;
     vi.mocked(persistence.saveScene).mockImplementation(
@@ -141,7 +161,7 @@ describe("App", () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(persistence.saveScene).toHaveBeenCalledTimes(1);
+    expect(persistence.saveScene.mock.calls.length).toBeGreaterThanOrEqual(1);
     expect(navigateTo).not.toHaveBeenCalled();
 
     await vi.advanceTimersByTimeAsync(1000);

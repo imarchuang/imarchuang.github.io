@@ -119,7 +119,7 @@ export default function App() {
       );
       latestSceneRef.current = scene;
       setStatus("Saving...");
-      persist(scene);
+      void persist(scene).catch(() => {});
     },
     [persist],
   );
