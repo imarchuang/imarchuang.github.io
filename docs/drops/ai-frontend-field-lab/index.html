@@ -20,7 +20,6 @@
       --display: Rockwell, "Roboto Slab", "Iowan Old Style", serif;
       --body: "Avenir Next", "Segoe UI", system-ui, sans-serif;
       --mono: SFMono-Regular, Consolas, "Liberation Mono", monospace;
-      --shadow: 0 8px 24px rgba(23, 33, 43, .08);
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -45,7 +44,7 @@
     a { color: var(--blue); text-underline-offset: .18em; }
     h1, h2, h3, p { margin-top: 0; }
     h1, h2, h3 { font-family: var(--display); line-height: 1.08; }
-    h1 { max-width: 17ch; margin-bottom: .65rem; font-size: clamp(2.35rem, 7vw, 5.6rem); letter-spacing: -.04em; }
+    h1 { max-width: 21ch; margin-bottom: .65rem; font-size: clamp(2.35rem, 5vw, 4.35rem); letter-spacing: -.04em; }
     h2 { font-size: clamp(1.75rem, 3vw, 2.75rem); }
     h3 { font-size: 1.15rem; }
     .sr-only {
@@ -63,7 +62,7 @@
       padding: 1.2rem max(1.1rem, calc((100vw - 1500px) / 2));
       border-bottom: 1px solid var(--ink);
     }
-    .lab-header > a { display: inline-block; margin-bottom: 3rem; font-family: var(--mono); font-size: .78rem; text-transform: uppercase; }
+    .lab-header > a { display: inline-block; margin-bottom: 1.25rem; font-family: var(--mono); font-size: .78rem; text-transform: uppercase; }
     .kicker, .eyebrow, .label, .event-type, .risk, .protocol-line, .data-table th {
       font-family: var(--mono);
       font-size: .72rem;
@@ -114,7 +113,6 @@
       border: 1px solid var(--ink);
       padding: 1rem;
       background: var(--white);
-      box-shadow: var(--shadow);
     }
     .canvas {
       position: relative;
@@ -204,7 +202,16 @@
     .case-file div { padding: .65rem 0; border-bottom: 1px solid var(--rule); }
     .case-file dt { color: var(--muted); font: .68rem var(--mono); text-transform: uppercase; }
     .case-file dd { margin: .2rem 0 0; font-weight: 700; overflow-wrap: anywhere; }
-    .event-tape { position: relative; padding: 1rem max(1.1rem, calc((100vw - 1500px) / 2)) 2rem; background: var(--ink); color: white; }
+    .event-tape {
+      position: sticky;
+      z-index: 10;
+      bottom: 0;
+      max-height: min(32vh, 300px);
+      padding: 1rem max(1.1rem, calc((100vw - 1500px) / 2)) 2rem;
+      overflow-y: auto;
+      background: var(--ink);
+      color: white;
+    }
     .tape-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .8rem; }
     .event-tape h2 { margin-bottom: .35rem; font-size: 1.8rem; }
     .event-tape button { border-color: #AAB4B1; background: transparent; color: white; }
@@ -229,8 +236,9 @@
       html { scroll-behavior: auto; }
       .lab-header > a { margin-bottom: 2rem; }
       .lab { display: block; }
-      .case-rail { overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--ink); }
-      .rail-list { grid-template-columns: repeat(4, minmax(118px, 1fr)); }
+      .case-rail { border-right: 0; border-bottom: 1px solid var(--ink); }
+      .rail-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .35rem; }
+      .station-tab { min-height: 6.5rem; padding: .45rem; overflow-wrap: anywhere; }
       .progress-track { margin-bottom: 0; }
       .instrument, .case-file { padding: 1rem; }
       .instrument-head, .ask-layout, .compose-layout { display: block; }
@@ -252,6 +260,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+      button:hover { box-shadow: none; transform: none; }
     }
   </style>
 </head>
@@ -687,9 +696,15 @@
       node.append(list);
       return node;
     }
+    const STATUS_TONES = Object.freeze({
+      coral: "var(--coral)",
+      mint: "var(--mint)",
+      violet: "var(--violet)"
+    });
     function renderStatus(props) {
       const node = element("article", "surface-node");
-      node.style.borderLeft = "6px solid var(--" + props.tone + ")";
+      node.style.borderLeftWidth = "6px";
+      node.style.borderLeftColor = STATUS_TONES[props.tone] || "var(--rule)";
       node.append(element("span", "label", "Status"), element("p", "", props.text));
       return node;
     }
@@ -1014,7 +1029,7 @@
       scope.setAttribute("preserveAspectRatio", "none");
       scope.setAttribute("aria-hidden", "true");
       const line = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-      const visibleCount = Math.min(state.events.length, 10);
+      const visibleCount = state.events.length;
       const points = ["0,25"];
       for (let index = 1; index <= visibleCount; index += 1) {
         const x = index * (1000 / Math.max(visibleCount, 1));
