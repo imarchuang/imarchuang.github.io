@@ -13,24 +13,66 @@ test("serves migrated articles with article chrome", async ({ page, request }, t
   }
 });
 
-test("wraps long article titles without script or navigation overflow", async ({ page }, testInfo) => {
+test("loads representative articles without local resource, script, or layout failures", async ({
+  page,
+  request,
+}, testInfo) => {
   const pageErrors: string[] = [];
+  const failedSameOriginRequests: string[] = [];
+  const failedSameOriginResponses: string[] = [];
+  const baseURL = testInfo.project.use.baseURL;
+  if (typeof baseURL !== "string") {
+    throw new Error("Playwright baseURL must be configured");
+  }
+  const expectedOrigin = new URL(baseURL).origin;
+
   page.on("pageerror", (error) => pageErrors.push(error.message));
+  page.on("requestfailed", (failedRequest) => {
+    if (new URL(failedRequest.url()).origin === expectedOrigin) {
+      failedSameOriginRequests.push(
+        `${failedRequest.method()} ${failedRequest.url()}: ${failedRequest.failure()?.errorText ?? "unknown"}`,
+      );
+    }
+  });
+  page.on("response", (response) => {
+    if (new URL(response.url()).origin === expectedOrigin && response.status() >= 400) {
+      failedSameOriginResponses.push(`${response.status()} ${response.url()}`);
+    }
+  });
 
   await page.goto("/system/philosophy/k8s_design_principle/");
+  await page.waitForLoadState("networkidle");
 
   const dimensions = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     viewportWidth: window.innerWidth,
   }));
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
-  expect(pageErrors).toEqual([]);
+
+  const faviconHref = await page.locator('link[rel~="icon"]').getAttribute("href");
+  expect(faviconHref).toBe("/og-default.svg");
+  const faviconResponse = await request.get(new URL(faviconHref, baseURL).toString());
+  expect(faviconResponse.ok()).toBe(true);
+  expect(faviconResponse.headers()["content-type"]).toContain("image/svg+xml");
 
   if (testInfo.project.name !== "mobile") {
     const navigation = page.locator("[data-section-nav-desktop]");
     const navigationBox = await navigation.boundingBox();
     expect(navigationBox?.height).toBeLessThanOrEqual(688);
   }
+
+  await page.goto("/ideas/example/");
+  await page.waitForLoadState("networkidle");
+  const shortArticleDimensions = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    viewportWidth: window.innerWidth,
+  }));
+  expect(shortArticleDimensions.scrollWidth).toBeLessThanOrEqual(
+    shortArticleDimensions.viewportWidth,
+  );
+  expect(pageErrors).toEqual([]);
+  expect(failedSameOriginRequests).toEqual([]);
+  expect(failedSameOriginResponses).toEqual([]);
 });
 
 test("opens the mobile section menu with keyboard and closes on escape", async ({ page }) => {

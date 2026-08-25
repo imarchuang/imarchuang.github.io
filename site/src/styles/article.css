@@ -78,6 +78,11 @@
   font-family: var(--font-code);
 }
 
+.article-prose :where(p, li, blockquote, td, th) code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .article-prose pre {
   position: relative;
   overflow: auto;
