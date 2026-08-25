@@ -1,17 +1,62 @@
 ---
-const pageTitle = "艾马的主页";
+import SystemsPath from "../components/SystemsPath.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import "../styles/home.css";
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{pageTitle}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{pageTitle}</h1>
-      <p>内容建设中。</p>
-    </main>
-  </body>
-</html>
+<BaseLayout
+  title="Marc Huang — 产品、平台与系统思考"
+  description="Marc Huang 的作品与笔记：用产品思维和技术领导力，让复杂系统变得清晰、可用。"
+>
+  <div class="home-main page-shell">
+    <span class="orb orb-one" aria-hidden="true"></span>
+    <span class="orb orb-two" aria-hidden="true"></span>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">产品思维 × 技术领导力</p>
+        <h1 id="hero-title" aria-label="把复杂系统变得清晰、可用。">把复杂系统<span>变得清晰、可用。</span></h1>
+      </div>
+      <div class="hero-intro">
+        <p>我是 Marc。关注产品、平台与人如何一起工作，把系统思考转化为可以落地的产品和实践。</p>
+        <a class="text-link" href="/about/">了解我的工作&nbsp; →</a>
+      </div>
+    </section>
+
+    <section class="visual-work" aria-labelledby="visual-work-title">
+      <div class="visual-work-inner">
+        <div class="visual-label">
+          <p class="kicker">Selected work</p>
+          <p>视觉思考与<br />交互实验</p>
+        </div>
+        <div class="visual-content">
+          <SystemsPath />
+          <div class="visual-copy">
+            <p class="kicker">Diagrams · experiments · explainers</p>
+            <h2 id="visual-work-title">让看不见的系统，<br />变得可以探索。</h2>
+            <p>用图解与交互实验，呈现复杂问题背后的结构、关系和取舍，让抽象概念成为可以观察、操作与讨论的体验。</p>
+            <a href="/work/" aria-label="浏览视觉作品">浏览视觉作品&nbsp; ↗</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="explore-grid" aria-label="继续探索">
+      <a class="explore-card" href="/work/">
+        <span class="kicker">Explore / 01</span>
+        <h2>交互图解</h2>
+        <p>用可以操作的画面理解系统关系。</p>
+      </a>
+      <a class="explore-card" href="/notes/">
+        <span class="kicker">Explore / 02</span>
+        <h2>技术笔记</h2>
+        <p>产品、平台与工程实践的工作记录。</p>
+      </a>
+      <a class="explore-card" href="/about/">
+        <span class="kicker">Explore / 03</span>
+        <h2>我的工作</h2>
+        <p>如何思考、带领团队并推动产品落地。</p>
+      </a>
+    </section>
+  </div>
+</BaseLayout>

@@ -1,0 +1,19 @@
+@import "@fontsource-variable/manrope";
+@import "@fontsource/noto-sans-sc/400.css";
+@import "@fontsource/noto-sans-sc/600.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+:root {
+  --ink: #102630;
+  --paper: #f5f8f7;
+  --cobalt: #3658e6;
+  --aqua: #bcece3;
+  --coral: #ff684f;
+  --muted: #60747a;
+  --line: #bac8c5;
+  --font-display: "Manrope Variable", "Noto Sans SC", sans-serif;
+  --font-body: "Manrope Variable", "Noto Sans SC", sans-serif;
+  --font-code: "IBM Plex Mono", monospace;
+  --page-gutter: clamp(1.25rem, 5vw, 4.5rem);
+  --content-width: 82rem;
+}

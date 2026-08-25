@@ -1,0 +1,54 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import navigationData from "../../generated/navigation.json";
+import { validateNavigation } from "../../lib/navigation";
+
+const navigation = validateNavigation(navigationData);
+const sections = navigation
+  .filter(({ href }) => !["/", "/ideas/", "/draw/", "/drops/", "/contact/"].includes(href))
+  .slice(0, 6);
+const recent = sections
+  .flatMap((section) => section.items)
+  .flatMap((item) => item.children.length > 0 ? item.children : [item])
+  .filter(({ href }) => href !== "/")
+  .slice(0, 6);
+---
+
+<BaseLayout
+  title="技术笔记 — Marc Huang"
+  description="关于产品、平台、系统设计与工程实践的持续工作记录。"
+>
+  <article class="landing page-shell">
+    <header class="landing-header">
+      <p class="kicker">Notes / Working knowledge</p>
+      <h1>持续生长的技术现场。</h1>
+      <p class="lede">从系统设计到产品实践，这些笔记保留思考的路径，而不只记录最终答案。</p>
+    </header>
+
+    <section aria-labelledby="sections-title">
+      <p class="kicker">Major sections</p>
+      <h2 id="sections-title">按主题浏览</h2>
+      <div class="card-grid">
+        {sections.map((section) => (
+          <div class="collection-card">
+            <h2><a href={section.href}>{section.title}</a></h2>
+            <p>{section.items.length} 个主题入口</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="landing" aria-labelledby="recent-title">
+      <p class="kicker">Recently migrated</p>
+      <h2 id="recent-title">最近整理</h2>
+      <div class="card-grid">
+        {recent.map((entry) => (
+          <div class="collection-card">
+            <h2><a href={entry.href}>{entry.title}</a></h2>
+            <p>一则从旧站迁移、持续修订中的工作笔记。</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  </article>
+</BaseLayout>
