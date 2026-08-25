@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="五年级数学思维训练教材：用奥林匹克数学题型训练会想、会说、会检查。">
+  <link rel="icon" href="data:,">
+  <title>编写依据与延伸资源 · 五年级数学思维训练</title>
+  <style>
+    :root {
+      --paper:#f7f4ec;
+      --card:#fffdf8;
+      --ink:#1d2a36;
+      --muted:#5d6a74;
+      --line:#d7d0c3;
+      --accent:#5A666E;
+      --grid:rgba(49,92,255,.08);
+      --display:"Iowan Old Style","Palatino Linotype","Songti SC","Noto Serif SC",serif;
+      --body:"Avenir Next","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      color:var(--ink);
+      font:17px/1.72 var(--body);
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        radial-gradient(circle at top left, #fff8ef 0%, var(--paper) 55%);
+      background-size:24px 24px, 24px 24px, auto;
+    }
+    a { color:var(--accent); text-underline-offset:.18em; }
+    .layout {
+      display:grid;
+      grid-template-columns:minmax(240px, 280px) minmax(0, 1fr);
+      min-height:100vh;
+    }
+    .sidebar {
+      position:sticky; top:0; align-self:start;
+      height:100vh; overflow:auto;
+      padding:20px 16px 28px;
+      border-right:1px solid var(--line);
+      background:rgba(255,253,248,.92);
+      backdrop-filter:blur(8px);
+    }
+    .brand {
+      display:block; margin-bottom:18px; text-decoration:none; color:inherit;
+    }
+    .brand strong {
+      display:block; font:700 1.05rem/1.25 var(--display);
+      letter-spacing:-.02em;
+    }
+    .brand small { color:var(--muted); font-size:.82rem; }
+    .nav { display:grid; gap:6px; }
+    .nav a {
+      display:grid; grid-template-columns:10px 1fr; gap:10px; align-items:start;
+      padding:10px 10px; border:1px solid transparent; border-radius:14px;
+      text-decoration:none; color:inherit;
+    }
+    .nav a:hover { border-color:var(--line); background:rgba(255,255,255,.7); }
+    .nav a.active {
+      border-color:color-mix(in srgb, var(--accent) 35%, var(--line));
+      background:color-mix(in srgb, var(--accent) 8%, white);
+    }
+    .nav strong { display:block; font-size:.92rem; line-height:1.3; }
+    .nav small { display:block; color:var(--muted); font-size:.74rem; line-height:1.35; }
+    .dot { width:10px; height:10px; border-radius:50%; margin-top:5px; }
+    main { padding:28px clamp(18px, 4vw, 42px) 48px; }
+    .sheet {
+      max-width:860px;
+      margin:0 auto;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:clamp(22px, 4vw, 36px);
+      box-shadow:0 18px 50px rgba(29,42,54,.08);
+    }
+    .eyebrow {
+      display:inline-flex; align-items:center; gap:.45rem;
+      margin-bottom:14px; padding:.35rem .7rem;
+      border:1px solid var(--line); border-radius:999px;
+      font:700 .72rem var(--mono); letter-spacing:.08em; text-transform:uppercase;
+      color:var(--muted);
+    }
+    .eyebrow::before {
+      content:""; width:.55rem; height:.55rem; border-radius:50%; background:var(--accent);
+    }
+    h1, h2, h3 { font-family:var(--display); line-height:1.2; letter-spacing:-.02em; }
+    h1 { font-size:clamp(2rem, 4vw, 2.8rem); margin:0 0 1rem; }
+    h2 { font-size:clamp(1.35rem, 2.4vw, 1.8rem); margin:2rem 0 .8rem; }
+    h3 { font-size:1.08rem; margin:1.4rem 0 .55rem; }
+    p, ul, ol, blockquote { margin:0 0 1rem; }
+    ul, ol { padding-left:1.25rem; }
+    li + li { margin-top:.35rem; }
+    code {
+      padding:.08rem .35rem; border-radius:.35rem;
+      background:rgba(29,42,54,.06); font:.92em var(--mono);
+    }
+    blockquote {
+      margin:1rem 0; padding:.9rem 1rem;
+      border-left:4px solid var(--accent);
+      background:rgba(49,92,255,.05); color:var(--muted);
+    }
+    hr { border:0; border-top:1px dashed var(--line); margin:1.6rem 0; }
+    .toolbar {
+      display:flex; flex-wrap:wrap; gap:10px; margin:0 0 18px;
+    }
+    .btn {
+      appearance:none; border:1px solid var(--line); border-radius:999px;
+      background:white; color:var(--ink); padding:.55rem .9rem;
+      font:inherit; cursor:pointer;
+    }
+    .btn:hover { border-color:var(--accent); }
+    .answers-hidden .answer-block { display:none; }
+    .answer-block {
+      margin-top:1rem; padding:1rem 1.1rem;
+      border:1px dashed color-mix(in srgb, var(--accent) 40%, var(--line));
+      border-radius:18px; background:rgba(255,255,255,.75);
+    }
+    .mobile-top {
+      display:none; position:sticky; top:0; z-index:5;
+      padding:12px 14px; border-bottom:1px solid var(--line);
+      background:rgba(247,244,236,.95); backdrop-filter:blur(8px);
+    }
+    @media (max-width: 920px) {
+      .layout { grid-template-columns:1fr; }
+      .sidebar { display:none; }
+      .mobile-top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+      .sheet { border-radius:22px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior:auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-top">
+    <a href="./index.html"><strong>思维训练教材</strong></a>
+    <a class="btn" href="./index.html">目录</a>
+  </div>
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" href="./index.html">
+        <strong>五年级数学思维训练</strong>
+        <small>奥林匹克题型 · 14 单元 · 16 周</small>
+      </a>
+      <nav class="nav" aria-label="章节导航">
+        <a href="./diagnostic.html"><span class="dot" style="background:#2E6B9E"></span><span><strong>学前诊断</strong><small>课前定位起点</small></span></a><a href="./unit-01.html"><span class="dot" style="background:#315CFF"></span><span><strong>第一单元</strong><small>线段图与数量关系</small></span></a><a href="./unit-02.html"><span class="dot" style="background:#2FBF8F"></span><span><strong>第二单元</strong><small>分类列举</small></span></a><a href="./unit-03.html"><span class="dot" style="background:#7357FF"></span><span><strong>第三单元</strong><small>找规律与递推</small></span></a><a href="./unit-04.html"><span class="dot" style="background:#FF6846"></span><span><strong>第四单元</strong><small>倒推与逆运算</small></span></a><a href="./unit-05.html"><span class="dot" style="background:#9A4A20"></span><span><strong>第五单元</strong><small>鸡兔同笼类问题</small></span></a><a href="./unit-06.html"><span class="dot" style="background:#006A78"></span><span><strong>第六单元</strong><small>因数倍数与周期</small></span></a><a href="./unit-07.html"><span class="dot" style="background:#7A2048"></span><span><strong>第七单元</strong><small>份数法与单位1</small></span></a><a href="./unit-08.html"><span class="dot" style="background:#1F4F8A"></span><span><strong>第八单元</strong><small>分步与排除</small></span></a><a href="./unit-09.html"><span class="dot" style="background:#245A3D"></span><span><strong>第九单元</strong><small>等积变形</small></span></a><a href="./unit-10.html"><span class="dot" style="background:#6A3FA0"></span><span><strong>第十单元</strong><small>体积与涂色块</small></span></a><a href="./unit-11.html"><span class="dot" style="background:#315CFF"></span><span><strong>第十一单元</strong><small>奇偶与不变量</small></span></a><a href="./unit-12.html"><span class="dot" style="background:#2FBF8F"></span><span><strong>第十二单元</strong><small>最不利情况</small></span></a><a href="./unit-13.html"><span class="dot" style="background:#FF6846"></span><span><strong>第十三单元</strong><small>天平与逻辑</small></span></a><a href="./unit-14.html"><span class="dot" style="background:#7357FF"></span><span><strong>第十四单元</strong><small>建模与方案比较</small></span></a><a href="./tests.html"><span class="dot" style="background:#17212B"></span><span><strong>四次混合检测</strong><small>4次阶段检测</small></span></a><a href="./hints.html"><span class="dot" style="background:#5A666E"></span><span><strong>挑战题提示索</strong><small>分级提示</small></span></a><a href="./answers.html"><span class="dot" style="background:#17212B"></span><span><strong>答案与解题要</strong><small>教师与家长参考</small></span></a><a href="./schedule.html"><span class="dot" style="background:#315CFF"></span><span><strong>16 周教学</strong><small>周计划</small></span></a><a href="./questions.html"><span class="dot" style="background:#2FBF8F"></span><span><strong>教师提问句库</strong><small>课堂提问</small></span></a><a href="./mistakes.html"><span class="dot" style="background:#FF6846"></span><span><strong>错题记录模板</strong><small>复盘模板</small></span></a><a href="./references.html" class="active"><span class="dot" style="background:#5A666E"></span><span><strong>编写依据与延</strong><small>参考来源</small></span></a><a href="./notes.html"><span class="dot" style="background:#5A666E"></span><span><strong>使用提醒</strong><small>使用说明</small></span></a>
+      </nav>
+    </aside>
+    <main>
+      <article class="sheet" id="content">
+        <div class="eyebrow">Math Thinking</div>
+        <ol>
+<li>中华人民共和国教育部，《义务教育数学课程标准（2022 年版）》及第三学段相关要求。</li>
+<li>江西省教育厅，《义务教育阶段小学数学作业设计与实施指导意见（2024 修订版）》：强调分数、小数、因数倍数、估算、数量关系及真实情境中的问题解决。</li>
+<li>MOEMS（Mathematical Olympiads for Elementary and Middle Schools）官方介绍：Division E 面向 4～6 年级，重视非套路问题、灵活策略和数学创造性。</li>
+</ol>
+<p>   https://www.moems.org/pages/about-the-program</p>
+<ol>
+<li>Math Kangaroo 官方 5～6 年级练习材料：按难度组织问题，强调适龄、有趣、逻辑与空间思维。</li>
+</ol>
+<p>   https://mathkangaroo.org/mks/practice/grades-5-6/</p>
+<ol>
+<li>Education Endowment Foundation，Improving Mathematics in Key Stages 2 and 3：建议使用完整、残缺或含错的例题，显性示范计划—监控—评价，并逐步撤去支架。</li>
+</ol>
+<p>   https://educationendowmentfoundation.org.uk/news/eef-blog-how-can-we-improve-childrens-problem-solving-in-maths</p>
+<ol>
+<li>National Council of Teachers of Mathematics，Effective Mathematics Teaching Practices：倡导多入口、高认知需求任务、表征连接和有支持的“有效挣扎”。</li>
+</ol>
+<p>   https://www.nctm.org/Conferences-and-Professional-Development/Principles-to-Actions-Toolkit/Resources/7-EffectiveMathematicsTeachingPractices/</p>
+<ol>
+<li>Taylor &amp; Rohrer 等关于数学交错练习的研究综述：短期练习感受可能更难，但延迟测验和策略辨别通常更好。</li>
+</ol>
+<p>   https://www.retrievalpractice.org/strategies/2017/interleaving</p>
+<hr>
+      </article>
+    </main>
+  </div>
+  <script>
+    (function () {
+      const page = document.body;
+      const key = "g5-think-hide-answers";
+      const hide = localStorage.getItem(key) !== "off";
+      if (hide) page.classList.add("answers-hidden");
+      const btn = document.getElementById("toggle-answers");
+      if (btn) {
+        const sync = () => {
+          const hidden = page.classList.contains("answers-hidden");
+          btn.textContent = hidden ? "显示答案与要点" : "隐藏答案与要点";
+        };
+        sync();
+        btn.addEventListener("click", () => {
+          page.classList.toggle("answers-hidden");
+          localStorage.setItem(key, page.classList.contains("answers-hidden") ? "on" : "off");
+          sync();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
