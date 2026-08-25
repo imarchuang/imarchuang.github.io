@@ -7,12 +7,12 @@
   <title>用字母表示（一） | 五年级数学互动课件</title>
   <style>
     :root{
-      
+
     --chapter-primary:#6A4C93;
     --chapter-secondary:#EFE4FA;
     --chapter-accent:#F3B63F;
     --chapter-dark:#523B71;
-  
+
       --ink:#20303d;
       --muted:#5b6a78;
       --line:#d7e2ea;
@@ -395,6 +395,170 @@
     .answer-plain{
       margin:0;
     }
+    .practice-extension{
+      position:relative;
+      overflow:hidden;
+      margin-top:44px;
+      padding:clamp(24px,4vw,48px);
+      border:1px solid rgba(36,74,112,.14);
+      border-radius:32px;
+      background:
+        radial-gradient(circle at 92% 5%, rgba(243,182,63,.20), transparent 28%),
+        linear-gradient(145deg, rgba(255,255,255,.97), rgba(247,250,252,.96));
+      box-shadow:var(--shadow);
+    }
+    .practice-extension::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:radial-gradient(circle at 1px 1px, rgba(90,110,125,.10) 1px, transparent 0) 0 0/20px 20px;
+      mask-image:linear-gradient(90deg, transparent, #000 35%, #000);
+    }
+    .practice-extension > *{
+      position:relative;
+    }
+    .practice-extension-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:24px;
+      padding-bottom:28px;
+      border-bottom:1px solid rgba(36,74,112,.12);
+    }
+    .practice-eyebrow{
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .practice-extension h2{
+      margin:8px 0 10px;
+      font-size:clamp(30px,4vw,52px);
+      line-height:1.08;
+      letter-spacing:-.04em;
+    }
+    .practice-extension-head p,.practice-group-title p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+    .practice-summary{
+      flex:0 0 auto;
+      display:grid;
+      grid-template-columns:auto auto;
+      gap:3px 9px;
+      align-items:baseline;
+      min-width:150px;
+      padding:16px 18px;
+      border-radius:22px;
+      background:var(--chapter-primary);
+      color:white;
+      box-shadow:0 14px 30px rgba(31,58,95,.16);
+    }
+    .practice-summary strong{
+      font-size:28px;
+      line-height:1;
+    }
+    .practice-summary span{
+      font-size:13px;
+      opacity:.84;
+    }
+    .practice-group{
+      margin-top:34px;
+    }
+    .practice-group-title{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .practice-group-title > span{
+      display:grid;
+      place-items:center;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:rgba(243,182,63,.22);
+      color:var(--chapter-primary);
+      font-weight:900;
+    }
+    .practice-group-title h3{
+      margin:0 0 4px;
+      font-size:24px;
+    }
+    .practice-card-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    .practice-card-grid.bonus-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .extension-card{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-width:0;
+      min-height:280px;
+      padding:20px;
+      border:1px solid rgba(36,74,112,.13);
+      border-radius:24px;
+      background:rgba(255,255,255,.90);
+      box-shadow:0 12px 26px rgba(31,58,95,.08);
+    }
+    .extension-card.bonus-card{
+      border-color:rgba(179,126,28,.28);
+      background:linear-gradient(155deg, rgba(255,252,241,.98), rgba(255,247,222,.88));
+    }
+    .practice-card-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.04em;
+    }
+    .practice-check{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:var(--muted);
+      font-weight:650;
+      letter-spacing:0;
+      cursor:pointer;
+    }
+    .practice-check input{
+      width:18px;
+      height:18px;
+      accent-color:var(--chapter-primary);
+    }
+    .extension-card h4{
+      margin:0;
+      font-size:19px;
+      line-height:1.65;
+      font-weight:760;
+    }
+    .practice-hint{
+      border-top:1px dashed rgba(36,74,112,.18);
+      padding-top:12px;
+      color:var(--muted);
+    }
+    .practice-hint summary{
+      color:var(--chapter-primary);
+      font-weight:750;
+      cursor:pointer;
+    }
+    .practice-hint p{
+      margin:8px 0 0;
+      line-height:1.65;
+    }
+    .extension-card .answer-area{
+      margin-top:auto;
+    }
     .visual-pane{
       display:flex;
       align-items:stretch;
@@ -639,6 +803,9 @@
       .slide-count{
         text-align:left;
       }
+      .practice-card-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
     }
     @media (max-width:520px){
       .deck-shell{
@@ -652,7 +819,7 @@
       .topbar-group{
         width:100%;
         display:grid;
-        grid-template-columns:repeat(2,minmax(0,1fr));
+        grid-template-columns:repeat(3,minmax(0,1fr));
         gap:8px;
       }
       .topbar-group:last-child{
@@ -688,6 +855,27 @@
       }
       .challenge-title,.next-lesson{
         font-size:22px;
+      }
+      .practice-extension{
+        margin-top:28px;
+        padding:22px 16px;
+        border-radius:24px;
+      }
+      .practice-extension-head{
+        align-items:stretch;
+        flex-direction:column;
+      }
+      .practice-summary{
+        grid-template-columns:auto auto auto auto;
+        min-width:0;
+      }
+      .practice-card-grid,
+      .practice-card-grid.bonus-grid{
+        grid-template-columns:1fr;
+      }
+      .extension-card{
+        min-height:0;
+        padding:18px;
       }
     }
     @media (prefers-reduced-motion: reduce){
@@ -740,6 +928,12 @@
         print-color-adjust:exact;
         -webkit-print-color-adjust:exact;
       }
+      .practice-extension{
+        box-shadow:none;
+      }
+      .extension-card{
+        break-inside:avoid;
+      }
     }
   </style>
 </head>
@@ -748,7 +942,7 @@
     <div class="deck-topbar">
       <div class="topbar-group">
         <a class="toolbar-link" href="../index.html">返回总目录</a>
-        <a class="toolbar-link" href="https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E7%94%A8%E5%AD%97%E6%AF%8D%E8%A1%A8%E7%A4%BA%EF%BC%88%E4%B8%80%EF%BC%89.pptx">下载 PPTX</a>
+        <button class="toolbar-button" id="practiceJump" type="button">强化练习</button>
       </div>
       <div class="topbar-group">
         <div class="deck-badge"><strong>第 4 章</strong><span>1课时</span></div>
@@ -760,7 +954,7 @@
       <section class="stage-column">
         <div class="stage-frame" id="stageFrame">
           <div class="slides-viewport" id="slidesViewport" tabindex="0" aria-label="用字母表示（一） 课件">
-            
+
                   <section class="slide active" id="slide-1" data-slide-number="1" aria-roledescription="slide" aria-label="封面，第 1 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -811,7 +1005,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-2" data-slide-number="2" aria-roledescription="slide" aria-label="学习目标 + 5分钟诊断，第 2 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -831,21 +1025,21 @@
           <section class="paper-panel">
             <div class="mini-label">5 分钟诊断</div>
             <ol class="question-list">
-              
+
                     <li>
                       <div class="question-text">正方形边长 a，周长怎样表示？</div>
                     </li>
-                  
+
                     <li>
                       <div class="question-text">妈妈比明明大 28 岁，明明 a 岁，妈妈几岁？</div>
                     </li>
-                  
+
                     <li>
                       <div class="question-text">当 a=5 时，2a+3 等于多少？</div>
                     </li>
-                  
+
             </ol>
-            
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="letters-1-diagnostic-answer" aria-expanded="false" aria-controls="letters-1-diagnostic-answer">
         显示答案
@@ -855,7 +1049,7 @@
         <ol class="answer-list"><li><strong>1.</strong> 4a</li><li><strong>2.</strong> a+28</li><li><strong>3.</strong> 13</li></ol>
       </div>
     </div>
-  
+
           </section>
         </div>
       </div>
@@ -885,7 +1079,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-3" data-slide-number="3" aria-roledescription="slide" aria-label="核心概念/模型，第 3 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -929,7 +1123,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-4" data-slide-number="4" aria-roledescription="slide" aria-label="例题精讲，第 4 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -947,15 +1141,15 @@
         </section>
         <section class="paper-panel">
           <div class="mini-label">示范步骤</div>
-          
+
     <div class="quote-list">
       <div class="mini-label">一步一步想</div>
       <ol>
         <li><span class="order-badge">1</span><span>先列式：3a+2。</span></li><li><span class="order-badge">2</span><span>再代入 a=4，得到 3×4+2=14。</span></li><li><span class="order-badge">3</span><span>先有关系，后有数值，这是用字母表示的顺序。 </span></li>
       </ol>
     </div>
-  
-          
+
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="letters-1-worked-answer" aria-expanded="false" aria-controls="letters-1-worked-answer">
         显示答案
@@ -965,7 +1159,7 @@
         <p class="answer-plain">式子是 3a+2；当 a=4 时共 14 元。</p>
       </div>
     </div>
-  
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -994,7 +1188,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-5" data-slide-number="5" aria-roledescription="slide" aria-label="易错门诊，第 5 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1007,25 +1201,25 @@
                     <div class="slide-main">
                       <div class="text-pane">
         <section class="stack-list">
-          
+
                 <article class="mistake-card ">
                   <div class="mistake-title">误区 1</div>
                   <p><strong>常见说法：</strong>把 a 看成固定就是 1</p>
                   <p><strong>修正建议：</strong>字母表示的是一个数，不一定是1。</p>
                 </article>
-              
+
                 <article class="mistake-card mistake-warm">
                   <div class="mistake-title">误区 2</div>
                   <p><strong>常见说法：</strong>3a 写成 3+a</p>
                   <p><strong>修正建议：</strong>3a 表示 3×a，是乘法的简写。</p>
                 </article>
-              
+
                 <article class="mistake-card ">
                   <div class="mistake-title">误区 3</div>
                   <p><strong>常见说法：</strong>同一题里两个 a 可以代不同数</p>
                   <p><strong>修正建议：</strong>同一情境下同一字母表示同一个量。 </p>
                 </article>
-              
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -1054,7 +1248,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-6" data-slide-number="6" aria-roledescription="slide" aria-label="引导练习，第 6 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1067,24 +1261,24 @@
                     <div class="slide-main">
                       <div class="text-pane">
         <div class="practice-grid">
-          
+
                 <section class="practice-card">
                   <div class="mini-label">练习 1</div>
                   <p class="practice-question">长方形长 a、宽 5，周长</p>
                 </section>
-              
+
                 <section class="practice-card">
                   <div class="mini-label">练习 2</div>
                   <p class="practice-question">比 x 多 7 的数</p>
                 </section>
-              
+
                 <section class="practice-card">
                   <div class="mini-label">练习 3</div>
                   <p class="practice-question">当 m=6 时，5m−4</p>
                 </section>
-              
+
         </div>
-        
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="letters-1-practice-answer" aria-expanded="false" aria-controls="letters-1-practice-answer">
         显示答案
@@ -1094,7 +1288,7 @@
         <ol class="answer-list"><li><strong>1.</strong> 2(a+5)</li><li><strong>2.</strong> x+7</li><li><strong>3.</strong> 26</li></ol>
       </div>
     </div>
-  
+
       </div>
                       <aside class="visual-pane">
     <div class="visual-card">
@@ -1122,7 +1316,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-7" data-slide-number="7" aria-roledescription="slide" aria-label="挑战/应用，第 7 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1138,7 +1332,7 @@
           <div class="mini-label">任务</div>
           <h3 class="challenge-title">拼图规律</h3>
           <p class="challenge-text">第 1 个图形用 4 根小棒，第 2 个用 7 根，第 3 个用 10 根。第 n 个图形需要多少根？</p>
-          
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="letters-1-challenge-answer" aria-expanded="false" aria-controls="letters-1-challenge-answer">
         显示答案
@@ -1148,7 +1342,7 @@
         <p class="answer-plain">可表示为 3n+1。</p>
       </div>
     </div>
-  
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -1157,15 +1351,15 @@
       <div class="visual-caption">每增加一个图形，多 3 根小棒，所以用 3n+1 表示。</div>
       <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="小棒规律示意图" xmlns="http://www.w3.org/2000/svg">
               <rect x="54" y="32" width="312" height="212" rx="20" fill="#ffffff" stroke="#d6e2ec" stroke-width="2"/>
-              
+
                     <text x="86" y="78" font-size="21" font-weight="500" fill="#1f2933">第1个: 4根</text>
-                  
+
                     <text x="86" y="120" font-size="21" font-weight="500" fill="#1f2933">第2个: 7根</text>
-                  
+
                     <text x="86" y="162" font-size="21" font-weight="500" fill="#1f2933">第3个: 10根</text>
-                  
+
                     <text x="86" y="204" font-size="24" font-weight="700" fill="#6A4C93">每次 +3</text>
-                  
+
               <text x="210" y="226" text-anchor="middle" font-size="14" fill="#64748b">第 n 个图形可写成 3n + 1</text>
             </svg></div>
     </div>
@@ -1181,7 +1375,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-8" data-slide-number="8" aria-roledescription="slide" aria-label="小结/自检，第 8 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1196,28 +1390,28 @@
         <section class="paper-panel">
           <div class="mini-label">自检清单</div>
           <ul class="self-check-list">
-            
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="letters-1-summary-0">
                       <span>我知道字母可以表示数量关系。</span>
                     </label>
                   </li>
-                
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="letters-1-summary-1">
                       <span>我会把一句话改写成含字母的式子。</span>
                     </label>
                   </li>
-                
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="letters-1-summary-2">
                       <span>我会代入求值并保留原来的运算顺序。 </span>
                     </label>
                   </li>
-                
+
           </ul>
         </section>
       </div>
@@ -1247,7 +1441,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-9" data-slide-number="9" aria-roledescription="slide" aria-label="作业/下节衔接，第 9 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1262,14 +1456,14 @@
         <div class="content-grid two-up">
           <section class="paper-panel">
             <div class="mini-label">课后任务</div>
-            
+
     <div class="quote-list">
       <div class="mini-label">作业安排</div>
       <ol>
         <li><span class="order-badge">1</span><span>把 3 个生活句子改写成含字母式子。</span></li><li><span class="order-badge">2</span><span>完成 2 题代入求值。</span></li><li><span class="order-badge">3</span><span>预习下节：回忆长方形、平行四边形面积公式。 </span></li>
       </ol>
     </div>
-  
+
           </section>
           <section class="paper-panel">
             <div class="mini-label">下节衔接</div>
@@ -1304,7 +1498,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
           </div>
         </div>
         <div class="nav-row" aria-label="翻页控制">
@@ -1341,6 +1535,244 @@
         </div>
       </aside>
     </div>
+
+    <section class="practice-extension" id="practiceExtension" aria-labelledby="practiceTitle">
+      <header class="practice-extension-head">
+        <div>
+          <div class="practice-eyebrow">HTML 专属 · 课后加练</div>
+          <h2 id="practiceTitle">强化练习题 + 附加题</h2>
+          <p>先独立完成，再查看提示；订正后勾选“已完成”。完成状态会保存在当前浏览器。</p>
+        </div>
+        <div class="practice-summary"><strong>6</strong><span>道强化</span><strong>2</strong><span>道附加</span></div>
+      </header>
+      <section class="practice-group" aria-labelledby="reinforcementTitle">
+        <div class="practice-group-title">
+          <span>01</span>
+          <div><h3 id="reinforcementTitle">强化练习题</h3><p>巩固本章核心方法，注意写清关键步骤。</p></div>
+        </div>
+        <div class="practice-card-grid">
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 1</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="letters-1-reinforcement-1">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>每盒彩笔有 x 支，5 盒共有多少支？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>相同数量有 5 份。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="letters-1-reinforcement-1-answer" aria-expanded="false" aria-controls="letters-1-reinforcement-1-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="letters-1-reinforcement-1-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">5x 支</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 2</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="letters-1-reinforcement-2">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>一个数是 n，比它多 12 的数怎样表示？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>“多 12”表示加 12。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="letters-1-reinforcement-2-answer" aria-expanded="false" aria-controls="letters-1-reinforcement-2-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="letters-1-reinforcement-2-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">n + 12</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 3</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="letters-1-reinforcement-3">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>正方形边长为 a 厘米，它的周长怎样表示？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>正方形有四条相等的边。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="letters-1-reinforcement-3-answer" aria-expanded="false" aria-controls="letters-1-reinforcement-3-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="letters-1-reinforcement-3-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">4a 厘米</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 4</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="letters-1-reinforcement-4">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>当 x = 7 时，求 3x + 5 的值。</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>把 x 换成 7 后按顺序计算。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="letters-1-reinforcement-4-answer" aria-expanded="false" aria-controls="letters-1-reinforcement-4-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="letters-1-reinforcement-4-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">26</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 5</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="letters-1-reinforcement-5">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>把 c 块饼干平均分给 6 人，每人分到多少块？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>平均分使用除法。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="letters-1-reinforcement-5-answer" aria-expanded="false" aria-controls="letters-1-reinforcement-5-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="letters-1-reinforcement-5-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">c ÷ 6 块</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 6</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="letters-1-reinforcement-6">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>长方形长 a 厘米、宽 3 厘米。写出周长，并求 a = 8 时的周长。</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>周长等于长与宽的和乘 2。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="letters-1-reinforcement-6-answer" aria-expanded="false" aria-controls="letters-1-reinforcement-6-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="letters-1-reinforcement-6-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">周长是 2(a + 3) 厘米；a = 8 时是 22 厘米。</p>
+      </div>
+    </div>
+
+    </article>
+
+        </div>
+      </section>
+      <section class="practice-group bonus-group" aria-labelledby="bonusTitle">
+        <div class="practice-group-title">
+          <span>02</span>
+          <div><h3 id="bonusTitle">附加题</h3><p>需要多想一步，鼓励画图、列表或尝试不同方法。</p></div>
+        </div>
+        <div class="practice-card-grid bonus-grid">
+
+    <article class="extension-card bonus-card" data-practice-kind="bonus">
+      <div class="practice-card-head">
+        <span>附加题 1</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="letters-1-bonus-1">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>用小棒连续拼正六边形：第 1 个用 6 根，以后每增加一个六边形多用 5 根。第 n 个图形共用多少根？第 10 个呢？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>从 6 根开始，每次增加 5 根。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="letters-1-bonus-1-answer" aria-expanded="false" aria-controls="letters-1-bonus-1-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="letters-1-bonus-1-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">5n + 1 根；第 10 个用 51 根。</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card bonus-card" data-practice-kind="bonus">
+      <div class="practice-card-head">
+        <span>附加题 2</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="letters-1-bonus-2">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>成人票每张 x 元，儿童票比成人票便宜 12 元。买一张成人票和一张儿童票共多少元？当 x = 35 时共多少元？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>儿童票价是 x - 12。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="letters-1-bonus-2-answer" aria-expanded="false" aria-controls="letters-1-bonus-2-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="letters-1-bonus-2-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">2x - 12 元；当 x = 35 时共 58 元。</p>
+      </div>
+    </div>
+
+    </article>
+
+        </div>
+      </section>
+    </section>
+
     <div class="visually-hidden" aria-live="polite" id="liveRegion"></div>
   </main>
   <script>
@@ -1354,6 +1786,7 @@
       const nextButton = document.getElementById("nextButton");
       const notesToggle = document.getElementById("notesToggle");
       const fullscreenToggle = document.getElementById("fullscreenToggle");
+      const practiceJump = document.getElementById("practiceJump");
       const notesBody = document.getElementById("notesBody");
       const notesHeading = document.getElementById("notesHeading");
       const liveRegion = document.getElementById("liveRegion");
@@ -1414,6 +1847,12 @@
 
       prevButton.addEventListener("click", () => go(-1));
       nextButton.addEventListener("click", () => go(1));
+      practiceJump.addEventListener("click", () => {
+        document.getElementById("practiceExtension").scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+        });
+      });
 
       notesToggle.addEventListener("click", () => {
         const hidden = app.classList.toggle("notes-hidden");

@@ -7,12 +7,12 @@
   <title>倍数与因数 | 五年级数学互动课件</title>
   <style>
     :root{
-      
+
     --chapter-primary:#4C5B35;
     --chapter-secondary:#E9EFD9;
     --chapter-accent:#C78F2B;
     --chapter-dark:#394427;
-  
+
       --ink:#20303d;
       --muted:#5b6a78;
       --line:#d7e2ea;
@@ -395,6 +395,170 @@
     .answer-plain{
       margin:0;
     }
+    .practice-extension{
+      position:relative;
+      overflow:hidden;
+      margin-top:44px;
+      padding:clamp(24px,4vw,48px);
+      border:1px solid rgba(36,74,112,.14);
+      border-radius:32px;
+      background:
+        radial-gradient(circle at 92% 5%, rgba(243,182,63,.20), transparent 28%),
+        linear-gradient(145deg, rgba(255,255,255,.97), rgba(247,250,252,.96));
+      box-shadow:var(--shadow);
+    }
+    .practice-extension::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:radial-gradient(circle at 1px 1px, rgba(90,110,125,.10) 1px, transparent 0) 0 0/20px 20px;
+      mask-image:linear-gradient(90deg, transparent, #000 35%, #000);
+    }
+    .practice-extension > *{
+      position:relative;
+    }
+    .practice-extension-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:24px;
+      padding-bottom:28px;
+      border-bottom:1px solid rgba(36,74,112,.12);
+    }
+    .practice-eyebrow{
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .practice-extension h2{
+      margin:8px 0 10px;
+      font-size:clamp(30px,4vw,52px);
+      line-height:1.08;
+      letter-spacing:-.04em;
+    }
+    .practice-extension-head p,.practice-group-title p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+    .practice-summary{
+      flex:0 0 auto;
+      display:grid;
+      grid-template-columns:auto auto;
+      gap:3px 9px;
+      align-items:baseline;
+      min-width:150px;
+      padding:16px 18px;
+      border-radius:22px;
+      background:var(--chapter-primary);
+      color:white;
+      box-shadow:0 14px 30px rgba(31,58,95,.16);
+    }
+    .practice-summary strong{
+      font-size:28px;
+      line-height:1;
+    }
+    .practice-summary span{
+      font-size:13px;
+      opacity:.84;
+    }
+    .practice-group{
+      margin-top:34px;
+    }
+    .practice-group-title{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .practice-group-title > span{
+      display:grid;
+      place-items:center;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:rgba(243,182,63,.22);
+      color:var(--chapter-primary);
+      font-weight:900;
+    }
+    .practice-group-title h3{
+      margin:0 0 4px;
+      font-size:24px;
+    }
+    .practice-card-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    .practice-card-grid.bonus-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .extension-card{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-width:0;
+      min-height:280px;
+      padding:20px;
+      border:1px solid rgba(36,74,112,.13);
+      border-radius:24px;
+      background:rgba(255,255,255,.90);
+      box-shadow:0 12px 26px rgba(31,58,95,.08);
+    }
+    .extension-card.bonus-card{
+      border-color:rgba(179,126,28,.28);
+      background:linear-gradient(155deg, rgba(255,252,241,.98), rgba(255,247,222,.88));
+    }
+    .practice-card-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.04em;
+    }
+    .practice-check{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:var(--muted);
+      font-weight:650;
+      letter-spacing:0;
+      cursor:pointer;
+    }
+    .practice-check input{
+      width:18px;
+      height:18px;
+      accent-color:var(--chapter-primary);
+    }
+    .extension-card h4{
+      margin:0;
+      font-size:19px;
+      line-height:1.65;
+      font-weight:760;
+    }
+    .practice-hint{
+      border-top:1px dashed rgba(36,74,112,.18);
+      padding-top:12px;
+      color:var(--muted);
+    }
+    .practice-hint summary{
+      color:var(--chapter-primary);
+      font-weight:750;
+      cursor:pointer;
+    }
+    .practice-hint p{
+      margin:8px 0 0;
+      line-height:1.65;
+    }
+    .extension-card .answer-area{
+      margin-top:auto;
+    }
     .visual-pane{
       display:flex;
       align-items:stretch;
@@ -639,6 +803,9 @@
       .slide-count{
         text-align:left;
       }
+      .practice-card-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
     }
     @media (max-width:520px){
       .deck-shell{
@@ -652,7 +819,7 @@
       .topbar-group{
         width:100%;
         display:grid;
-        grid-template-columns:repeat(2,minmax(0,1fr));
+        grid-template-columns:repeat(3,minmax(0,1fr));
         gap:8px;
       }
       .topbar-group:last-child{
@@ -688,6 +855,27 @@
       }
       .challenge-title,.next-lesson{
         font-size:22px;
+      }
+      .practice-extension{
+        margin-top:28px;
+        padding:22px 16px;
+        border-radius:24px;
+      }
+      .practice-extension-head{
+        align-items:stretch;
+        flex-direction:column;
+      }
+      .practice-summary{
+        grid-template-columns:auto auto auto auto;
+        min-width:0;
+      }
+      .practice-card-grid,
+      .practice-card-grid.bonus-grid{
+        grid-template-columns:1fr;
+      }
+      .extension-card{
+        min-height:0;
+        padding:18px;
       }
     }
     @media (prefers-reduced-motion: reduce){
@@ -740,6 +928,12 @@
         print-color-adjust:exact;
         -webkit-print-color-adjust:exact;
       }
+      .practice-extension{
+        box-shadow:none;
+      }
+      .extension-card{
+        break-inside:avoid;
+      }
     }
   </style>
 </head>
@@ -748,7 +942,7 @@
     <div class="deck-topbar">
       <div class="topbar-group">
         <a class="toolbar-link" href="../index.html">返回总目录</a>
-        <a class="toolbar-link" href="https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E5%80%8D%E6%95%B0%E4%B8%8E%E5%9B%A0%E6%95%B0.pptx">下载 PPTX</a>
+        <button class="toolbar-button" id="practiceJump" type="button">强化练习</button>
       </div>
       <div class="topbar-group">
         <div class="deck-badge"><strong>第 7 章</strong><span>2课时</span></div>
@@ -760,7 +954,7 @@
       <section class="stage-column">
         <div class="stage-frame" id="stageFrame">
           <div class="slides-viewport" id="slidesViewport" tabindex="0" aria-label="倍数与因数 课件">
-            
+
                   <section class="slide active" id="slide-1" data-slide-number="1" aria-roledescription="slide" aria-label="封面，第 1 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -820,7 +1014,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-2" data-slide-number="2" aria-roledescription="slide" aria-label="学习目标 + 5分钟诊断，第 2 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -840,21 +1034,21 @@
           <section class="paper-panel">
             <div class="mini-label">5 分钟诊断</div>
             <ol class="question-list">
-              
+
                     <li>
                       <div class="question-text">12 是 3 的倍数吗？</div>
                     </li>
-                  
+
                     <li>
                       <div class="question-text">1 是质数吗？</div>
                     </li>
-                  
+
                     <li>
                       <div class="question-text">8 的因数有哪些？</div>
                     </li>
-                  
+
             </ol>
-            
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="factors-multiples-diagnostic-answer" aria-expanded="false" aria-controls="factors-multiples-diagnostic-answer">
         显示答案
@@ -864,7 +1058,7 @@
         <ol class="answer-list"><li><strong>1.</strong> 是，因为12÷3=4。</li><li><strong>2.</strong> 不是，1既不是质数也不是合数。</li><li><strong>3.</strong> 1、2、4、8。</li></ol>
       </div>
     </div>
-  
+
           </section>
         </div>
       </div>
@@ -903,7 +1097,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-3" data-slide-number="3" aria-roledescription="slide" aria-label="核心概念/模型，第 3 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -956,7 +1150,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-4" data-slide-number="4" aria-roledescription="slide" aria-label="例题精讲，第 4 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -974,15 +1168,15 @@
         </section>
         <section class="paper-panel">
           <div class="mini-label">示范步骤</div>
-          
+
     <div class="quote-list">
       <div class="mini-label">一步一步想</div>
       <ol>
         <li><span class="order-badge">1</span><span>18 的因数成对找：1×18，2×9，3×6。</span></li><li><span class="order-badge">2</span><span>18 的因数有 1、2、3、6、9、18；24 的因数有 1、2、3、4、6、8、12、24。</span></li><li><span class="order-badge">3</span><span>共同因数中最大的是 6。 </span></li>
       </ol>
     </div>
-  
-          
+
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="factors-multiples-worked-answer" aria-expanded="false" aria-controls="factors-multiples-worked-answer">
         显示答案
@@ -992,7 +1186,7 @@
         <p class="answer-plain">18 的因数是 1、2、3、6、9、18；最大公因数是 6。</p>
       </div>
     </div>
-  
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -1030,7 +1224,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-5" data-slide-number="5" aria-roledescription="slide" aria-label="易错门诊，第 5 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1043,25 +1237,25 @@
                     <div class="slide-main">
                       <div class="text-pane">
         <section class="stack-list">
-          
+
                 <article class="mistake-card ">
                   <div class="mistake-title">误区 1</div>
                   <p><strong>常见说法：</strong>把倍数和因数说反</p>
                   <p><strong>修正建议：</strong>先看除法能否整除，再判断谁是谁的倍数。</p>
                 </article>
-              
+
                 <article class="mistake-card mistake-warm">
                   <div class="mistake-title">误区 2</div>
                   <p><strong>常见说法：</strong>因数可以无限列下去</p>
                   <p><strong>修正建议：</strong>一个数的因数有限，倍数通常无限。</p>
                 </article>
-              
+
                 <article class="mistake-card ">
                   <div class="mistake-title">误区 3</div>
                   <p><strong>常见说法：</strong>1 是最小质数</p>
                   <p><strong>修正建议：</strong>最小质数是 2。 </p>
                 </article>
-              
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -1099,7 +1293,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-6" data-slide-number="6" aria-roledescription="slide" aria-label="引导练习，第 6 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1112,24 +1306,24 @@
                     <div class="slide-main">
                       <div class="text-pane">
         <div class="practice-grid">
-          
+
                 <section class="practice-card">
                   <div class="mini-label">练习 1</div>
                   <p class="practice-question">找 15 的因数</p>
                 </section>
-              
+
                 <section class="practice-card">
                   <div class="mini-label">练习 2</div>
                   <p class="practice-question">写出 6 的前 5 个倍数</p>
                 </section>
-              
+
                 <section class="practice-card">
                   <div class="mini-label">练习 3</div>
                   <p class="practice-question">10 和 15 的最小公倍数</p>
                 </section>
-              
+
         </div>
-        
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="factors-multiples-practice-answer" aria-expanded="false" aria-controls="factors-multiples-practice-answer">
         显示答案
@@ -1139,7 +1333,7 @@
         <ol class="answer-list"><li><strong>1.</strong> 1、3、5、15</li><li><strong>2.</strong> 6、12、18、24、30</li><li><strong>3.</strong> 30</li></ol>
       </div>
     </div>
-  
+
       </div>
                       <aside class="visual-pane">
     <div class="visual-card">
@@ -1176,7 +1370,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-7" data-slide-number="7" aria-roledescription="slide" aria-label="挑战/应用，第 7 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1192,7 +1386,7 @@
           <div class="mini-label">任务</div>
           <h3 class="challenge-title">排队发物资</h3>
           <p class="challenge-text">24 本练习册和 36 支铅笔平均分给若干名学生，且每人分到的本数和支数都一样，最多可分给多少人？</p>
-          
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="factors-multiples-challenge-answer" aria-expanded="false" aria-controls="factors-multiples-challenge-answer">
         显示答案
@@ -1202,7 +1396,7 @@
         <p class="answer-plain">最多分给 12 人。</p>
       </div>
     </div>
-  
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -1233,7 +1427,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-8" data-slide-number="8" aria-roledescription="slide" aria-label="小结/自检，第 8 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1248,28 +1442,28 @@
         <section class="paper-panel">
           <div class="mini-label">自检清单</div>
           <ul class="self-check-list">
-            
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="factors-multiples-summary-0">
                       <span>我能从乘法关系说清倍数与因数。</span>
                     </label>
                   </li>
-                
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="factors-multiples-summary-1">
                       <span>我能正确判断质数、合数和1。</span>
                     </label>
                   </li>
-                
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="factors-multiples-summary-2">
                       <span>我会在问题中找公因数或公倍数。 </span>
                     </label>
                   </li>
-                
+
           </ul>
         </section>
       </div>
@@ -1308,7 +1502,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-9" data-slide-number="9" aria-roledescription="slide" aria-label="作业/下节衔接，第 9 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1323,14 +1517,14 @@
         <div class="content-grid two-up">
           <section class="paper-panel">
             <div class="mini-label">课后任务</div>
-            
+
     <div class="quote-list">
       <div class="mini-label">作业安排</div>
       <ol>
         <li><span class="order-badge">1</span><span>完成 3 题找因数/倍数和 1 题公倍数应用题。</span></li><li><span class="order-badge">2</span><span>画一棵因数树或质因数分解树，整理 24 或 36。</span></li><li><span class="order-badge">3</span><span>预习下节：想一想“可能”“一定”“不可能”有什么区别。 </span></li>
       </ol>
     </div>
-  
+
           </section>
           <section class="paper-panel">
             <div class="mini-label">下节衔接</div>
@@ -1374,7 +1568,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
           </div>
         </div>
         <div class="nav-row" aria-label="翻页控制">
@@ -1411,6 +1605,244 @@
         </div>
       </aside>
     </div>
+
+    <section class="practice-extension" id="practiceExtension" aria-labelledby="practiceTitle">
+      <header class="practice-extension-head">
+        <div>
+          <div class="practice-eyebrow">HTML 专属 · 课后加练</div>
+          <h2 id="practiceTitle">强化练习题 + 附加题</h2>
+          <p>先独立完成，再查看提示；订正后勾选“已完成”。完成状态会保存在当前浏览器。</p>
+        </div>
+        <div class="practice-summary"><strong>6</strong><span>道强化</span><strong>2</strong><span>道附加</span></div>
+      </header>
+      <section class="practice-group" aria-labelledby="reinforcementTitle">
+        <div class="practice-group-title">
+          <span>01</span>
+          <div><h3 id="reinforcementTitle">强化练习题</h3><p>巩固本章核心方法，注意写清关键步骤。</p></div>
+        </div>
+        <div class="practice-card-grid">
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 1</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="factors-multiples-reinforcement-1">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>写出 36 的所有因数。</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>从 1×36 开始成对寻找。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="factors-multiples-reinforcement-1-answer" aria-expanded="false" aria-controls="factors-multiples-reinforcement-1-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="factors-multiples-reinforcement-1-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">1、2、3、4、6、9、12、18、36</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 2</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="factors-multiples-reinforcement-2">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>写出 7 的前 6 个正倍数。</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>依次用 7 乘 1～6。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="factors-multiples-reinforcement-2-answer" aria-expanded="false" aria-controls="factors-multiples-reinforcement-2-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="factors-multiples-reinforcement-2-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">7、14、21、28、35、42</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 3</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="factors-multiples-reinforcement-3">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>29 是质数还是合数？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>检查它能否被 2、3、5 整除。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="factors-multiples-reinforcement-3-answer" aria-expanded="false" aria-controls="factors-multiples-reinforcement-3-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="factors-multiples-reinforcement-3-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">质数</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 4</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="factors-multiples-reinforcement-4">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>24 和 40 的最大公因数是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>分别列出两数的因数。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="factors-multiples-reinforcement-4-answer" aria-expanded="false" aria-controls="factors-multiples-reinforcement-4-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="factors-multiples-reinforcement-4-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">8</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 5</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="factors-multiples-reinforcement-5">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>6 和 8 的最小公倍数是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>从较大数的倍数中寻找。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="factors-multiples-reinforcement-5-answer" aria-expanded="false" aria-controls="factors-multiples-reinforcement-5-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="factors-multiples-reinforcement-5-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">24</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 6</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="factors-multiples-reinforcement-6">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>两盏灯同时亮起后，一盏每 4 秒亮一次，另一盏每 6 秒亮一次。至少几秒后再次同时亮？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>求 4 和 6 的最小公倍数。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="factors-multiples-reinforcement-6-answer" aria-expanded="false" aria-controls="factors-multiples-reinforcement-6-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="factors-multiples-reinforcement-6-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">12 秒</p>
+      </div>
+    </div>
+
+    </article>
+
+        </div>
+      </section>
+      <section class="practice-group bonus-group" aria-labelledby="bonusTitle">
+        <div class="practice-group-title">
+          <span>02</span>
+          <div><h3 id="bonusTitle">附加题</h3><p>需要多想一步，鼓励画图、列表或尝试不同方法。</p></div>
+        </div>
+        <div class="practice-card-grid bonus-grid">
+
+    <article class="extension-card bonus-card" data-practice-kind="bonus">
+      <div class="practice-card-head">
+        <span>附加题 1</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="factors-multiples-bonus-1">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>48 个苹果和 60 个橙子平均装成尽可能多的相同果篮，且全部装完。最多装多少篮？每篮各有多少个？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>篮数是 48 和 60 的最大公因数。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="factors-multiples-bonus-1-answer" aria-expanded="false" aria-controls="factors-multiples-bonus-1-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="factors-multiples-bonus-1-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">最多 12 篮；每篮 4 个苹果、5 个橙子。</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card bonus-card" data-practice-kind="bonus">
+      <div class="practice-card-head">
+        <span>附加题 2</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="factors-multiples-bonus-2">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>找出大于 50，且同时是 6 和 8 的倍数的最小整数。</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>先求最小公倍数 24，再看它的倍数。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="factors-multiples-bonus-2-answer" aria-expanded="false" aria-controls="factors-multiples-bonus-2-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="factors-multiples-bonus-2-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">72</p>
+      </div>
+    </div>
+
+    </article>
+
+        </div>
+      </section>
+    </section>
+
     <div class="visually-hidden" aria-live="polite" id="liveRegion"></div>
   </main>
   <script>
@@ -1424,6 +1856,7 @@
       const nextButton = document.getElementById("nextButton");
       const notesToggle = document.getElementById("notesToggle");
       const fullscreenToggle = document.getElementById("fullscreenToggle");
+      const practiceJump = document.getElementById("practiceJump");
       const notesBody = document.getElementById("notesBody");
       const notesHeading = document.getElementById("notesHeading");
       const liveRegion = document.getElementById("liveRegion");
@@ -1484,6 +1917,12 @@
 
       prevButton.addEventListener("click", () => go(-1));
       nextButton.addEventListener("click", () => go(1));
+      practiceJump.addEventListener("click", () => {
+        document.getElementById("practiceExtension").scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+        });
+      });
 
       notesToggle.addEventListener("click", () => {
         const hidden = app.classList.toggle("notes-hidden");

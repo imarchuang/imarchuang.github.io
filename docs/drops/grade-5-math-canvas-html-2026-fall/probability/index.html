@@ -7,12 +7,12 @@
   <title>可能性 | 五年级数学互动课件</title>
   <style>
     :root{
-      
+
     --chapter-primary:#A04E62;
     --chapter-secondary:#F8DFE8;
     --chapter-accent:#4F86C6;
     --chapter-dark:#7D3A4C;
-  
+
       --ink:#20303d;
       --muted:#5b6a78;
       --line:#d7e2ea;
@@ -395,6 +395,170 @@
     .answer-plain{
       margin:0;
     }
+    .practice-extension{
+      position:relative;
+      overflow:hidden;
+      margin-top:44px;
+      padding:clamp(24px,4vw,48px);
+      border:1px solid rgba(36,74,112,.14);
+      border-radius:32px;
+      background:
+        radial-gradient(circle at 92% 5%, rgba(243,182,63,.20), transparent 28%),
+        linear-gradient(145deg, rgba(255,255,255,.97), rgba(247,250,252,.96));
+      box-shadow:var(--shadow);
+    }
+    .practice-extension::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:radial-gradient(circle at 1px 1px, rgba(90,110,125,.10) 1px, transparent 0) 0 0/20px 20px;
+      mask-image:linear-gradient(90deg, transparent, #000 35%, #000);
+    }
+    .practice-extension > *{
+      position:relative;
+    }
+    .practice-extension-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:24px;
+      padding-bottom:28px;
+      border-bottom:1px solid rgba(36,74,112,.12);
+    }
+    .practice-eyebrow{
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .practice-extension h2{
+      margin:8px 0 10px;
+      font-size:clamp(30px,4vw,52px);
+      line-height:1.08;
+      letter-spacing:-.04em;
+    }
+    .practice-extension-head p,.practice-group-title p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+    .practice-summary{
+      flex:0 0 auto;
+      display:grid;
+      grid-template-columns:auto auto;
+      gap:3px 9px;
+      align-items:baseline;
+      min-width:150px;
+      padding:16px 18px;
+      border-radius:22px;
+      background:var(--chapter-primary);
+      color:white;
+      box-shadow:0 14px 30px rgba(31,58,95,.16);
+    }
+    .practice-summary strong{
+      font-size:28px;
+      line-height:1;
+    }
+    .practice-summary span{
+      font-size:13px;
+      opacity:.84;
+    }
+    .practice-group{
+      margin-top:34px;
+    }
+    .practice-group-title{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .practice-group-title > span{
+      display:grid;
+      place-items:center;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:rgba(243,182,63,.22);
+      color:var(--chapter-primary);
+      font-weight:900;
+    }
+    .practice-group-title h3{
+      margin:0 0 4px;
+      font-size:24px;
+    }
+    .practice-card-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    .practice-card-grid.bonus-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .extension-card{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-width:0;
+      min-height:280px;
+      padding:20px;
+      border:1px solid rgba(36,74,112,.13);
+      border-radius:24px;
+      background:rgba(255,255,255,.90);
+      box-shadow:0 12px 26px rgba(31,58,95,.08);
+    }
+    .extension-card.bonus-card{
+      border-color:rgba(179,126,28,.28);
+      background:linear-gradient(155deg, rgba(255,252,241,.98), rgba(255,247,222,.88));
+    }
+    .practice-card-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.04em;
+    }
+    .practice-check{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:var(--muted);
+      font-weight:650;
+      letter-spacing:0;
+      cursor:pointer;
+    }
+    .practice-check input{
+      width:18px;
+      height:18px;
+      accent-color:var(--chapter-primary);
+    }
+    .extension-card h4{
+      margin:0;
+      font-size:19px;
+      line-height:1.65;
+      font-weight:760;
+    }
+    .practice-hint{
+      border-top:1px dashed rgba(36,74,112,.18);
+      padding-top:12px;
+      color:var(--muted);
+    }
+    .practice-hint summary{
+      color:var(--chapter-primary);
+      font-weight:750;
+      cursor:pointer;
+    }
+    .practice-hint p{
+      margin:8px 0 0;
+      line-height:1.65;
+    }
+    .extension-card .answer-area{
+      margin-top:auto;
+    }
     .visual-pane{
       display:flex;
       align-items:stretch;
@@ -639,6 +803,9 @@
       .slide-count{
         text-align:left;
       }
+      .practice-card-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
     }
     @media (max-width:520px){
       .deck-shell{
@@ -652,7 +819,7 @@
       .topbar-group{
         width:100%;
         display:grid;
-        grid-template-columns:repeat(2,minmax(0,1fr));
+        grid-template-columns:repeat(3,minmax(0,1fr));
         gap:8px;
       }
       .topbar-group:last-child{
@@ -688,6 +855,27 @@
       }
       .challenge-title,.next-lesson{
         font-size:22px;
+      }
+      .practice-extension{
+        margin-top:28px;
+        padding:22px 16px;
+        border-radius:24px;
+      }
+      .practice-extension-head{
+        align-items:stretch;
+        flex-direction:column;
+      }
+      .practice-summary{
+        grid-template-columns:auto auto auto auto;
+        min-width:0;
+      }
+      .practice-card-grid,
+      .practice-card-grid.bonus-grid{
+        grid-template-columns:1fr;
+      }
+      .extension-card{
+        min-height:0;
+        padding:18px;
       }
     }
     @media (prefers-reduced-motion: reduce){
@@ -740,6 +928,12 @@
         print-color-adjust:exact;
         -webkit-print-color-adjust:exact;
       }
+      .practice-extension{
+        box-shadow:none;
+      }
+      .extension-card{
+        break-inside:avoid;
+      }
     }
   </style>
 </head>
@@ -748,7 +942,7 @@
     <div class="deck-topbar">
       <div class="topbar-group">
         <a class="toolbar-link" href="../index.html">返回总目录</a>
-        <a class="toolbar-link" href="https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/%E5%8F%AF%E8%83%BD%E6%80%A7.pptx">下载 PPTX</a>
+        <button class="toolbar-button" id="practiceJump" type="button">强化练习</button>
       </div>
       <div class="topbar-group">
         <div class="deck-badge"><strong>第 8 章</strong><span>1课时</span></div>
@@ -760,7 +954,7 @@
       <section class="stage-column">
         <div class="stage-frame" id="stageFrame">
           <div class="slides-viewport" id="slidesViewport" tabindex="0" aria-label="可能性 课件">
-            
+
                   <section class="slide active" id="slide-1" data-slide-number="1" aria-roledescription="slide" aria-label="封面，第 1 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -813,7 +1007,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-2" data-slide-number="2" aria-roledescription="slide" aria-label="学习目标 + 5分钟诊断，第 2 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -833,21 +1027,21 @@
           <section class="paper-panel">
             <div class="mini-label">5 分钟诊断</div>
             <ol class="question-list">
-              
+
                     <li>
                       <div class="question-text">太阳明天从西边升起，属于哪类事件？</div>
                     </li>
-                  
+
                     <li>
                       <div class="question-text">掷一个标准骰子，掷出奇数的可能性是多少？</div>
                     </li>
-                  
+
                     <li>
                       <div class="question-text">袋中红球 4 个、蓝球 1 个，摸到红球更可能吗？</div>
                     </li>
-                  
+
             </ol>
-            
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="probability-diagnostic-answer" aria-expanded="false" aria-controls="probability-diagnostic-answer">
         显示答案
@@ -857,7 +1051,7 @@
         <ol class="answer-list"><li><strong>1.</strong> 不可能。</li><li><strong>2.</strong> 3/6，也就是1/2。</li><li><strong>3.</strong> 更可能。</li></ol>
       </div>
     </div>
-  
+
           </section>
         </div>
       </div>
@@ -889,7 +1083,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-3" data-slide-number="3" aria-roledescription="slide" aria-label="核心概念/模型，第 3 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -935,7 +1129,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-4" data-slide-number="4" aria-roledescription="slide" aria-label="例题精讲，第 4 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -953,15 +1147,15 @@
         </section>
         <section class="paper-panel">
           <div class="mini-label">示范步骤</div>
-          
+
     <div class="quote-list">
       <div class="mini-label">一步一步想</div>
       <ol>
         <li><span class="order-badge">1</span><span>总球数是 6 个。</span></li><li><span class="order-badge">2</span><span>红球数量最多，所以最可能摸到红球。</span></li><li><span class="order-badge">3</span><span>摸到红球的可能性是 3/6，也就是 1/2。 </span></li>
       </ol>
     </div>
-  
-          
+
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="probability-worked-answer" aria-expanded="false" aria-controls="probability-worked-answer">
         显示答案
@@ -971,7 +1165,7 @@
         <p class="answer-plain">红球最可能；摸到红球的可能性是 1/2。</p>
       </div>
     </div>
-  
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -1002,7 +1196,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-5" data-slide-number="5" aria-roledescription="slide" aria-label="易错门诊，第 5 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1015,25 +1209,25 @@
                     <div class="slide-main">
                       <div class="text-pane">
         <section class="stack-list">
-          
+
                 <article class="mistake-card ">
                   <div class="mistake-title">误区 1</div>
                   <p><strong>常见说法：</strong>摸过红球后，下次一定不是红球</p>
                   <p><strong>修正建议：</strong>若每次放回，下一次可能性不变。</p>
                 </article>
-              
+
                 <article class="mistake-card mistake-warm">
                   <div class="mistake-title">误区 2</div>
                   <p><strong>常见说法：</strong>结果少就一定不可能</p>
                   <p><strong>修正建议：</strong>结果少可能只是“较小”，不是“不可能”。</p>
                 </article>
-              
+
                 <article class="mistake-card ">
                   <div class="mistake-title">误区 3</div>
                   <p><strong>常见说法：</strong>试验 3 次都没出现，就是不会出现</p>
                   <p><strong>修正建议：</strong>样本太少，不能代替长期规律。 </p>
                 </article>
-              
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -1064,7 +1258,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-6" data-slide-number="6" aria-roledescription="slide" aria-label="引导练习，第 6 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1077,24 +1271,24 @@
                     <div class="slide-main">
                       <div class="text-pane">
         <div class="practice-grid">
-          
+
                 <section class="practice-card">
                   <div class="mini-label">练习 1</div>
                   <p class="practice-question">掷硬币 1 次，正反面谁更可能</p>
                 </section>
-              
+
                 <section class="practice-card">
                   <div class="mini-label">练习 2</div>
                   <p class="practice-question">转盘 8 等份中红色 2 份，转到红色概率</p>
                 </section>
-              
+
                 <section class="practice-card">
                   <div class="mini-label">练习 3</div>
                   <p class="practice-question">盒中 5 白 5 黑，摸到白球</p>
                 </section>
-              
+
         </div>
-        
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="probability-practice-answer" aria-expanded="false" aria-controls="probability-practice-answer">
         显示答案
@@ -1104,7 +1298,7 @@
         <ol class="answer-list"><li><strong>1.</strong> 一样可能。</li><li><strong>2.</strong> 2/8=1/4</li><li><strong>3.</strong> 可能性是1/2。</li></ol>
       </div>
     </div>
-  
+
       </div>
                       <aside class="visual-pane">
     <div class="visual-card">
@@ -1134,7 +1328,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-7" data-slide-number="7" aria-roledescription="slide" aria-label="挑战/应用，第 7 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1150,7 +1344,7 @@
           <div class="mini-label">任务</div>
           <h3 class="challenge-title">游戏公平吗？</h3>
           <p class="challenge-text">甲掷一个骰子，掷出 1、2、3 算赢；乙掷出 4、5、6 算赢。这个游戏公平吗？如果改成甲赢 1、2，乙赢 3、4、5、6 呢？</p>
-          
+
     <div class="answer-area">
       <button class="toggle-answer" type="button" data-target="probability-challenge-answer" aria-expanded="false" aria-controls="probability-challenge-answer">
         显示答案
@@ -1160,7 +1354,7 @@
         <p class="answer-plain">前者公平，后者不公平，乙更容易赢。</p>
       </div>
     </div>
-  
+
         </section>
       </div>
                       <aside class="visual-pane">
@@ -1169,15 +1363,15 @@
       <div class="visual-caption">结果数相同就公平；结果数不同就不公平。</div>
       <div class="visual-board"><svg viewBox="0 0 420 280" role="img" aria-label="骰子公平性比较" xmlns="http://www.w3.org/2000/svg">
               <rect x="48" y="36" width="324" height="208" rx="20" fill="#ffffff" stroke="#d6e2ec" stroke-width="2"/>
-              
+
                     <text x="86" y="84" font-size="22" font-weight="500" fill="#1f2933">甲赢: 1,2,3</text>
-                  
+
                     <text x="86" y="124" font-size="22" font-weight="500" fill="#1f2933">乙赢: 4,5,6</text>
-                  
+
                     <text x="86" y="164" font-size="22" font-weight="500" fill="#1f2933">各 3 种结果</text>
-                  
+
                     <text x="86" y="204" font-size="24" font-weight="700" fill="#A04E62">所以公平</text>
-                  
+
             </svg></div>
     </div>
   </aside>
@@ -1192,7 +1386,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-8" data-slide-number="8" aria-roledescription="slide" aria-label="小结/自检，第 8 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1207,28 +1401,28 @@
         <section class="paper-panel">
           <div class="mini-label">自检清单</div>
           <ul class="self-check-list">
-            
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="probability-summary-0">
                       <span>我能区分一定、可能、不可能。</span>
                     </label>
                   </li>
-                
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="probability-summary-1">
                       <span>我会比较不同结果对应的可能性大小。</span>
                     </label>
                   </li>
-                
+
                   <li>
                     <label>
                       <input type="checkbox" data-check-key="probability-summary-2">
                       <span>我知道用试验结果来支持判断，但不能迷信少量样本。 </span>
                     </label>
                   </li>
-                
+
           </ul>
         </section>
       </div>
@@ -1260,7 +1454,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
                   <section class="slide" id="slide-9" data-slide-number="9" aria-roledescription="slide" aria-label="作业/下节衔接，第 9 页，共 9 页">
                     <header class="slide-header">
                       <div class="slide-title">
@@ -1275,14 +1469,14 @@
         <div class="content-grid two-up">
           <section class="paper-panel">
             <div class="mini-label">课后任务</div>
-            
+
     <div class="quote-list">
       <div class="mini-label">作业安排</div>
       <ol>
         <li><span class="order-badge">1</span><span>设计一个摸球或转盘小游戏，并判断是否公平。</span></li><li><span class="order-badge">2</span><span>完成 2 题分数形式表示可能性。</span></li><li><span class="order-badge">3</span><span>预习总复习：整理本学期最容易错的 3 个知识点。 </span></li>
       </ol>
     </div>
-  
+
           </section>
           <section class="paper-panel">
             <div class="mini-label">下节衔接</div>
@@ -1319,7 +1513,7 @@
                       <div class="notes-status">支持键盘、触摸、刷新续播与打印</div>
                     </footer>
                   </section>
-                
+
           </div>
         </div>
         <div class="nav-row" aria-label="翻页控制">
@@ -1356,6 +1550,244 @@
         </div>
       </aside>
     </div>
+
+    <section class="practice-extension" id="practiceExtension" aria-labelledby="practiceTitle">
+      <header class="practice-extension-head">
+        <div>
+          <div class="practice-eyebrow">HTML 专属 · 课后加练</div>
+          <h2 id="practiceTitle">强化练习题 + 附加题</h2>
+          <p>先独立完成，再查看提示；订正后勾选“已完成”。完成状态会保存在当前浏览器。</p>
+        </div>
+        <div class="practice-summary"><strong>6</strong><span>道强化</span><strong>2</strong><span>道附加</span></div>
+      </header>
+      <section class="practice-group" aria-labelledby="reinforcementTitle">
+        <div class="practice-group-title">
+          <span>01</span>
+          <div><h3 id="reinforcementTitle">强化练习题</h3><p>巩固本章核心方法，注意写清关键步骤。</p></div>
+        </div>
+        <div class="practice-card-grid">
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 1</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-1">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>袋中有 5 个红球、3 个蓝球、2 个黄球，任摸一个球，摸到红球的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>用红球数除以球的总数。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-1-answer" aria-expanded="false" aria-controls="probability-reinforcement-1-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-1-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">5/10，即 1/2</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 2</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-2">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>掷一个标准六面骰子，点数大于 4 的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>符合条件的是 5 和 6。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-2-answer" aria-expanded="false" aria-controls="probability-reinforcement-2-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-2-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">2/6，即 1/3</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 3</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-3">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>抛一枚均匀硬币，正面朝上的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>正面和反面是两种等可能结果。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-3-answer" aria-expanded="false" aria-controls="probability-reinforcement-3-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-3-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">1/2</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 4</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-4">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>盒中只有白球。任摸一个球，摸到白球属于“一定”“可能”还是“不可能”？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>盒中没有其他颜色。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-4-answer" aria-expanded="false" aria-controls="probability-reinforcement-4-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-4-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">一定</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 5</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-5">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>一个转盘被平均分成 8 格，其中 3 格是绿色。指针停在绿色区域的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>每一格大小相同。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-5-answer" aria-expanded="false" aria-controls="probability-reinforcement-5-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-5-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">3/8</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card" data-practice-kind="reinforcement">
+      <div class="practice-card-head">
+        <span>强化练习 6</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-reinforcement-6">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>摸球试验做了 50 次，其中 31 次摸到红球。红球出现的试验频率是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>用出现次数除以试验总次数。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-reinforcement-6-answer" aria-expanded="false" aria-controls="probability-reinforcement-6-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-reinforcement-6-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">31/50，即 0.62</p>
+      </div>
+    </div>
+
+    </article>
+
+        </div>
+      </section>
+      <section class="practice-group bonus-group" aria-labelledby="bonusTitle">
+        <div class="practice-group-title">
+          <span>02</span>
+          <div><h3 id="bonusTitle">附加题</h3><p>需要多想一步，鼓励画图、列表或尝试不同方法。</p></div>
+        </div>
+        <div class="practice-card-grid bonus-grid">
+
+    <article class="extension-card bonus-card" data-practice-kind="bonus">
+      <div class="practice-card-head">
+        <span>附加题 1</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-bonus-1">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>同时抛两枚均匀硬币，恰好一枚正面朝上的可能性是多少？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>列出正正、正反、反正、反反。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-bonus-1-answer" aria-expanded="false" aria-controls="probability-bonus-1-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-bonus-1-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">2/4，即 1/2</p>
+      </div>
+    </div>
+
+    </article>
+
+    <article class="extension-card bonus-card" data-practice-kind="bonus">
+      <div class="practice-card-head">
+        <span>附加题 2</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="probability-bonus-2">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>袋中有 4 个红球和 2 个蓝球。至少再放入多少个蓝球，才能使摸到红球和蓝球的可能性相等？</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>两种颜色数量相等时可能性相等。</p>
+      </details>
+
+    <div class="answer-area">
+      <button class="toggle-answer" type="button" data-target="probability-bonus-2-answer" aria-expanded="false" aria-controls="probability-bonus-2-answer">
+        显示答案
+      </button>
+      <div class="answer-panel" id="probability-bonus-2-answer" hidden>
+        <div class="answer-title">参考答案</div>
+        <p class="answer-plain">2 个蓝球</p>
+      </div>
+    </div>
+
+    </article>
+
+        </div>
+      </section>
+    </section>
+
     <div class="visually-hidden" aria-live="polite" id="liveRegion"></div>
   </main>
   <script>
@@ -1369,6 +1801,7 @@
       const nextButton = document.getElementById("nextButton");
       const notesToggle = document.getElementById("notesToggle");
       const fullscreenToggle = document.getElementById("fullscreenToggle");
+      const practiceJump = document.getElementById("practiceJump");
       const notesBody = document.getElementById("notesBody");
       const notesHeading = document.getElementById("notesHeading");
       const liveRegion = document.getElementById("liveRegion");
@@ -1429,6 +1862,12 @@
 
       prevButton.addEventListener("click", () => go(-1));
       nextButton.addEventListener("click", () => go(1));
+      practiceJump.addEventListener("click", () => {
+        document.getElementById("practiceExtension").scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+        });
+      });
 
       notesToggle.addEventListener("click", () => {
         const hidden = app.classList.toggle("notes-hidden");

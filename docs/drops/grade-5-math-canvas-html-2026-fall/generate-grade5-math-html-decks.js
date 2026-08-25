@@ -7,9 +7,9 @@ const SOURCE_SCRIPT = path.resolve(
   "../grade5-math-decks/generate-grade5-math-decks.js"
 );
 const OUT_DIR = __dirname;
-const PPT_BASE_URL =
-  "https://imarchuang.github.io/drops/grade-5-math-chapter-decks-2026-fall/";
 const TOTAL_SLIDES = 9;
+
+const PRACTICE_BANKS = require("./practice-banks");
 
 const FIXES = [
   {
@@ -83,10 +83,6 @@ function applyFixes(chapters) {
   return { chapters: next, applied };
 }
 
-function pptHref(chapter) {
-  return `${PPT_BASE_URL}${encodeURIComponent(chapter.title)}.pptx`;
-}
-
 function chapterLabel(index) {
   return `第 ${index + 1} 章`;
 }
@@ -127,6 +123,75 @@ function answerToggleHtml(id, title, contentHtml) {
         ${contentHtml}
       </div>
     </div>
+  `;
+}
+
+function practiceCardHtml(chapterKey, item, index, kind) {
+  const kindLabel = kind === "bonus" ? "附加题" : "强化练习";
+  const answerId = `${chapterKey}-${kind}-${index + 1}-answer`;
+  return `
+    <article class="extension-card${kind === "bonus" ? " bonus-card" : ""}" data-practice-kind="${kind}">
+      <div class="practice-card-head">
+        <span>${kindLabel} ${index + 1}</span>
+        <label class="practice-check">
+          <input type="checkbox" data-check-key="${escapeAttr(
+            `${chapterKey}-${kind}-${index + 1}`
+          )}">
+          <span>已完成</span>
+        </label>
+      </div>
+      <h4>${escapeHtml(item.question)}</h4>
+      <details class="practice-hint">
+        <summary>查看提示</summary>
+        <p>${escapeHtml(item.hint)}</p>
+      </details>
+      ${answerToggleHtml(
+        answerId,
+        "参考答案",
+        `<p class="answer-plain">${escapeHtml(item.answer)}</p>`
+      )}
+    </article>
+  `;
+}
+
+function practiceSectionHtml(chapter) {
+  const bank = PRACTICE_BANKS[chapter.key];
+  if (!bank || bank.reinforcement.length !== 6 || bank.bonus.length !== 2) {
+    throw new Error(`Invalid practice bank for ${chapter.key}`);
+  }
+  return `
+    <section class="practice-extension" id="practiceExtension" aria-labelledby="practiceTitle">
+      <header class="practice-extension-head">
+        <div>
+          <div class="practice-eyebrow">HTML 专属 · 课后加练</div>
+          <h2 id="practiceTitle">强化练习题 + 附加题</h2>
+          <p>先独立完成，再查看提示；订正后勾选“已完成”。完成状态会保存在当前浏览器。</p>
+        </div>
+        <div class="practice-summary"><strong>6</strong><span>道强化</span><strong>2</strong><span>道附加</span></div>
+      </header>
+      <section class="practice-group" aria-labelledby="reinforcementTitle">
+        <div class="practice-group-title">
+          <span>01</span>
+          <div><h3 id="reinforcementTitle">强化练习题</h3><p>巩固本章核心方法，注意写清关键步骤。</p></div>
+        </div>
+        <div class="practice-card-grid">
+          ${bank.reinforcement
+            .map((item, index) => practiceCardHtml(chapter.key, item, index, "reinforcement"))
+            .join("")}
+        </div>
+      </section>
+      <section class="practice-group bonus-group" aria-labelledby="bonusTitle">
+        <div class="practice-group-title">
+          <span>02</span>
+          <div><h3 id="bonusTitle">附加题</h3><p>需要多想一步，鼓励画图、列表或尝试不同方法。</p></div>
+        </div>
+        <div class="practice-card-grid bonus-grid">
+          ${bank.bonus
+            .map((item, index) => practiceCardHtml(chapter.key, item, index, "bonus"))
+            .join("")}
+        </div>
+      </section>
+    </section>
   `;
 }
 
@@ -1407,6 +1472,170 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
     .answer-plain{
       margin:0;
     }
+    .practice-extension{
+      position:relative;
+      overflow:hidden;
+      margin-top:44px;
+      padding:clamp(24px,4vw,48px);
+      border:1px solid rgba(36,74,112,.14);
+      border-radius:32px;
+      background:
+        radial-gradient(circle at 92% 5%, rgba(243,182,63,.20), transparent 28%),
+        linear-gradient(145deg, rgba(255,255,255,.97), rgba(247,250,252,.96));
+      box-shadow:var(--shadow);
+    }
+    .practice-extension::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:radial-gradient(circle at 1px 1px, rgba(90,110,125,.10) 1px, transparent 0) 0 0/20px 20px;
+      mask-image:linear-gradient(90deg, transparent, #000 35%, #000);
+    }
+    .practice-extension > *{
+      position:relative;
+    }
+    .practice-extension-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:24px;
+      padding-bottom:28px;
+      border-bottom:1px solid rgba(36,74,112,.12);
+    }
+    .practice-eyebrow{
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+    }
+    .practice-extension h2{
+      margin:8px 0 10px;
+      font-size:clamp(30px,4vw,52px);
+      line-height:1.08;
+      letter-spacing:-.04em;
+    }
+    .practice-extension-head p,.practice-group-title p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.7;
+    }
+    .practice-summary{
+      flex:0 0 auto;
+      display:grid;
+      grid-template-columns:auto auto;
+      gap:3px 9px;
+      align-items:baseline;
+      min-width:150px;
+      padding:16px 18px;
+      border-radius:22px;
+      background:var(--chapter-primary);
+      color:white;
+      box-shadow:0 14px 30px rgba(31,58,95,.16);
+    }
+    .practice-summary strong{
+      font-size:28px;
+      line-height:1;
+    }
+    .practice-summary span{
+      font-size:13px;
+      opacity:.84;
+    }
+    .practice-group{
+      margin-top:34px;
+    }
+    .practice-group-title{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .practice-group-title > span{
+      display:grid;
+      place-items:center;
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:rgba(243,182,63,.22);
+      color:var(--chapter-primary);
+      font-weight:900;
+    }
+    .practice-group-title h3{
+      margin:0 0 4px;
+      font-size:24px;
+    }
+    .practice-card-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+    }
+    .practice-card-grid.bonus-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .extension-card{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-width:0;
+      min-height:280px;
+      padding:20px;
+      border:1px solid rgba(36,74,112,.13);
+      border-radius:24px;
+      background:rgba(255,255,255,.90);
+      box-shadow:0 12px 26px rgba(31,58,95,.08);
+    }
+    .extension-card.bonus-card{
+      border-color:rgba(179,126,28,.28);
+      background:linear-gradient(155deg, rgba(255,252,241,.98), rgba(255,247,222,.88));
+    }
+    .practice-card-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--chapter-primary);
+      font-size:13px;
+      font-weight:850;
+      letter-spacing:.04em;
+    }
+    .practice-check{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:var(--muted);
+      font-weight:650;
+      letter-spacing:0;
+      cursor:pointer;
+    }
+    .practice-check input{
+      width:18px;
+      height:18px;
+      accent-color:var(--chapter-primary);
+    }
+    .extension-card h4{
+      margin:0;
+      font-size:19px;
+      line-height:1.65;
+      font-weight:760;
+    }
+    .practice-hint{
+      border-top:1px dashed rgba(36,74,112,.18);
+      padding-top:12px;
+      color:var(--muted);
+    }
+    .practice-hint summary{
+      color:var(--chapter-primary);
+      font-weight:750;
+      cursor:pointer;
+    }
+    .practice-hint p{
+      margin:8px 0 0;
+      line-height:1.65;
+    }
+    .extension-card .answer-area{
+      margin-top:auto;
+    }
     .visual-pane{
       display:flex;
       align-items:stretch;
@@ -1651,6 +1880,9 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
       .slide-count{
         text-align:left;
       }
+      .practice-card-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
     }
     @media (max-width:520px){
       .deck-shell{
@@ -1664,7 +1896,7 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
       .topbar-group{
         width:100%;
         display:grid;
-        grid-template-columns:repeat(2,minmax(0,1fr));
+        grid-template-columns:repeat(3,minmax(0,1fr));
         gap:8px;
       }
       .topbar-group:last-child{
@@ -1700,6 +1932,27 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
       }
       .challenge-title,.next-lesson{
         font-size:22px;
+      }
+      .practice-extension{
+        margin-top:28px;
+        padding:22px 16px;
+        border-radius:24px;
+      }
+      .practice-extension-head{
+        align-items:stretch;
+        flex-direction:column;
+      }
+      .practice-summary{
+        grid-template-columns:auto auto auto auto;
+        min-width:0;
+      }
+      .practice-card-grid,
+      .practice-card-grid.bonus-grid{
+        grid-template-columns:1fr;
+      }
+      .extension-card{
+        min-height:0;
+        padding:18px;
       }
     }
     @media (prefers-reduced-motion: reduce){
@@ -1752,6 +2005,12 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
         print-color-adjust:exact;
         -webkit-print-color-adjust:exact;
       }
+      .practice-extension{
+        box-shadow:none;
+      }
+      .extension-card{
+        break-inside:avoid;
+      }
     }
   </style>
 </head>
@@ -1760,7 +2019,7 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
     <div class="deck-topbar">
       <div class="topbar-group">
         <a class="toolbar-link" href="../index.html">返回总目录</a>
-        <a class="toolbar-link" href="${escapeAttr(pptHref(chapter))}">下载 PPTX</a>
+        <button class="toolbar-button" id="practiceJump" type="button">强化练习</button>
       </div>
       <div class="topbar-group">
         <div class="deck-badge"><strong>${escapeHtml(chapterLabel(chapterIndex))}</strong><span>${escapeHtml(
@@ -1835,6 +2094,7 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
         </div>
       </aside>
     </div>
+    ${practiceSectionHtml(chapter)}
     <div class="visually-hidden" aria-live="polite" id="liveRegion"></div>
   </main>
   <script>
@@ -1848,6 +2108,7 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
       const nextButton = document.getElementById("nextButton");
       const notesToggle = document.getElementById("notesToggle");
       const fullscreenToggle = document.getElementById("fullscreenToggle");
+      const practiceJump = document.getElementById("practiceJump");
       const notesBody = document.getElementById("notesBody");
       const notesHeading = document.getElementById("notesHeading");
       const liveRegion = document.getElementById("liveRegion");
@@ -1908,6 +2169,12 @@ function buildDeckHtml(chapter, chapterIndex, deckStructure) {
 
       prevButton.addEventListener("click", () => go(-1));
       nextButton.addEventListener("click", () => go(1));
+      practiceJump.addEventListener("click", () => {
+        document.getElementById("practiceExtension").scrollIntoView({
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+          block: "start",
+        });
+      });
 
       notesToggle.addEventListener("click", () => {
         const hidden = app.classList.toggle("notes-hidden");
@@ -2160,7 +2427,7 @@ function buildRootIndex(chapters) {
       flex-wrap:wrap;
       margin-top:auto;
     }
-    .start-link,.ppt-link{
+    .start-link{
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -2175,12 +2442,7 @@ function buildRootIndex(chapters) {
       background:var(--card-primary);
       color:#ffffff;
     }
-    .ppt-link{
-      background:rgba(255,255,255,.88);
-      color:var(--card-primary);
-      border-color:rgba(255,255,255,.65);
-    }
-    .start-link:focus-visible,.ppt-link:focus-visible{
+    .start-link:focus-visible{
       outline:3px solid rgba(243,182,63,.45);
       outline-offset:3px;
     }
@@ -2202,12 +2464,12 @@ function buildRootIndex(chapters) {
   <main class="wrap">
     <section class="hero">
       <h1>五年级数学互动课件总目录</h1>
-      <p>本目录汇总 9 个独立章节课件。每份课件都保留原有九页教学结构，并改造成无需依赖外部资源的交互式 HTML 教学画布，可直接本地打开、局域网分享或静态托管。</p>
+      <p>本目录汇总 9 个独立章节课件。每份课件都保留原有九页教学结构，并改造成无需依赖外部资源的交互式 HTML 教学画布；章末另有强化练习题与附加题，仅在网页中使用。</p>
       <div class="legend">
         <span>16:9 课堂画布</span>
         <span>键盘 / 触摸翻页</span>
         <span>答案切换与教师提示</span>
-        <span>支持打印与深链接</span>
+        <span>章末强化练习 + 附加题</span>
       </div>
     </section>
     <section class="grid">
@@ -2222,14 +2484,13 @@ function buildRootIndex(chapters) {
               <p class="tagline">${escapeHtml(chapter.tagline)}</p>
               <div class="actions">
                 <a class="start-link" href="./${escapeAttr(chapter.key)}/">开始课件</a>
-                <a class="ppt-link" href="${escapeAttr(pptHref(chapter))}">下载 PPTX</a>
               </div>
             </article>
           `
         )
         .join("")}
     </section>
-    <p class="footer-note">目录使用相对路径链接章节页面，因此托管到任意子路径时仍可正常进入各章节。PPTX 下载链接指向已发布的历史课件包。</p>
+    <p class="footer-note">目录使用相对路径链接章节页面，因此托管到任意子路径时仍可正常进入各章节。</p>
   </main>
 </body>
 </html>`;
@@ -2258,7 +2519,8 @@ function buildReadme(chapters) {
 
 1. 根目录索引页
 2. 九个章节子目录与独立 \`index.html\`
-3. 教学备注、视觉模型、交互控制与打印样式
+3. 教学备注、视觉模型、交互控制、打印样式，以及每章末尾的强化练习与附加题
+4. 不包含 PPTX 文件或下载链接
 
 ## 章节列表
 
@@ -2291,18 +2553,30 @@ function prepareOutput(chapters) {
   removeIfExists(path.join(OUT_DIR, "README.md"));
 }
 
+function cleanGeneratedText(value) {
+  return value.replace(/[ \t]+$/gm, "");
+}
+
 function writeBundle(chapters, deckStructure) {
   chapters.forEach((chapter, index) => {
     const chapterDir = path.join(OUT_DIR, chapter.key);
     ensureDir(chapterDir);
     fs.writeFileSync(
       path.join(chapterDir, "index.html"),
-      buildDeckHtml(chapter, index, deckStructure),
+      cleanGeneratedText(buildDeckHtml(chapter, index, deckStructure)),
       "utf8"
     );
   });
-  fs.writeFileSync(path.join(OUT_DIR, "index.html"), buildRootIndex(chapters), "utf8");
-  fs.writeFileSync(path.join(OUT_DIR, "README.md"), buildReadme(chapters), "utf8");
+  fs.writeFileSync(
+    path.join(OUT_DIR, "index.html"),
+    cleanGeneratedText(buildRootIndex(chapters)),
+    "utf8"
+  );
+  fs.writeFileSync(
+    path.join(OUT_DIR, "README.md"),
+    cleanGeneratedText(buildReadme(chapters)),
+    "utf8"
+  );
 }
 
 function main() {
