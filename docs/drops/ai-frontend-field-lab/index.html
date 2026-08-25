@@ -345,7 +345,7 @@
       ]
     });
     const ACTIONS = Object.freeze([
-      { id: "inspect", risk: "read-only", title: "Inspect release telemetry", detail: "Read deployment and payment traces. No state changes." },
+      { id: "inspect", risk: "read-only", title: "Inspect release telemetry", detail: "Read deployment and payment traces and record a reversible inspection audit. This does not change release state." },
       { id: "banner", risk: "reversible", title: "Draft customer banner", detail: "Prepare a reviewable banner; publishing remains separate." },
       { id: "rollback", risk: "consequential", title: "Roll back mobile release", detail: "Restore the prior mobile-web release after explicit approval." }
     ]);
@@ -383,6 +383,7 @@
         actionMode: "review",
         actionNotice: null,
         fixtureRelease: "2026.08.25",
+        fixtureRolloutPercent: 100,
         telemetryInspected: false,
         bannerDraft: null,
         movementMenuId: null,
@@ -413,6 +414,7 @@
 
     function setStation(id) {
       if (!STATIONS.some(item => item.id === id)) return;
+      if (state.station === id) return;
       stopSurfaceTimer();
       state.station = id;
       appendEvent("state", "human", "Opened " + id + " instrument", { station: id }, false);
@@ -431,6 +433,11 @@
       const node = element("button", className, label);
       node.type = "button";
       node.addEventListener("click", handler);
+      return node;
+    }
+
+    function withFocusKey(node, key) {
+      node.dataset.focusKey = key;
       return node;
     }
 
@@ -808,11 +815,16 @@
         intents.append(control);
       });
       const controls = element("div", "controls");
-      controls.append(
-        button("Generate surface", generateSurface, "primary"),
+      const toggle = withFocusKey(
         button(state.surfacePlaying ? "Pause" : "Resume", toggleSurface),
-        button("Step", () => { stopSurfaceTimer(); surfaceStep(); }),
-        button("Reset", resetSurface)
+        "compose-toggle"
+      );
+      toggle.disabled = !state.surfacePlaying && state.surfaceIndex >= SURFACES[state.surfaceIntent].length;
+      controls.append(
+        withFocusKey(button("Generate surface", generateSurface, "primary"), "compose-generate"),
+        toggle,
+        withFocusKey(button("Step", () => { stopSurfaceTimer(); surfaceStep(); }), "compose-step"),
+        withFocusKey(button("Reset", resetSurface), "compose-reset")
       );
       const layout = element("div", "compose-layout");
       const surface = element("div", "surface panel");
@@ -862,8 +874,12 @@
         before = { bannerDraft: state.bannerDraft };
         after = { bannerDraft: "Mobile checkout issue identified · draft only" };
       } else {
-        before = { release: state.fixtureRelease, rolloutPercent: 0 };
-        after = { release: "2026.08.18", rolloutPercent: rollout };
+        before = { release: state.fixtureRelease, rolloutPercent: state.fixtureRolloutPercent };
+        after = {
+          release: "2026.08.18",
+          rolloutPercent: rollout,
+          impactSessions: rollbackImpactSessions(rollout)
+        };
       }
       const execution = {
         id: "execution-" + (state.executions.length + 1),
@@ -875,9 +891,14 @@
       state.executions.push(execution);
       if (actionId === "inspect") state.telemetryInspected = true;
       if (actionId === "banner") state.bannerDraft = after.bannerDraft;
-      if (actionId === "rollback") state.fixtureRelease = after.release;
+      if (actionId === "rollback") {
+        state.fixtureRelease = after.release;
+        state.fixtureRolloutPercent = after.rolloutPercent;
+      }
       state.actionMode = "executed";
-      state.actionNotice = action.title + " executed. An undo control is available below.";
+      state.actionNotice = actionId === "inspect"
+        ? "Inspection audit recorded. Release state is unchanged; undo removes the inspection audit state."
+        : action.title + " executed. An undo control is available below.";
       appendEvent("tool", "agent", "Executed approved " + action.title, execution, true);
       render();
     }
@@ -888,7 +909,10 @@
       execution.undone = true;
       if (execution.actionId === "inspect") state.telemetryInspected = execution.before.telemetryInspected;
       if (execution.actionId === "banner") state.bannerDraft = execution.before.bannerDraft;
-      if (execution.actionId === "rollback") state.fixtureRelease = execution.before.release;
+      if (execution.actionId === "rollback") {
+        state.fixtureRelease = execution.before.release;
+        state.fixtureRolloutPercent = execution.before.rolloutPercent;
+      }
       state.actionMode = "review";
       state.actionNotice = execution.actionId + " action undone. Prior fixture state restored.";
       appendEvent("tool", "human", "Undid " + execution.actionId + " action", { executionId, restored: execution.before }, true);
@@ -898,6 +922,7 @@
     function resetAct() {
       state.executions = [];
       state.fixtureRelease = "2026.08.25";
+      state.fixtureRolloutPercent = 100;
       state.telemetryInspected = false;
       state.bannerDraft = null;
       state.rolloutPercent = 100;
@@ -918,6 +943,27 @@
         }
         step.append(record);
       });
+    }
+
+    function rollbackImpactSessions(percent) {
+      return Math.round(3400 * percent / 100);
+    }
+
+    function renderRollbackDiff(diff, execution) {
+      const before = execution?.before || {
+        release: state.fixtureRelease,
+        rolloutPercent: state.fixtureRolloutPercent
+      };
+      const after = execution?.after || {
+        release: "2026.08.18",
+        rolloutPercent: state.rolloutPercent,
+        impactSessions: rollbackImpactSessions(state.rolloutPercent)
+      };
+      diff.replaceChildren(
+        element("span", "", "Before: mobile-web " + before.release + ", " + before.rolloutPercent + "% rollout, 18% checkout failure"),
+        element("span", "", "After:  mobile-web " + after.release + ", " + after.rolloutPercent + "% rollout, expected 4% checkout failure"),
+        element("span", "", "Impact: ~" + after.impactSessions.toLocaleString("en-US") + " active sessions restart checkout")
+      );
     }
 
     function renderAct(container) {
@@ -945,11 +991,7 @@
           step.append(preview);
         } else {
           const diff = element("div", "diff");
-          diff.append(
-            element("span", "", "Before: mobile-web 2026.08.25, 18% checkout failure"),
-            element("span", "", "After:  mobile-web 2026.08.18, expected 4% checkout failure"),
-            element("span", "", "Impact: ~3,400 active sessions restart checkout")
-          );
+          renderRollbackDiff(diff, activeExecution);
           step.append(diff);
           if (state.actionMode === "edit" && !activeExecution) {
             const edit = element("div", "edit-rollout");
@@ -962,8 +1004,9 @@
             input.max = "100";
             input.step = "10";
             input.value = String(state.rolloutPercent);
-            input.addEventListener("change", () => {
+            input.addEventListener("input", () => {
               state.rolloutPercent = Math.max(10, Math.min(100, Number(input.value) || 100));
+              renderRollbackDiff(diff);
             });
             edit.append(label, input, element("span", "", "%"));
             step.append(edit);
@@ -1014,11 +1057,11 @@
       const filters = element("div", "filter-list");
       filters.setAttribute("aria-label", "Filter event tape");
       ["all", "state", "tool", "surface", "interrupt"].forEach(filter => {
-        const control = button(filter, () => {
+        const control = withFocusKey(button(filter, () => {
           state.eventFilter = filter;
           state.announcement = "Showing " + filter + " events.";
           render();
-        }, state.eventFilter === filter ? "selected" : "");
+        }, state.eventFilter === filter ? "selected" : ""), "event-filter-" + filter);
         control.setAttribute("aria-pressed", String(state.eventFilter === filter));
         filters.append(control);
       });
@@ -1041,15 +1084,16 @@
       state.events.filter(event => state.eventFilter === "all" || event.type === state.eventFilter).slice().reverse().forEach(event => {
         const row = element("article", "event-row");
         const expanded = state.expandedEventId === event.id;
-        const trigger = button("");
+        const trigger = withFocusKey(button(""), "event-" + event.id);
         trigger.setAttribute("aria-expanded", String(expanded));
-        trigger.setAttribute("aria-controls", "payload-" + event.id);
+        if (expanded) trigger.setAttribute("aria-controls", "payload-" + event.id);
         trigger.append(
           element("span", "event-meta", event.time + " · " + event.actor + " · " + event.type),
           element("span", "event-summary" + (event.reversible ? " reversible" : ""), event.summary)
         );
         trigger.addEventListener("click", () => {
           state.expandedEventId = expanded ? null : event.id;
+          state.announcement = "Event payload " + (expanded ? "collapsed" : "expanded") + " for " + event.summary + ".";
           render();
         });
         row.append(trigger);
@@ -1066,6 +1110,7 @@
     }
 
     function render() {
+      const focusKey = document.activeElement?.dataset.focusKey || null;
       renderRail();
       const instrument = document.querySelector(".instrument");
       instrument.replaceChildren();
@@ -1076,6 +1121,11 @@
       renderCaseFile();
       renderEventTape();
       document.getElementById("announcer").textContent = state.announcement;
+      if (focusKey) {
+        const focusTarget = Array.from(document.querySelectorAll("[data-focus-key]"))
+          .find(node => node.dataset.focusKey === focusKey);
+        focusTarget?.focus({ preventScroll: true });
+      }
     }
 
     state = createInitialState();
