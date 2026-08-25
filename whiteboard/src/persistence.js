@@ -40,6 +40,27 @@ function transact(mode, operation) {
   );
 }
 
+function isPersistedObject(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function validateScene(scene) {
+  if (scene === null) {
+    return null;
+  }
+
+  if (
+    !isPersistedObject(scene) ||
+    !Array.isArray(scene.elements) ||
+    !isPersistedObject(scene.appState) ||
+    !isPersistedObject(scene.files)
+  ) {
+    return null;
+  }
+
+  return scene;
+}
+
 export function selectPersistedAppState(appState = {}) {
   return Object.fromEntries(
     SAFE_APP_STATE_KEYS.filter((key) => appState[key] !== undefined).map(
@@ -62,7 +83,9 @@ export function saveScene({ elements, appState, files }) {
 }
 
 export function loadScene() {
-  return transact("readonly", (store) => store.get(CURRENT_SCENE));
+  return transact("readonly", (store) => store.get(CURRENT_SCENE)).then(
+    validateScene,
+  );
 }
 
 export function clearScene() {

@@ -8,6 +8,28 @@ import {
   selectPersistedAppState,
 } from "./persistence";
 
+const DB_NAME = "marc-personal-whiteboard";
+const STORE_NAME = "scenes";
+const CURRENT_SCENE = "current";
+
+function putRawScene(scene) {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME);
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction(STORE_NAME, "readwrite");
+      const store = transaction.objectStore(STORE_NAME);
+      store.put(scene, CURRENT_SCENE);
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+      transaction.onerror = () => reject(transaction.error);
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
 describe("scene persistence", () => {
   beforeEach(async () => {
     await clearScene();
@@ -34,6 +56,16 @@ describe("scene persistence", () => {
       },
       files: scene.files,
     });
+  });
+
+  it("returns null for malformed persisted scene data", async () => {
+    await putRawScene({
+      elements: "not-an-array",
+      appState: { theme: "dark" },
+      files: {},
+    });
+
+    expect(await loadScene()).toBeNull();
   });
 
   it("keeps only restorable app-state fields", () => {
