@@ -13,6 +13,26 @@ test("serves migrated articles with article chrome", async ({ page, request }, t
   }
 });
 
+test("wraps long article titles without script or navigation overflow", async ({ page }, testInfo) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto("/system/philosophy/k8s_design_principle/");
+
+  const dimensions = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    viewportWidth: window.innerWidth,
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
+  expect(pageErrors).toEqual([]);
+
+  if (testInfo.project.name !== "mobile") {
+    const navigation = page.locator("[data-section-nav-desktop]");
+    const navigationBox = await navigation.boundingBox();
+    expect(navigationBox?.height).toBeLessThanOrEqual(688);
+  }
+});
+
 test("opens the mobile section menu with keyboard and closes on escape", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/python/functions/");

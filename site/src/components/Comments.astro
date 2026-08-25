@@ -15,9 +15,13 @@
 </section>
 
 <script is:inline>
-  const root = document.querySelector("[data-comments-root]");
+  (() => {
+    const root = document.querySelector("[data-comments-root]");
 
-  if (root instanceof HTMLElement) {
+    if (!(root instanceof HTMLElement)) {
+      return;
+    }
+
     const loadButton = root.querySelector("[data-comments-load]");
     const frame = root.querySelector("[data-comments-frame]");
     const status = root.querySelector("[data-comments-status]");
@@ -73,5 +77,5 @@
       });
       observer.observe(root);
     }
-  }
+  })();
 </script>

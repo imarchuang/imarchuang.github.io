@@ -72,8 +72,12 @@ const sections = navigation.filter((section) => section.href !== "/");
 </section>
 
 <script is:inline>
-  const root = document.querySelector("[data-section-nav]");
-  if (root instanceof HTMLElement) {
+  (() => {
+    const root = document.querySelector("[data-section-nav]");
+    if (!(root instanceof HTMLElement)) {
+      return;
+    }
+
     const desktop = root.querySelector("[data-section-nav-desktop]");
     const desktopPanel = root.querySelector("#section-nav-desktop-panel");
     const toggle = root.querySelector("[data-section-nav-toggle]");
@@ -132,5 +136,5 @@ const sections = navigation.filter((section) => section.href !== "/");
         }
       });
     }
-  }
+  })();
 </script>
