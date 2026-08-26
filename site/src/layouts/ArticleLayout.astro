@@ -1,8 +1,7 @@
 ---
 import ArticlePager from "../components/ArticlePager.astro";
 import Comments from "../components/Comments.astro";
-import SectionNav from "../components/SectionNav.astro";
-import TableOfContents from "../components/TableOfContents.astro";
+import ArticleReadingNavigation from "../components/ArticleReadingNavigation.astro";
 import BaseLayout from "./BaseLayout.astro";
 import "../styles/article.css";
 
@@ -36,23 +35,27 @@ const {
   next,
   language,
 } = Astro.props;
-
-const tocHeadings = headings.filter((heading) => heading.depth <= 4);
-const showToc = tocHeadings.length >= 2;
 ---
 
 <BaseLayout title={`${title} — Marc Huang`} description={description || title} language={language}>
-  <div class="article-shell page-shell">
-    <SectionNav navigation={navigation} currentPath={currentPath} />
+  <div class="article-reading-root" data-reading-root>
+    <div class="reading-progress" aria-hidden="true">
+      <span data-reading-progress></span>
+    </div>
+    <div class="article-shell page-shell">
+      <ArticleReadingNavigation
+        navigation={navigation}
+        currentPath={currentPath}
+        headings={headings}
+      />
 
-    <article class="article-main">
-      <header class="article-header">
-        <p class="kicker">Knowledge base / Article</p>
-        <h1>{title}</h1>
-        {description && <p class="article-lede">{description}</p>}
-      </header>
+      <article class="article-main" data-article-column>
+        <header class="article-header">
+          <p class="article-context">Knowledge base / Article</p>
+          <h1>{title}</h1>
+          {description && <p class="article-lede">{description}</p>}
+        </header>
 
-      <div class="article-content-shell">
         <div class="article-prose-wrap">
           <div class="article-prose" data-article-prose>
             <slot />
@@ -60,11 +63,14 @@ const showToc = tocHeadings.length >= 2;
           <ArticlePager previous={previous} next={next} />
           <Comments />
         </div>
-        {showToc && <TableOfContents headings={tocHeadings} />}
-      </div>
-    </article>
+      </article>
+    </div>
   </div>
 </BaseLayout>
+
+<script>
+  import "../scripts/article-reading";
+</script>
 
 <script is:inline>
   const prose = document.querySelector("[data-article-prose]");

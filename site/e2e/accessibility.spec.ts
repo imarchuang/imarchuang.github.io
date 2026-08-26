@@ -27,3 +27,25 @@ test("opened search dialog has no serious accessibility violations", async ({ pa
 
   expect(violations).toEqual([]);
 });
+
+test("opened reading panels have no serious accessibility violations", async ({ page }, testInfo) => {
+  await page.goto("/coding/tree/");
+  const trigger =
+    testInfo.project.name === "mobile"
+      ? page.getByRole("button", { name: "目录", exact: true })
+      : page.getByRole("button", { name: "打开文章目录" });
+  await trigger.click();
+
+  const selector =
+    testInfo.project.name === "mobile"
+      ? '[data-reading-dialog="toc"]'
+      : '[data-reading-panel="toc"]';
+  await expect(page.locator(selector)).toBeVisible();
+
+  const results = await new AxeBuilder({ page }).include(selector).analyze();
+  const violations = results.violations.filter(
+    ({ impact }) => impact === "serious" || impact === "critical",
+  );
+
+  expect(violations).toEqual([]);
+});

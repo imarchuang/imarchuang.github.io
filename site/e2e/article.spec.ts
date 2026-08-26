@@ -7,9 +7,10 @@ test("serves migrated articles with article chrome", async ({ page, request }, t
   await page.goto("/python/functions/");
   await expect(page.getByRole("heading", { level: 1, name: "Python的函数是一等公民" })).toBeVisible();
   if (testInfo.project.name === "mobile") {
-    await expect(page.getByRole("button", { name: "打开章节导航" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "章节", exact: true })).toBeVisible();
   } else {
-    await expect(page.getByRole("navigation", { name: "章节导航" })).toBeVisible();
+    await expect(page.locator('[data-reading-rail="section"]')).toBeVisible();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeHidden();
   }
 });
 
@@ -80,7 +81,7 @@ test("loads representative articles without local resource, script, or layout fa
   expect(faviconResponse.headers()["content-type"]).toContain("image/svg+xml");
 
   if (testInfo.project.name !== "mobile") {
-    const navigation = page.locator("[data-section-nav-desktop]");
+    const navigation = page.locator('[data-reading-rail="section"]');
     const navigationBox = await navigation.boundingBox();
     expect(navigationBox?.height).toBeLessThanOrEqual(688);
   }
@@ -99,28 +100,241 @@ test("loads representative articles without local resource, script, or layout fa
   expect(failedSameOriginResponses).toEqual([]);
 });
 
-test("opens the mobile section menu with keyboard and closes on escape", async ({ page }) => {
+test("opens mobile reading dialogs with keyboard and restores focus", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/python/functions/");
-
-  const openButton = page.getByRole("button", { name: "打开章节导航" });
-  await openButton.focus();
-  await page.keyboard.press("Enter");
-
-  const dialog = page.getByRole("dialog", { name: "章节导航" });
-  await expect(dialog).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(dialog).toBeHidden();
-  await expect(openButton).toBeFocused();
-});
-
-test("shows a table of contents on longer articles", async ({ page }) => {
   await page.goto("/coding/tree/");
 
-  await expect(page.getByRole("heading", { level: 1, name: "关于二叉树，是所有高级图论算法的基础" })).toBeVisible();
-  const toc = page.getByRole("navigation", { name: "文章目录" });
-  await expect(toc).toBeVisible();
-  await expect(toc.getByRole("link", { name: "我告诉你遍历回溯分治动规" })).toBeVisible();
+  const sectionButton = page.getByRole("button", { name: "章节", exact: true });
+  await sectionButton.focus();
+  await page.keyboard.press("Enter");
+
+  const sectionDialog = page.getByRole("dialog", { name: "章节导航" });
+  await expect(sectionDialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(sectionDialog).toBeHidden();
+  await expect(sectionButton).toBeFocused();
+
+  const tocButton = page.getByRole("button", { name: "目录", exact: true });
+  await tocButton.focus();
+  await page.keyboard.press("Enter");
+  const tocDialog = page.getByRole("dialog", { name: "文章目录" });
+  await expect(tocDialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(tocDialog).toBeHidden();
+  await expect(tocButton).toBeFocused();
+});
+
+test("dismisses a tablet dialog only from the true backdrop and returns focus", async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.goto("/coding/tree/");
+
+  const tocButton = page.getByRole("button", { name: "目录", exact: true });
+  await tocButton.click();
+
+  const tocDialog = page.locator('[data-reading-dialog="toc"]');
+  await expect(tocDialog).toBeVisible();
+
+  const box = await tocDialog.boundingBox();
+  if (!box) {
+    throw new Error("expected article dialog box");
+  }
+
+  await tocDialog.click({ position: { x: 16, y: 16 } });
+  await expect(tocDialog).toHaveJSProperty("open", true);
+
+  const backdropX = Math.max(4, Math.floor(box.x / 2));
+  const backdropY = Math.max(4, Math.floor(box.y / 2));
+  await page.mouse.click(backdropX, backdropY);
+
+  await expect(tocDialog).not.toHaveJSProperty("open", true);
+  await expect(tocButton).toBeFocused();
+});
+
+test("transfers active reading UI across the exact 901px boundary", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 901, height: 900 });
+  await page.goto("/coding/tree/");
+
+  const desktopTocButton = page.getByRole("button", { name: "打开文章目录" });
+  await desktopTocButton.click();
+  await expect(page.locator('[data-reading-panel="toc"]')).toBeVisible();
+
+  await page.setViewportSize({ width: 900, height: 900 });
+
+  const mobileTocButton = page.getByRole("button", { name: "目录", exact: true });
+  await expect(mobileTocButton).toBeVisible();
+  await expect(page.locator('[data-reading-panel="toc"]')).toBeHidden();
+  await expect(page.locator('[data-reading-dialog="toc"]')).not.toHaveJSProperty("open", true);
+  await expect(mobileTocButton).toBeFocused();
+
+  await mobileTocButton.click();
+  await expect(page.locator('[data-reading-dialog="toc"]')).toHaveJSProperty("open", true);
+
+  await page.setViewportSize({ width: 901, height: 900 });
+
+  await expect(desktopTocButton).toBeVisible();
+  await expect(page.locator('[data-reading-dialog="toc"]')).not.toHaveJSProperty("open", true);
+  await expect(page.locator('[data-reading-panel="toc"]')).toBeHidden();
+  await expect(desktopTocButton).toBeFocused();
+});
+
+test("opens the article table of contents without moving the article", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile");
+  await page.goto("/coding/tree/");
+
+  const article = page.locator("[data-article-column]");
+  const before = await article.boundingBox();
+  const open = page.getByRole("button", { name: "打开文章目录" });
+  await open.click();
+
+  const panel = page.locator('[data-reading-panel="toc"]');
+  await expect(panel).toBeVisible();
+  await expect(open).toHaveAttribute("aria-expanded", "true");
+  await expect(panel.getByRole("link", { name: "我告诉你遍历回溯分治动规" })).toBeVisible();
+
+  const after = await article.boundingBox();
+  expect(after?.x).toBeCloseTo(before?.x ?? 0, 0);
+  expect(after?.width).toBeCloseTo(before?.width ?? 0, 0);
+});
+
+test("tracks the current heading and reading progress", async ({ page }) => {
+  await page.goto("/coding/tree/");
+  await page
+    .getByRole("heading", { name: "我告诉你遍历回溯分治动规", exact: true })
+    .evaluate((element) => element.scrollIntoView({ block: "start" }));
+
+  await expect
+    .poll(async () =>
+      page.locator('.article-toc-list a[aria-current="location"]').first().textContent(),
+    )
+    .toContain("我告诉你遍历回溯分治动规");
+
+  await expect
+    .poll(() =>
+      page.locator("[data-reading-progress]").evaluate((element) =>
+        Number(getComputedStyle(element).getPropertyValue("--reading-progress")),
+      ),
+    )
+    .toBeGreaterThan(0);
+});
+
+test("tracks exact article progress endpoints and remeasures after article growth", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/coding/tree/");
+
+  const progressValue = () =>
+    page.locator("[data-reading-progress]").evaluate((element) =>
+      Number(getComputedStyle(element).getPropertyValue("--reading-progress")),
+    );
+
+  const articleMetrics = () =>
+    page.evaluate(() => {
+      const article = document.querySelector<HTMLElement>("[data-article-column]");
+      if (!article) {
+        throw new Error("expected article column");
+      }
+      const articleTop = article.getBoundingClientRect().top + window.scrollY;
+      const articleEnd = articleTop + article.offsetHeight - window.innerHeight;
+      return { articleTop, articleEnd };
+    });
+
+  const { articleTop, articleEnd } = await articleMetrics();
+
+  await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), articleTop);
+  await expect.poll(progressValue).toBeLessThan(0.01);
+
+  await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), articleEnd);
+  await expect.poll(progressValue).toBeGreaterThan(0.99);
+
+  const intermediateScroll = articleTop + (articleEnd - articleTop) / 2;
+  await page.evaluate((top) => window.scrollTo({ top, behavior: "instant" }), intermediateScroll);
+  await expect.poll(progressValue).toBeGreaterThan(0.2);
+
+  const progressBeforeSpacer = await progressValue();
+  await page.evaluate(() => {
+    const article = document.querySelector<HTMLElement>("[data-article-column]");
+    if (!article) {
+      throw new Error("expected article column");
+    }
+    const spacer = document.createElement("div");
+    spacer.id = "playwright-reading-progress-spacer";
+    spacer.style.height = "1200px";
+    spacer.setAttribute("aria-hidden", "true");
+    article.append(spacer);
+  });
+
+  await expect.poll(progressValue).toBeLessThan(progressBeforeSpacer);
+
+  await page.evaluate(() => {
+    document.getElementById("playwright-reading-progress-spacer")?.remove();
+  });
+});
+
+test("omits table-of-contents controls on short articles", async ({ page }) => {
+  await page.goto("/ideas/example/");
+  await expect(page.locator('[data-reading-rail="toc"]')).toHaveCount(0);
+  await expect(page.locator('[data-reading-open="toc"]')).toHaveCount(0);
+});
+
+test.describe("desktop reading rails", () => {
+  test.beforeEach(async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === "mobile");
+    await page.goto("/coding/classic/subsequence/");
+    await page.evaluate(() => window.localStorage.clear());
+    await page.reload();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeHidden();
+    await expect(page.locator('[data-reading-panel="toc"]')).toBeHidden();
+  });
+
+  test("renders compact rails", async ({ page }) => {
+    const rails = page.locator("[data-reading-rail]");
+    await expect(rails).toHaveCount(2);
+    for (const rail of await rails.all()) {
+      expect((await rail.boundingBox())?.width).toBeGreaterThanOrEqual(40);
+      expect((await rail.boundingBox())?.width).toBeLessThanOrEqual(48);
+    }
+  });
+
+  test("keeps only one overlay open and restores focus", async ({ page }) => {
+    const sectionOpen = page.getByRole("button", { name: "打开章节导航" });
+    const tocOpen = page.getByRole("button", { name: "打开文章目录" });
+    await sectionOpen.click();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeVisible();
+
+    await tocOpen.click();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeHidden();
+    await expect(page.locator('[data-reading-panel="toc"]')).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(page.locator('[data-reading-panel="toc"]')).toBeHidden();
+    await expect(tocOpen).toBeFocused();
+  });
+
+  test("restores same-page state and survives unavailable storage", async ({ page }) => {
+    const sectionOpen = page.getByRole("button", { name: "打开章节导航" });
+    await sectionOpen.click();
+    await page.reload();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeVisible();
+
+    await page.getByRole("button", { name: "关闭章节导航" }).click();
+    await page.reload();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeHidden();
+
+    await page.addInitScript(() => {
+      Storage.prototype.getItem = () => {
+        throw new Error("storage unavailable");
+      };
+      Storage.prototype.setItem = () => {
+        throw new Error("storage unavailable");
+      };
+    });
+    await page.reload();
+    await page.getByRole("button", { name: "打开章节导航" }).click();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeVisible();
+  });
 });
 
 test("links previous and next articles in generated navigation order", async ({ page }) => {
@@ -185,13 +399,29 @@ test("renders comments only on article pages", async ({ page }) => {
   await expect(page.getByRole("button", { name: "加载评论" })).toHaveCount(0);
 });
 
-test("shows the no-JS section fallback", async ({ browser }) => {
+test("shows native reading disclosures without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
 
-  await page.goto("/python/functions/");
-  await expect(page.getByRole("navigation", { name: "章节导航" }).first()).toBeVisible();
-  await expect(page.getByRole("button", { name: "打开章节导航" })).toBeHidden();
+  await page.goto("/coding/tree/");
+
+  const fallbacks = page.locator(".reading-fallbacks details");
+  await expect(fallbacks).toHaveCount(2);
+  const sectionSummary = fallbacks.nth(0).locator("summary");
+  const tocSummary = fallbacks.nth(1).locator("summary");
+  await expect(sectionSummary).toHaveText("章节导航");
+  await expect(tocSummary).toHaveText("文章目录");
+
+  await sectionSummary.click();
+  await expect(fallbacks.nth(0).getByRole("navigation", { name: "章节导航" })).toBeVisible();
+
+  await tocSummary.click();
+  await expect(fallbacks.nth(1).getByRole("navigation", { name: "文章目录" })).toBeVisible();
+
+  const rails = page.locator("[data-reading-rail]");
+  await expect(rails).toHaveCount(2);
+  await expect(rails.nth(0)).toBeHidden();
+  await expect(rails.nth(1)).toBeHidden();
 
   await context.close();
 });

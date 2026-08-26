@@ -1,0 +1,177 @@
+---
+import type { NavigationSection } from "../lib/navigation";
+import SectionNavTree from "./SectionNavTree.astro";
+
+interface HeadingLink {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  navigation: NavigationSection[];
+  currentPath: string;
+  headings: HeadingLink[];
+}
+
+const { navigation, currentPath, headings } = Astro.props;
+const sections = navigation.filter((section) => section.href !== "/");
+const tocItems = headings.filter((heading) => heading.depth <= 4);
+const showToc = tocItems.length >= 2;
+---
+
+<div class="reading-fallbacks">
+  <details>
+    <summary>章节导航</summary>
+    <nav aria-label="章节导航">
+      <SectionNavTree items={sections} currentPath={currentPath} />
+    </nav>
+  </details>
+  {showToc && (
+    <details>
+      <summary>文章目录</summary>
+      <nav aria-label="文章目录">
+        <ul class="article-toc-list">
+          {tocItems.map((heading) => (
+            <li style={`--toc-depth:${Math.max(heading.depth - 2, 0)}`}>
+              <a href={`#${heading.slug}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </details>
+  )}
+</div>
+
+<aside class="reading-rail reading-rail-section" data-reading-rail="section">
+  <button
+    type="button"
+    data-reading-open="section"
+    data-reading-mode="desktop"
+    aria-controls="reading-section-panel"
+    aria-expanded="false"
+    aria-label="打开章节导航"
+  >☰</button>
+  <span aria-hidden="true">章节导航</span>
+</aside>
+
+{showToc && (
+  <aside class="reading-rail reading-rail-toc" data-reading-rail="toc">
+    <button
+      type="button"
+      data-reading-open="toc"
+      data-reading-mode="desktop"
+      aria-controls="reading-toc-panel"
+      aria-expanded="false"
+      aria-label="打开文章目录"
+    >•••</button>
+    <span aria-hidden="true">本文目录</span>
+  </aside>
+)}
+
+<div class="reading-mobile-toolbar" aria-label="阅读工具">
+  <button
+    type="button"
+    data-reading-open="section"
+    data-reading-mode="mobile"
+    aria-controls="reading-section-dialog"
+    aria-expanded="false"
+  >章节</button>
+  {showToc && (
+    <button
+      type="button"
+      data-reading-open="toc"
+      data-reading-mode="mobile"
+      aria-controls="reading-toc-dialog"
+      aria-expanded="false"
+    >目录</button>
+  )}
+</div>
+
+<button
+  class="reading-panel-backdrop"
+  type="button"
+  data-reading-backdrop
+  aria-label="关闭阅读面板"
+  hidden
+></button>
+
+<aside
+  id="reading-section-panel"
+  class="reading-panel reading-panel-section"
+  data-reading-panel="section"
+  role="dialog"
+  aria-label="章节导航"
+  hidden
+>
+  <header>
+    <div><p class="kicker">Browse notes</p><h2>章节导航</h2></div>
+    <button type="button" data-reading-close="section" aria-label="关闭章节导航">关闭</button>
+  </header>
+  <nav aria-label="章节导航">
+    <SectionNavTree items={sections} currentPath={currentPath} />
+  </nav>
+</aside>
+
+{showToc && (
+  <aside
+    id="reading-toc-panel"
+    class="reading-panel reading-panel-toc"
+    data-reading-panel="toc"
+    role="dialog"
+    aria-label="文章目录"
+    hidden
+  >
+    <header>
+      <div><p class="kicker">On this page</p><h2>文章目录</h2></div>
+      <button type="button" data-reading-close="toc" aria-label="关闭文章目录">关闭</button>
+    </header>
+    <nav aria-label="文章目录">
+      <ul class="article-toc-list">
+        {tocItems.map((heading) => (
+          <li style={`--toc-depth:${Math.max(heading.depth - 2, 0)}`}>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </aside>
+)}
+
+<dialog
+  id="reading-section-dialog"
+  class="reading-dialog"
+  data-reading-dialog="section"
+  aria-label="章节导航"
+>
+  <header>
+    <div><p class="kicker">Browse notes</p><h2>章节导航</h2></div>
+    <button type="button" data-reading-close="section">关闭</button>
+  </header>
+  <nav aria-label="章节导航">
+    <SectionNavTree items={sections} currentPath={currentPath} />
+  </nav>
+</dialog>
+
+{showToc && (
+  <dialog
+    id="reading-toc-dialog"
+    class="reading-dialog"
+    data-reading-dialog="toc"
+    aria-label="文章目录"
+  >
+    <header>
+      <div><p class="kicker">On this page</p><h2>文章目录</h2></div>
+      <button type="button" data-reading-close="toc">关闭</button>
+    </header>
+    <nav aria-label="文章目录">
+      <ul class="article-toc-list">
+        {tocItems.map((heading) => (
+          <li style={`--toc-depth:${Math.max(heading.depth - 2, 0)}`}>
+            <a href={`#${heading.slug}`}>{heading.text}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </dialog>
+)}
