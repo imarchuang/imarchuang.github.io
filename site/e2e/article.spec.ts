@@ -179,6 +179,24 @@ test("transfers active reading UI across the exact 901px boundary", async ({
   await expect(desktopTocButton).toBeFocused();
 });
 
+test("uses the expanded desktop reading lane without horizontal overflow", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === "mobile");
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.goto("/coding/tree/");
+
+  const article = page.locator("[data-article-column]");
+  const articleBox = await article.boundingBox();
+  expect(articleBox?.width).toBeGreaterThanOrEqual(700);
+
+  const dimensions = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    viewportWidth: window.innerWidth,
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
+});
+
 test("opens the article table of contents without moving the article", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "mobile");
   await page.goto("/coding/tree/");

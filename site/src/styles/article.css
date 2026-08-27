@@ -4,10 +4,10 @@
 
 .article-shell {
   display: grid;
-  grid-template-columns: 48px minmax(0, 68ch) 48px;
+  grid-template-columns: 48px minmax(0, 76ch) 48px;
   justify-content: center;
-  gap: clamp(1rem, 3vw, 2.25rem);
-  padding-block: clamp(2.5rem, 7vw, 5rem);
+  gap: clamp(1rem, 3vw, 1.5rem);
+  padding-block: clamp(2.5rem, 7vw, 3.5rem);
 }
 
 .article-main {
@@ -16,7 +16,7 @@
 }
 
 .article-header {
-  max-width: 68ch;
+  max-width: 76ch;
   margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
 }
 
@@ -268,7 +268,7 @@ html:not([data-js="true"]) .reading-fallbacks {
 }
 
 .article-prose {
-  max-width: 68ch;
+  max-width: 76ch;
   color: color-mix(in srgb, var(--ink) 88%, var(--muted));
   font-size: clamp(1rem, 1.2vw, 1.08rem);
   line-height: 1.82;
