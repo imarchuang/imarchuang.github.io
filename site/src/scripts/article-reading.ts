@@ -121,6 +121,11 @@ function initializeReadingRoot(root: HTMLElement): void {
     desktopClose(name)?.setAttribute("aria-expanded", String(open));
     if (name === "section" && open) {
       revealCurrentSection(panel);
+      void document.fonts.ready.then(() => {
+        if (root.getAttribute("data-section-open") === "true") {
+          revealCurrentSection(panel);
+        }
+      });
     }
 
     if (persist) {
@@ -171,6 +176,11 @@ function initializeReadingRoot(root: HTMLElement): void {
     setExpanded(name, "mobile", true);
     if (name === "section") {
       revealCurrentSection(dialog);
+      void document.fonts.ready.then(() => {
+        if (dialog.open) {
+          revealCurrentSection(dialog);
+        }
+      });
     }
   };
 
