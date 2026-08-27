@@ -17,6 +17,8 @@ interface HeadingLink {
 interface Props {
   title: string;
   description: string;
+  createdDate: string;
+  updatedDate: string;
   navigation: NavigationSection[];
   currentPath: string;
   headings: HeadingLink[];
@@ -28,6 +30,8 @@ interface Props {
 const {
   title,
   description,
+  createdDate,
+  updatedDate,
   navigation,
   currentPath,
   headings,
@@ -53,6 +57,10 @@ const {
         <header class="article-header">
           <p class="article-context">Knowledge base / Article</p>
           <h1>{title}</h1>
+          <p class="article-dates" aria-label="文章时间信息">
+            <span>创建于 <time datetime={createdDate}>{createdDate}</time></span>
+            <span>最后修改于 <time datetime={updatedDate}>{updatedDate}</time></span>
+          </p>
           {description && <p class="article-lede">{description}</p>}
         </header>
 

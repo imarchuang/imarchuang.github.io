@@ -61,6 +61,20 @@ test("keeps the homepage composed at 390 pixels", async ({ page }) => {
   expect(cards[1].top).toBeLessThan(cards[2].top);
 });
 
+test("keeps primary titles proportionate in short desktop viewports", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 576 });
+
+  for (const route of ["/", "/about/", "/work/", "/notes/", "/coding/tree/"]) {
+    await page.goto(route);
+    const titleBox = await page.getByRole("heading", { level: 1 }).boundingBox();
+    expect(titleBox?.height).toBeLessThanOrEqual(230);
+    expect((titleBox?.y ?? 0) + (titleBox?.height ?? 0)).toBeLessThanOrEqual(576);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+    ).toBe(true);
+  }
+});
+
 test("offers complete collection landing pages", async ({ page }) => {
   for (const route of ["/work/", "/notes/", "/about/"]) {
     await page.goto(route);

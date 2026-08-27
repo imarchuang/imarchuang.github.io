@@ -1,6 +1,8 @@
 import { mkdtemp, mkdir, readdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
 import { pathToFileURL } from "node:url";
 
 import { afterEach, describe, expect, test } from "vitest";
@@ -8,6 +10,7 @@ import { afterEach, describe, expect, test } from "vitest";
 const fixtureRoot = path.resolve("tests/fixtures/docs");
 const realDocsRoot = path.resolve("../docs");
 const tempPaths: string[] = [];
+const execFileAsync = promisify(execFile);
 
 async function makeTempDir(prefix: string) {
   const dir = await mkdtemp(path.join(tmpdir(), prefix));
@@ -48,7 +51,8 @@ afterEach(async () => {
 
 describe("migrate-content", () => {
   test("exports deterministic helper behavior", async () => {
-    const { EXCLUDED, normalizeLegacyLinks, routeFor } = await loadMigrationModule();
+    const { EXCLUDED, normalizeLegacyLinks, parseGitDateHistory, routeFor } =
+      await loadMigrationModule();
 
     expect([...EXCLUDED]).toEqual([
       "_coverpage.md",
@@ -78,6 +82,106 @@ describe("migrate-content", () => {
     expect(normalizeLegacyLinks("[Drop](/drops/demo/ ':ignore')")).toContain(
       "[Drop](/drops/demo/)",
     );
+
+    const dates = parseGitDateHistory(
+      [
+        "\x1e2026-08-27T08:30:00+08:00",
+        "",
+        "M\tdocs/guides/intro.md",
+        "A\tdocs/guides/other.md",
+        "\x1e2024-03-02T10:00:00+08:00",
+        "",
+        "R100\tdocs/guides/original.md\tdocs/guides/intro.md",
+        "\x1e2023-01-12T09:00:00+08:00",
+        "",
+        "A\tdocs/guides/original.md",
+      ].join("\n"),
+      "docs",
+    );
+    expect(Object.fromEntries(dates)).toEqual({
+      "guides/intro.md": {
+        createdDate: "2023-01-12",
+        updatedDate: "2026-08-27",
+      },
+      "guides/other.md": {
+        createdDate: "2026-08-27",
+        updatedDate: "2026-08-27",
+      },
+    });
+  });
+
+  test("rejects shallow repositories instead of emitting inaccurate creation dates", async () => {
+    const { migrateContent } = await loadMigrationModule();
+    const workspaceDir = await makeTempDir("note-dates-shallow-");
+    const originDir = path.join(workspaceDir, "origin");
+    const shallowDir = path.join(workspaceDir, "shallow");
+    await execFileAsync("git", ["init", originDir]);
+    await mkdir(path.join(originDir, "docs"), { recursive: true });
+    await writeFile(path.join(originDir, "docs", "README.md"), "# History\n", "utf8");
+    await execFileAsync("git", ["-C", originDir, "add", "docs/README.md"]);
+    await execFileAsync(
+      "git",
+      [
+        "-C",
+        originDir,
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.com",
+        "commit",
+        "-m",
+        "add history",
+      ],
+      {
+        env: {
+          ...process.env,
+          GIT_AUTHOR_DATE: "2024-01-02T10:00:00Z",
+          GIT_COMMITTER_DATE: "2024-01-02T10:00:00Z",
+        },
+      },
+    );
+    await writeFile(
+      path.join(originDir, "docs", "README.md"),
+      "# History\n\nUpdated.\n",
+      "utf8",
+    );
+    await execFileAsync("git", ["-C", originDir, "add", "docs/README.md"]);
+    await execFileAsync(
+      "git",
+      [
+        "-C",
+        originDir,
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.com",
+        "commit",
+        "-m",
+        "update history",
+      ],
+      {
+        env: {
+          ...process.env,
+          GIT_AUTHOR_DATE: "2025-02-03T10:00:00Z",
+          GIT_COMMITTER_DATE: "2025-02-03T10:00:00Z",
+        },
+      },
+    );
+    await execFileAsync("git", [
+      "clone",
+      "--depth=1",
+      `file://${originDir}`,
+      shallowDir,
+    ]);
+
+    await expect(
+      migrateContent({
+        sourceDir: path.join(shallowDir, "docs"),
+        notesDir: path.join(workspaceDir, "output", "notes"),
+        navigationFile: path.join(workspaceDir, "output", "navigation.json"),
+        knownIssuesFile: path.join(workspaceDir, "output", "content-known-issues.json"),
+      }),
+    ).rejects.toThrow(/shallow Git clone/u);
   });
 
   test("migrates fixture docs, rewrites links with source context, and collapses duplicate sidebar aliases", async () => {
@@ -147,6 +251,8 @@ describe("migrate-content", () => {
 
     expect(homeNote).toContain('title: "Fixture Home"');
     expect(homeNote).toContain('legacyPath: "#/README"');
+    expect(homeNote).toMatch(/createdDate: "\d{4}-\d{2}-\d{2}"/u);
+    expect(homeNote).toMatch(/updatedDate: "\d{4}-\d{2}-\d{2}"/u);
     expect(homeNote).not.toContain("# Fixture Home");
 
     expect(guideIndex).toContain('title: "Guides Home"');

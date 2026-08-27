@@ -1,13 +1,14 @@
 type PanelName = "section" | "toc";
 type PanelMode = "desktop" | "mobile";
 
-const storageKey = (name: PanelName) => `article-reading:${name}:open`;
+const storageKey = (name: PanelName) => `article-reading:v2:${name}:open`;
 
-function readStored(name: PanelName): boolean {
+function readStored(name: PanelName): boolean | null {
   try {
-    return window.localStorage.getItem(storageKey(name)) === "true";
+    const value = window.localStorage.getItem(storageKey(name));
+    return value === null ? null : value === "true";
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -20,11 +21,13 @@ function writeStored(name: PanelName, open: boolean): void {
 }
 
 function initializeReadingRoot(root: HTMLElement): void {
-  let activeDesktop: PanelName | null = null;
   let activeDialog: PanelName | null = null;
   let pendingDialogFocus: { name: PanelName; mode: PanelMode | null; restore: boolean } | null = null;
-  const backdrop = root.querySelector<HTMLButtonElement>("[data-reading-backdrop]");
   const mobileQuery = window.matchMedia("(max-width: 900px)");
+  const storedState: Record<PanelName, boolean | null> = {
+    section: readStored("section"),
+    toc: readStored("toc"),
+  };
 
   const triggers = (name: PanelName, mode: PanelMode) =>
     [
@@ -32,6 +35,11 @@ function initializeReadingRoot(root: HTMLElement): void {
         `[data-reading-open="${name}"][data-reading-mode="${mode}"]`,
       ),
     ];
+
+  const desktopClose = (name: PanelName) =>
+    root.querySelector<HTMLButtonElement>(
+      `[data-reading-close="${name}"][data-reading-mode="desktop"]`,
+    );
 
   const isVisible = (button: HTMLButtonElement): boolean =>
     button.isConnected &&
@@ -50,47 +58,40 @@ function initializeReadingRoot(root: HTMLElement): void {
     triggers(name, mode).forEach((button) => button.setAttribute("aria-expanded", String(open)));
   };
 
-  const closeDesktop = (
-    name: PanelName,
-    options: { restoreFocus?: boolean; focusMode?: PanelMode | null } = {},
-  ): void => {
-    const { restoreFocus = true, focusMode = "desktop" } = options;
-    const panel = root.querySelector<HTMLElement>(`[data-reading-panel="${name}"]`);
-    if (panel) {
-      panel.hidden = true;
-    }
-    setExpanded(name, "desktop", false);
-    writeStored(name, false);
-    if (activeDesktop === name) {
-      activeDesktop = null;
-    }
-    if (backdrop) {
-      backdrop.hidden = activeDesktop === null;
-    }
-    if (restoreFocus) {
-      focusTrigger(name, focusMode);
-    }
-  };
+  const defaultDesktopState = (name: PanelName): boolean =>
+    name === "section" ? window.innerWidth >= 1100 : window.innerWidth >= 1400;
 
-  const openDesktop = (name: PanelName): void => {
-    if (activeDesktop && activeDesktop !== name) {
-      closeDesktop(activeDesktop, { restoreFocus: false });
-    }
-    if (activeDialog && activeDialog !== name) {
-      closeDialog(activeDialog, { restoreFocus: false });
-    }
+  const setDesktop = (
+    name: PanelName,
+    open: boolean,
+    options: { persist?: boolean; moveFocus?: boolean } = {},
+  ): void => {
+    const { persist = false, moveFocus = false } = options;
     const panel = root.querySelector<HTMLElement>(`[data-reading-panel="${name}"]`);
-    if (!panel) {
+    const rail = root.querySelector<HTMLElement>(`[data-reading-rail="${name}"]`);
+    if (!panel || !rail) {
       return;
     }
-    activeDesktop = name;
-    panel.hidden = false;
-    if (backdrop) {
-      backdrop.hidden = false;
+
+    panel.hidden = !open;
+    rail.hidden = open;
+    root.setAttribute(`data-${name}-open`, String(open));
+    setExpanded(name, "desktop", open);
+    desktopClose(name)?.setAttribute("aria-expanded", String(open));
+
+    if (persist) {
+      storedState[name] = open;
+      writeStored(name, open);
     }
-    setExpanded(name, "desktop", true);
-    writeStored(name, true);
-    panel.querySelector<HTMLElement>("button, a")?.focus();
+
+    if (!moveFocus) {
+      return;
+    }
+    if (open) {
+      desktopClose(name)?.focus();
+    } else {
+      focusTrigger(name, "desktop");
+    }
   };
 
   const closeDialog = (
@@ -114,9 +115,6 @@ function initializeReadingRoot(root: HTMLElement): void {
   };
 
   const openDialog = (name: PanelName): void => {
-    if (activeDesktop) {
-      closeDesktop(activeDesktop, { restoreFocus: false });
-    }
     if (activeDialog && activeDialog !== name) {
       closeDialog(activeDialog, { restoreFocus: false });
     }
@@ -137,30 +135,22 @@ function initializeReadingRoot(root: HTMLElement): void {
         openDialog(name);
         return;
       }
-      if (activeDesktop === name) {
-        closeDesktop(name);
-      } else {
-        openDesktop(name);
-      }
+      setDesktop(name, true, { persist: true, moveFocus: true });
     });
   });
 
   root.querySelectorAll<HTMLButtonElement>("[data-reading-close]").forEach((button) => {
     button.addEventListener("click", () => {
       const name = button.dataset.readingClose as PanelName;
+      if (button.dataset.readingMode === "desktop") {
+        setDesktop(name, false, { persist: true, moveFocus: true });
+        return;
+      }
       const dialog = root.querySelector<HTMLDialogElement>(`[data-reading-dialog="${name}"]`);
       if (dialog?.open) {
         closeDialog(name);
-      } else {
-        closeDesktop(name);
       }
     });
-  });
-
-  backdrop?.addEventListener("click", () => {
-    if (activeDesktop) {
-      closeDesktop(activeDesktop);
-    }
   });
 
   root.querySelectorAll<HTMLDialogElement>("[data-reading-dialog]").forEach((dialog) => {
@@ -194,47 +184,76 @@ function initializeReadingRoot(root: HTMLElement): void {
     });
   });
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && activeDesktop) {
-      closeDesktop(activeDesktop);
-    }
-  });
-
   root.addEventListener("click", (event) => {
     const link = (event.target as Element).closest("a");
-    if (!link) {
+    const dialog = link?.closest("[data-reading-dialog]");
+    if (!(dialog instanceof HTMLDialogElement) || !dialog.open) {
+      return;
+    }
+    closeDialog(dialog.dataset.readingDialog as PanelName, {
+      restoreFocus: false,
+      focusMode: null,
+    });
+  });
+
+  const syncLayout = (): void => {
+    const nextMode: PanelMode = mobileQuery.matches ? "mobile" : "desktop";
+    const closingDialog = activeDialog;
+    if (closingDialog) {
+      closeDialog(closingDialog, { restoreFocus: false, focusMode: null });
+    }
+    if (mobileQuery.matches) {
+      const focusedContainer = (document.activeElement as Element | null)?.closest(
+        "[data-reading-panel], [data-reading-rail]",
+      );
+      const name =
+        focusedContainer?.getAttribute("data-reading-panel") ??
+        focusedContainer?.getAttribute("data-reading-rail");
+      if (name === "section" || name === "toc") {
+        focusTrigger(name, "mobile");
+      }
       return;
     }
     (["section", "toc"] as PanelName[]).forEach((name) => {
-      writeStored(name, false);
-      const dialog = root.querySelector<HTMLDialogElement>(`[data-reading-dialog="${name}"]`);
-      if (dialog?.open) {
-        closeDialog(name, { restoreFocus: false, focusMode: null });
+      const open = storedState[name] ?? defaultDesktopState(name);
+      const panel = root.querySelector<HTMLElement>(`[data-reading-panel="${name}"]`);
+      const focusWillHide = !open && panel?.contains(document.activeElement);
+      setDesktop(name, open);
+      if (focusWillHide) {
+        focusTrigger(name, "desktop");
       }
     });
-    if (activeDesktop) {
-      closeDesktop(activeDesktop, { restoreFocus: false, focusMode: null });
-    }
-  });
-
-  const syncMode = (): void => {
-    const nextMode: PanelMode = mobileQuery.matches ? "mobile" : "desktop";
-    if (activeDialog) {
-      closeDialog(activeDialog, { focusMode: nextMode });
-    }
-    if (activeDesktop) {
-      closeDesktop(activeDesktop, { focusMode: nextMode });
+    if (closingDialog) {
+      const open = root.getAttribute(`data-${closingDialog}-open`) === "true";
+      if (open) {
+        desktopClose(closingDialog)?.focus();
+      } else {
+        focusTrigger(closingDialog, nextMode);
+      }
     }
   };
 
-  mobileQuery.addEventListener("change", syncMode);
+  let resizeQueued = false;
+  window.addEventListener(
+    "resize",
+    () => {
+      if (!resizeQueued) {
+        resizeQueued = true;
+        requestAnimationFrame(() => {
+          syncLayout();
+          resizeQueued = false;
+        });
+      }
+    },
+    { passive: true },
+  );
 
-  (["section", "toc"] as PanelName[]).forEach((name) => {
-    const trigger = triggers(name, "desktop")[0];
-    if (trigger && !mobileQuery.matches && readStored(name)) {
-      openDesktop(name);
-    }
-  });
+  if (!mobileQuery.matches) {
+    (["section", "toc"] as PanelName[]).forEach((name) => {
+      setDesktop(name, storedState[name] ?? defaultDesktopState(name));
+    });
+  }
+  root.dataset.readingReady = "true";
 }
 
 function initializeProgress(root: HTMLElement): void {

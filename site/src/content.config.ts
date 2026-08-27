@@ -7,6 +7,8 @@ const notes = defineCollection({
     title: z.string(),
     description: z.string().default(""),
     legacyPath: z.string(),
+    createdDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
+    updatedDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
     language: z.enum(["en", "zh-CN"]),
     navOrder: z.number().optional(),
   }),

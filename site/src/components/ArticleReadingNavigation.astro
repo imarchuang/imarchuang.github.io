@@ -43,7 +43,7 @@ const showToc = tocItems.length >= 2;
   )}
 </div>
 
-<aside class="reading-rail reading-rail-section" data-reading-rail="section">
+<aside class="reading-rail reading-rail-section" data-reading-rail="section" aria-label="章节导航">
   <button
     type="button"
     data-reading-open="section"
@@ -55,18 +55,75 @@ const showToc = tocItems.length >= 2;
   <span aria-hidden="true">章节导航</span>
 </aside>
 
+<aside
+  id="reading-section-panel"
+  class="reading-sidebar reading-sidebar-section"
+  data-reading-panel="section"
+  aria-label="章节导航"
+  hidden
+>
+  <div class="reading-sidebar-inner">
+    <header>
+      <div><p class="kicker">Browse notes</p><h2>章节导航</h2></div>
+      <button
+        type="button"
+        data-reading-close="section"
+        data-reading-mode="desktop"
+        aria-controls="reading-section-panel"
+        aria-expanded="true"
+        aria-label="收起章节导航"
+      >收起</button>
+    </header>
+    <nav aria-label="章节导航">
+      <SectionNavTree items={sections} currentPath={currentPath} />
+    </nav>
+  </div>
+</aside>
+
 {showToc && (
-  <aside class="reading-rail reading-rail-toc" data-reading-rail="toc">
-    <button
-      type="button"
-      data-reading-open="toc"
-      data-reading-mode="desktop"
-      aria-controls="reading-toc-panel"
-      aria-expanded="false"
-      aria-label="打开文章目录"
-    >•••</button>
-    <span aria-hidden="true">本文目录</span>
-  </aside>
+  <>
+    <aside class="reading-rail reading-rail-toc" data-reading-rail="toc" aria-label="文章目录">
+      <button
+        type="button"
+        data-reading-open="toc"
+        data-reading-mode="desktop"
+        aria-controls="reading-toc-panel"
+        aria-expanded="false"
+        aria-label="打开文章目录"
+      >•••</button>
+      <span aria-hidden="true">本文目录</span>
+    </aside>
+    <aside
+      id="reading-toc-panel"
+      class="reading-sidebar reading-sidebar-toc"
+      data-reading-panel="toc"
+      aria-label="文章目录"
+      hidden
+    >
+      <div class="reading-sidebar-inner">
+        <header>
+          <div><p class="kicker">On this page</p><h2>文章目录</h2></div>
+          <button
+            type="button"
+            data-reading-close="toc"
+            data-reading-mode="desktop"
+            aria-controls="reading-toc-panel"
+            aria-expanded="true"
+            aria-label="收起文章目录"
+          >收起</button>
+        </header>
+        <nav aria-label="文章目录">
+          <ul class="article-toc-list">
+            {tocItems.map((heading) => (
+              <li style={`--toc-depth:${Math.max(heading.depth - 2, 0)}`}>
+                <a href={`#${heading.slug}`}>{heading.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </aside>
+  </>
 )}
 
 <div class="reading-mobile-toolbar" aria-label="阅读工具">
@@ -87,56 +144,6 @@ const showToc = tocItems.length >= 2;
     >目录</button>
   )}
 </div>
-
-<button
-  class="reading-panel-backdrop"
-  type="button"
-  data-reading-backdrop
-  aria-label="关闭阅读面板"
-  hidden
-></button>
-
-<aside
-  id="reading-section-panel"
-  class="reading-panel reading-panel-section"
-  data-reading-panel="section"
-  role="dialog"
-  aria-label="章节导航"
-  hidden
->
-  <header>
-    <div><p class="kicker">Browse notes</p><h2>章节导航</h2></div>
-    <button type="button" data-reading-close="section" aria-label="关闭章节导航">关闭</button>
-  </header>
-  <nav aria-label="章节导航">
-    <SectionNavTree items={sections} currentPath={currentPath} />
-  </nav>
-</aside>
-
-{showToc && (
-  <aside
-    id="reading-toc-panel"
-    class="reading-panel reading-panel-toc"
-    data-reading-panel="toc"
-    role="dialog"
-    aria-label="文章目录"
-    hidden
-  >
-    <header>
-      <div><p class="kicker">On this page</p><h2>文章目录</h2></div>
-      <button type="button" data-reading-close="toc" aria-label="关闭文章目录">关闭</button>
-    </header>
-    <nav aria-label="文章目录">
-      <ul class="article-toc-list">
-        {tocItems.map((heading) => (
-          <li style={`--toc-depth:${Math.max(heading.depth - 2, 0)}`}>
-            <a href={`#${heading.slug}`}>{heading.text}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </aside>
-)}
 
 <dialog
   id="reading-section-dialog"

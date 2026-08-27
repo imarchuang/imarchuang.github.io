@@ -6,11 +6,16 @@ test("serves migrated articles with article chrome", async ({ page, request }, t
 
   await page.goto("/python/functions/");
   await expect(page.getByRole("heading", { level: 1, name: "Python的函数是一等公民" })).toBeVisible();
+  const articleDates = page.locator(".article-dates time");
+  await expect(articleDates).toHaveCount(2);
+  for (const date of await articleDates.all()) {
+    await expect(date).toHaveAttribute("datetime", /^\d{4}-\d{2}-\d{2}$/u);
+  }
   if (testInfo.project.name === "mobile") {
     await expect(page.getByRole("button", { name: "章节", exact: true })).toBeVisible();
   } else {
-    await expect(page.locator('[data-reading-rail="section"]')).toBeVisible();
-    await expect(page.locator('[data-reading-panel="section"]')).toBeHidden();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeVisible();
+    await expect(page.locator('[data-reading-panel="toc"]')).toBeHidden();
   }
 });
 
@@ -81,7 +86,7 @@ test("loads representative articles without local resource, script, or layout fa
   expect(faviconResponse.headers()["content-type"]).toContain("image/svg+xml");
 
   if (testInfo.project.name !== "mobile") {
-    const navigation = page.locator('[data-reading-rail="section"]');
+    const navigation = page.locator('[data-reading-panel="section"]');
     const navigationBox = await navigation.boundingBox();
     expect(navigationBox?.height).toBeLessThanOrEqual(688);
   }
@@ -173,10 +178,39 @@ test("transfers active reading UI across the exact 901px boundary", async ({
 
   await page.setViewportSize({ width: 901, height: 900 });
 
-  await expect(desktopTocButton).toBeVisible();
   await expect(page.locator('[data-reading-dialog="toc"]')).not.toHaveJSProperty("open", true);
-  await expect(page.locator('[data-reading-panel="toc"]')).toBeHidden();
-  await expect(desktopTocButton).toBeFocused();
+  await expect(page.locator('[data-reading-panel="toc"]')).toBeVisible();
+  await expect(page.getByRole("button", { name: "收起文章目录" })).toBeFocused();
+});
+
+test("adapts persistent sidebars across desktop widths", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === "mobile");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/coding/tree/");
+  await page.evaluate(() => window.localStorage.clear());
+  await page.reload();
+
+  const section = page.locator('[data-reading-panel="section"]');
+  const toc = page.locator('[data-reading-panel="toc"]');
+  await expect(section).toBeVisible();
+  await expect(toc).toBeVisible();
+  await page.getByRole("button", { name: "收起文章目录" }).focus();
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await expect(section).toBeVisible();
+  await expect(toc).toBeHidden();
+  await expect(page.getByRole("button", { name: "打开文章目录" })).toBeFocused();
+
+  for (const width of [1024, 901]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(section).toBeHidden();
+    await expect(toc).toBeHidden();
+  }
+
+  await page.setViewportSize({ width: 900, height: 900 });
+  await expect(page.getByRole("button", { name: "章节", exact: true })).toBeVisible();
+  await expect(section).toBeHidden();
+  await expect(toc).toBeHidden();
 });
 
 test("uses the expanded desktop reading lane without horizontal overflow", async ({
@@ -197,12 +231,11 @@ test("uses the expanded desktop reading lane without horizontal overflow", async
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
 });
 
-test("opens the article table of contents without moving the article", async ({ page }, testInfo) => {
+test("docks the article table of contents without page overflow", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === "mobile");
   await page.goto("/coding/tree/");
 
   const article = page.locator("[data-article-column]");
-  const before = await article.boundingBox();
   const open = page.getByRole("button", { name: "打开文章目录" });
   await open.click();
 
@@ -211,9 +244,19 @@ test("opens the article table of contents without moving the article", async ({ 
   await expect(open).toHaveAttribute("aria-expanded", "true");
   await expect(panel.getByRole("link", { name: "我告诉你遍历回溯分治动规" })).toBeVisible();
 
-  const after = await article.boundingBox();
-  expect(after?.x).toBeCloseTo(before?.x ?? 0, 0);
-  expect(after?.width).toBeCloseTo(before?.width ?? 0, 0);
+  const articleBox = await article.boundingBox();
+  const sectionBox = await page.locator('[data-reading-panel="section"]').boundingBox();
+  const tocBox = await panel.boundingBox();
+  expect(articleBox?.width).toBeGreaterThanOrEqual(600);
+  expect(sectionBox?.x ?? 0).toBeLessThan(articleBox?.x ?? 0);
+  expect((tocBox?.x ?? 0) + 1).toBeGreaterThan(
+    (articleBox?.x ?? 0) + (articleBox?.width ?? 0),
+  );
+  const dimensions = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    viewportWidth: window.innerWidth,
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
 });
 
 test("tracks the current heading and reading progress", async ({ page }) => {
@@ -297,9 +340,10 @@ test("omits table-of-contents controls on short articles", async ({ page }) => {
   await expect(page.locator('[data-reading-open="toc"]')).toHaveCount(0);
 });
 
-test.describe("desktop reading rails", () => {
+test.describe("desktop reading sidebars", () => {
   test.beforeEach(async ({ page }, testInfo) => {
     test.skip(testInfo.project.name === "mobile");
+    await page.setViewportSize({ width: 1024, height: 720 });
     await page.goto("/coding/classic/subsequence/");
     await page.evaluate(() => window.localStorage.clear());
     await page.reload();
@@ -316,30 +360,41 @@ test.describe("desktop reading rails", () => {
     }
   });
 
-  test("keeps only one overlay open and restores focus", async ({ page }) => {
+  test("opens both sidebars independently and restores focus on collapse", async ({ page }) => {
     const sectionOpen = page.getByRole("button", { name: "打开章节导航" });
     const tocOpen = page.getByRole("button", { name: "打开文章目录" });
     await sectionOpen.click();
     await expect(page.locator('[data-reading-panel="section"]')).toBeVisible();
 
     await tocOpen.click();
-    await expect(page.locator('[data-reading-panel="section"]')).toBeHidden();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeVisible();
     await expect(page.locator('[data-reading-panel="toc"]')).toBeVisible();
+    await expect(tocOpen).toHaveAttribute("aria-expanded", "true");
 
-    await page.keyboard.press("Escape");
-    await expect(page.locator('[data-reading-panel="toc"]')).toBeHidden();
-    await expect(tocOpen).toBeFocused();
+    await page.getByRole("button", { name: "收起章节导航" }).click();
+    await expect(page.locator('[data-reading-panel="section"]')).toBeHidden();
+    await expect(sectionOpen).toBeFocused();
+
+    const dimensions = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+    }));
+    expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
   });
 
   test("restores same-page state and survives unavailable storage", async ({ page }) => {
     const sectionOpen = page.getByRole("button", { name: "打开章节导航" });
+    const tocOpen = page.getByRole("button", { name: "打开文章目录" });
     await sectionOpen.click();
+    await tocOpen.click();
     await page.reload();
     await expect(page.locator('[data-reading-panel="section"]')).toBeVisible();
+    await expect(page.locator('[data-reading-panel="toc"]')).toBeVisible();
 
-    await page.getByRole("button", { name: "关闭章节导航" }).click();
+    await page.getByRole("button", { name: "收起章节导航" }).click();
     await page.reload();
     await expect(page.locator('[data-reading-panel="section"]')).toBeHidden();
+    await expect(page.locator('[data-reading-panel="toc"]')).toBeVisible();
 
     await page.addInitScript(() => {
       Storage.prototype.getItem = () => {
@@ -352,6 +407,24 @@ test.describe("desktop reading rails", () => {
     await page.reload();
     await page.getByRole("button", { name: "打开章节导航" }).click();
     await expect(page.locator('[data-reading-panel="section"]')).toBeVisible();
+  });
+
+  test("keeps long sticky navigation scrollable to its final item", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 500 });
+    await page.reload();
+
+    const section = page.locator('[data-reading-panel="section"]');
+    await expect(section).toBeVisible();
+    const metrics = await section.evaluate((element) => ({
+      clientHeight: element.clientHeight,
+      scrollHeight: element.scrollHeight,
+    }));
+    expect(metrics.clientHeight).toBeLessThanOrEqual(468);
+    expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight);
+
+    const finalLink = section.getByRole("link").last();
+    await finalLink.scrollIntoViewIfNeeded();
+    await expect(finalLink).toBeVisible();
   });
 });
 

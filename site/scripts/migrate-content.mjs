@@ -8,8 +8,12 @@ import {
   stat,
   writeFile,
 } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import path from "node:path";
+import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+
+const execFileAsync = promisify(execFile);
 
 export const EXCLUDED = new Set([
   "_coverpage.md",
@@ -36,6 +40,132 @@ function toPosix(value) {
 
 function trimSlashes(value) {
   return value.replace(/^\/+|\/+$/g, "");
+}
+
+function dateOnly(value) {
+  return value.slice(0, 10);
+}
+
+export function parseGitDateHistory(output, sourcePrefix = "") {
+  const normalizedPrefix = trimSlashes(toPosix(sourcePrefix));
+  const dates = new Map();
+  const canonicalPaths = new Map();
+
+  for (const record of output.split("\x1e")) {
+    const lines = record
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const committedAt = lines[0];
+    if (!/^\d{4}-\d{2}-\d{2}T/u.test(committedAt ?? "")) {
+      continue;
+    }
+
+    for (const change of lines.slice(1)) {
+      const [status, firstPath, secondPath] = change.split("\t");
+      if (!status || !firstPath || status.startsWith("D")) {
+        continue;
+      }
+      const renamed = status.startsWith("R") && secondPath;
+      const changedPath = toPosix(renamed ? secondPath : firstPath);
+      const previousPath = renamed ? toPosix(firstPath) : null;
+      const canonicalPath = canonicalPaths.get(changedPath) ?? changedPath;
+      canonicalPaths.set(changedPath, canonicalPath);
+      if (previousPath) {
+        canonicalPaths.set(previousPath, canonicalPath);
+      }
+
+      if (
+        normalizedPrefix &&
+        canonicalPath !== normalizedPrefix &&
+        !canonicalPath.startsWith(`${normalizedPrefix}/`)
+      ) {
+        continue;
+      }
+      const relativePath = normalizedPrefix
+        ? canonicalPath.slice(normalizedPrefix.length).replace(/^\/+/u, "")
+        : canonicalPath;
+      if (!relativePath) {
+        continue;
+      }
+
+      const committedDate = dateOnly(committedAt);
+      const existing = dates.get(relativePath);
+      if (existing) {
+        existing.createdDate = committedDate;
+      } else {
+        dates.set(relativePath, {
+          createdDate: committedDate,
+          updatedDate: committedDate,
+        });
+      }
+    }
+  }
+
+  return dates;
+}
+
+async function loadGitDateHistory(sourceDir) {
+  let repositoryRoot;
+  let canonicalSourceDir;
+  try {
+    canonicalSourceDir = await realpath(sourceDir);
+    const { stdout: rootOutput } = await execFileAsync(
+      "git",
+      ["-C", canonicalSourceDir, "rev-parse", "--show-toplevel"],
+      { encoding: "utf8" },
+    );
+    repositoryRoot = rootOutput.trim();
+  } catch {
+    return new Map();
+  }
+
+  const sourcePrefix = toPosix(path.relative(repositoryRoot, canonicalSourceDir));
+  if (sourcePrefix === ".." || sourcePrefix.startsWith("../")) {
+    return new Map();
+  }
+  const { stdout: shallowOutput } = await execFileAsync(
+    "git",
+    ["-C", repositoryRoot, "rev-parse", "--is-shallow-repository"],
+    { encoding: "utf8" },
+  );
+  if (shallowOutput.trim() === "true") {
+    throw new Error(
+      "Cannot derive accurate note creation dates from a shallow Git clone. Fetch the full history first.",
+    );
+  }
+
+  const { stdout: historyOutput } = await execFileAsync(
+    "git",
+    [
+      "-C",
+      repositoryRoot,
+      "-c",
+      "core.quotePath=false",
+      "log",
+      "--format=%x1e%cI",
+      "--name-status",
+      "--find-renames",
+      "--",
+      sourcePrefix || ".",
+    ],
+    { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
+  );
+  return parseGitDateHistory(historyOutput, sourcePrefix);
+}
+
+async function resolveFileDates(absolutePath, relativePath, gitDates) {
+  const trackedDates = gitDates.get(relativePath);
+  if (trackedDates) {
+    return trackedDates;
+  }
+
+  const fileStats = await stat(absolutePath);
+  const createdAt = fileStats.birthtimeMs > 0 ? fileStats.birthtime : fileStats.mtime;
+  return {
+    createdDate: dateOnly(createdAt.toISOString()),
+    updatedDate: dateOnly(fileStats.mtime.toISOString()),
+  };
 }
 
 function routeToUrl(route) {
@@ -925,6 +1055,7 @@ async function writeGeneratedNote({
   routeReferences,
   issues,
   localAssets,
+  gitDates,
 }) {
   const rawMarkdown = await readFile(absolutePath, "utf8");
   const extracted = extractTitleAndBody(rawMarkdown);
@@ -941,6 +1072,7 @@ async function writeGeneratedNote({
     routeReferences,
     issues,
   );
+  const fileDates = await resolveFileDates(absolutePath, relativePath, gitDates);
 
   const frontmatter = {
     ...extracted.frontmatter,
@@ -950,6 +1082,8 @@ async function writeGeneratedNote({
         ? extracted.frontmatter.description
         : "",
     legacyPath: buildLegacyPath(relativePath),
+    createdDate: fileDates.createdDate,
+    updatedDate: fileDates.updatedDate,
     language:
       extracted.frontmatter.language === "en" ||
       extracted.frontmatter.language === "zh-CN"
@@ -983,6 +1117,7 @@ export async function migrateContent({
   const routeReferences = buildRouteReferenceMap(migrated);
   const issues = [];
   const localAssets = new Map();
+  const gitDates = await loadGitDateHistory(sourceDir);
 
   await rm(notesDir, { recursive: true, force: true });
   await mkdir(notesDir, { recursive: true });
@@ -996,6 +1131,7 @@ export async function migrateContent({
       routeReferences,
       issues,
       localAssets,
+      gitDates,
     });
   }
 
