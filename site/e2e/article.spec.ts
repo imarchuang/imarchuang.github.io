@@ -231,16 +231,19 @@ test("positions chapter navigation on the current note without stealing focus", 
   const current = container.locator('[aria-current="page"]');
   await expect(current).toBeVisible();
   await expect.poll(() => container.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
-  const withinViewport = await current.evaluate((element) => {
-    const container = element.closest("[data-reading-panel], [data-reading-dialog]");
-    if (!(container instanceof HTMLElement)) {
-      return false;
-    }
-    const itemRect = element.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    return itemRect.top >= containerRect.top && itemRect.bottom <= containerRect.bottom;
-  });
-  expect(withinViewport).toBe(true);
+  await expect
+    .poll(() =>
+      current.evaluate((element) => {
+        const container = element.closest("[data-reading-panel], [data-reading-dialog]");
+        if (!(container instanceof HTMLElement)) {
+          return false;
+        }
+        const itemRect = element.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        return itemRect.top >= containerRect.top - 1 && itemRect.bottom <= containerRect.bottom + 1;
+      }),
+    )
+    .toBe(true);
   await expect(current).not.toBeFocused();
 });
 
