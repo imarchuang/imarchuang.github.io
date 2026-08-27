@@ -58,6 +58,26 @@ function initializeReadingRoot(root: HTMLElement): void {
     triggers(name, mode).forEach((button) => button.setAttribute("aria-expanded", String(open)));
   };
 
+  const revealCurrentSection = (container: HTMLElement): void => {
+    const current = container.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!current) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const containerRect = container.getBoundingClientRect();
+        const currentRect = current.getBoundingClientRect();
+        const visibleTop = Math.max(containerRect.top, 0);
+        const visibleBottom = Math.min(containerRect.bottom, window.innerHeight);
+        const visibleHeight = Math.max(1, visibleBottom - visibleTop);
+        const currentCenter =
+          container.scrollTop + currentRect.top - containerRect.top + currentRect.height / 2;
+        const desiredCenter = visibleTop - containerRect.top + visibleHeight / 2;
+        container.scrollTop = Math.max(0, currentCenter - desiredCenter);
+      });
+    });
+  };
+
   const defaultDesktopState = (name: PanelName): boolean =>
     name === "section" ? window.innerWidth >= 1100 : window.innerWidth >= 1400;
 
@@ -78,6 +98,9 @@ function initializeReadingRoot(root: HTMLElement): void {
     root.setAttribute(`data-${name}-open`, String(open));
     setExpanded(name, "desktop", open);
     desktopClose(name)?.setAttribute("aria-expanded", String(open));
+    if (name === "section" && open) {
+      revealCurrentSection(panel);
+    }
 
     if (persist) {
       storedState[name] = open;
@@ -125,6 +148,9 @@ function initializeReadingRoot(root: HTMLElement): void {
     activeDialog = name;
     dialog.showModal();
     setExpanded(name, "mobile", true);
+    if (name === "section") {
+      revealCurrentSection(dialog);
+    }
   };
 
   root.querySelectorAll<HTMLButtonElement>("[data-reading-open]").forEach((trigger) => {

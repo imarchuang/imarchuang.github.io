@@ -213,6 +213,37 @@ test("adapts persistent sidebars across desktop widths", async ({ page }, testIn
   await expect(toc).toBeHidden();
 });
 
+test("positions chapter navigation on the current note without stealing focus", async ({
+  page,
+}, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  await page.setViewportSize({ width: mobile ? 390 : 1440, height: 500 });
+  await page.goto("/python/mongoengine/");
+
+  const container = mobile
+    ? page.locator('[data-reading-dialog="section"]')
+    : page.locator('[data-reading-panel="section"]');
+  if (mobile) {
+    await page.getByRole("button", { name: "章节", exact: true }).click();
+  }
+  await expect(container).toBeVisible();
+
+  const current = container.locator('[aria-current="page"]');
+  await expect(current).toBeVisible();
+  await expect.poll(() => container.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  const withinViewport = await current.evaluate((element) => {
+    const container = element.closest("[data-reading-panel], [data-reading-dialog]");
+    if (!(container instanceof HTMLElement)) {
+      return false;
+    }
+    const itemRect = element.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    return itemRect.top >= containerRect.top && itemRect.bottom <= containerRect.bottom;
+  });
+  expect(withinViewport).toBe(true);
+  await expect(current).not.toBeFocused();
+});
+
 test("uses the expanded desktop reading lane without horizontal overflow", async ({
   page,
 }, testInfo) => {
