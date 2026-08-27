@@ -110,8 +110,7 @@ test("opens mobile reading dialogs with keyboard and restores focus", async ({ p
   await page.goto("/coding/tree/");
 
   const sectionButton = page.getByRole("button", { name: "章节", exact: true });
-  await sectionButton.focus();
-  await page.keyboard.press("Enter");
+  await sectionButton.press("Enter");
 
   const sectionDialog = page.getByRole("dialog", { name: "章节导航" });
   await expect(sectionDialog).toBeVisible();
@@ -120,8 +119,7 @@ test("opens mobile reading dialogs with keyboard and restores focus", async ({ p
   await expect(sectionButton).toBeFocused();
 
   const tocButton = page.getByRole("button", { name: "目录", exact: true });
-  await tocButton.focus();
-  await page.keyboard.press("Enter");
+  await tocButton.press("Enter");
   const tocDialog = page.getByRole("dialog", { name: "文章目录" });
   await expect(tocDialog).toBeVisible();
   await page.keyboard.press("Escape");
@@ -277,15 +275,18 @@ test("docks the article table of contents without page overflow", async ({ page 
   await expect(panel).toBeVisible();
   await expect(open).toHaveAttribute("aria-expanded", "true");
   await expect(panel.getByRole("link", { name: "我告诉你遍历回溯分治动规" })).toBeVisible();
+  await expect
+    .poll(async () => {
+      const articleBox = await article.boundingBox();
+      const tocBox = await panel.boundingBox();
+      return (tocBox?.x ?? 0) + 1 > (articleBox?.x ?? 0) + (articleBox?.width ?? 0);
+    })
+    .toBe(true);
 
   const articleBox = await article.boundingBox();
   const sectionBox = await page.locator('[data-reading-panel="section"]').boundingBox();
-  const tocBox = await panel.boundingBox();
   expect(articleBox?.width).toBeGreaterThanOrEqual(600);
   expect(sectionBox?.x ?? 0).toBeLessThan(articleBox?.x ?? 0);
-  expect((tocBox?.x ?? 0) + 1).toBeGreaterThan(
-    (articleBox?.x ?? 0) + (articleBox?.width ?? 0),
-  );
   const dimensions = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     viewportWidth: window.innerWidth,
