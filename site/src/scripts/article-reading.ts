@@ -23,6 +23,7 @@ function writeStored(name: PanelName, open: boolean): void {
 function initializeReadingRoot(root: HTMLElement): void {
   let activeDialog: PanelName | null = null;
   let pendingDialogFocus: { name: PanelName; mode: PanelMode | null; restore: boolean } | null = null;
+  let lastFocusedPanel: PanelName | null = null;
   const mobileQuery = window.matchMedia("(max-width: 900px)");
   const storedState: Record<PanelName, boolean | null> = {
     section: readStored("section"),
@@ -53,6 +54,26 @@ function initializeReadingRoot(root: HTMLElement): void {
     const target = [...preferred, ...fallback].find((button) => isVisible(button));
     target?.focus();
   };
+
+  const panelNameFor = (target: EventTarget | null): PanelName | null => {
+    if (!(target instanceof Element)) {
+      return null;
+    }
+    const container = target.closest<HTMLElement>(
+      "[data-reading-open], [data-reading-close], [data-reading-panel], [data-reading-rail], [data-reading-dialog]",
+    );
+    const name =
+      container?.dataset.readingOpen ??
+      container?.dataset.readingClose ??
+      container?.dataset.readingPanel ??
+      container?.dataset.readingRail ??
+      container?.dataset.readingDialog;
+    return name === "section" || name === "toc" ? name : null;
+  };
+
+  root.addEventListener("focusin", (event) => {
+    lastFocusedPanel = panelNameFor(event.target);
+  });
 
   const setExpanded = (name: PanelName, mode: PanelMode, open: boolean): void => {
     triggers(name, mode).forEach((button) => button.setAttribute("aria-expanded", String(open)));
@@ -229,12 +250,9 @@ function initializeReadingRoot(root: HTMLElement): void {
       closeDialog(closingDialog, { restoreFocus: false, focusMode: null });
     }
     if (mobileQuery.matches) {
-      const focusedContainer = (document.activeElement as Element | null)?.closest(
-        "[data-reading-panel], [data-reading-rail]",
-      );
       const name =
-        focusedContainer?.getAttribute("data-reading-panel") ??
-        focusedContainer?.getAttribute("data-reading-rail");
+        panelNameFor(document.activeElement) ??
+        (document.activeElement === document.body ? lastFocusedPanel : null);
       if (name === "section" || name === "toc") {
         focusTrigger(name, "mobile");
       }
