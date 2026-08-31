@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#173a31">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>新派奥数课件｜四年级提高</title>
+  <style>
+    :root{--ink:#17231f;--board:#173a31;--board2:#214a3e;--paper:#f4eedf;--paper2:#e8ddc4;--chalk:#f7f1dc;--red:#c64b35;--gold:#d5a63d;--blue:#467a87;--muted:#708078}
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--ink);color:var(--ink)}
+    body{font-family:"Songti SC","STSong","Noto Serif SC",serif}
+    button{font:inherit}
+    .deck{width:100%;height:100%;position:relative}
+    .slide{position:absolute;inset:0;padding:clamp(26px,5vw,76px) clamp(24px,7vw,110px) clamp(58px,7vh,90px);display:grid;align-content:center;opacity:0;transform:translateX(3%);pointer-events:none;transition:.42s cubic-bezier(.22,.8,.25,1);overflow:auto;background:
+      linear-gradient(90deg,rgba(23,35,31,.035) 1px,transparent 1px),
+      linear-gradient(rgba(23,35,31,.035) 1px,transparent 1px),
+      radial-gradient(circle at 20% 10%,#fffaf0 0,var(--paper) 55%,var(--paper2) 100%);background-size:24px 24px,24px 24px,100% 100%}
+    .slide.active{opacity:1;transform:none;pointer-events:auto;z-index:2}
+    .slide.exit{opacity:0;transform:translateX(-3%)}
+    .slide.board{color:var(--chalk);background:
+      radial-gradient(circle at 70% 20%,rgba(255,255,255,.06),transparent 34%),
+      repeating-linear-gradient(1deg,rgba(255,255,255,.018) 0 1px,transparent 1px 5px),
+      linear-gradient(135deg,var(--board),var(--board2))}
+    .slide.board:after{content:"";position:absolute;inset:18px;border:1px solid rgba(247,241,220,.18);pointer-events:none}
+    .kicker{font:700 12px/1.2 "PingFang SC",sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--red);margin-bottom:14px}
+    .board .kicker{color:#f0c766}
+    h1,h2,h3,p{margin-top:0}
+    h1{font-size:clamp(48px,10vw,130px);line-height:.92;letter-spacing:-.06em;margin-bottom:22px}
+    h2{font-size:clamp(32px,5.2vw,72px);line-height:1.05;letter-spacing:-.045em;margin-bottom:24px}
+    h3{font-size:clamp(18px,2vw,27px);margin-bottom:10px}
+    p,li{font-size:clamp(15px,1.6vw,22px);line-height:1.65}
+    .lead{font-size:clamp(19px,2.3vw,32px);max-width:900px;line-height:1.5}
+    .stamp{display:inline-block;border:2px solid var(--red);color:var(--red);padding:8px 13px;transform:rotate(-3deg);font:800 13px "Kaiti SC",serif;letter-spacing:.12em}
+    .board .stamp{border-color:#f0c766;color:#f0c766}
+    .hero-grid,.two{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(24px,5vw,72px);align-items:center}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .four{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+    .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .card{background:rgba(255,255,255,.5);border:1px solid rgba(23,35,31,.14);border-radius:3px;padding:18px;box-shadow:4px 5px 0 rgba(23,35,31,.08)}
+    .board .card{background:rgba(255,255,255,.055);border-color:rgba(247,241,220,.22);box-shadow:4px 5px 0 rgba(0,0,0,.16)}
+    .card b{display:block;font-size:clamp(17px,1.7vw,24px);margin-bottom:6px}
+    .card p,.card li{font-size:clamp(12px,1.15vw,16px);line-height:1.45;margin:0}
+    .lesson-card{min-height:122px;position:relative;padding:16px 14px 12px}
+    .lesson-card .num{font:900 35px/1 "Baskerville",serif;color:rgba(198,75,53,.9);position:absolute;right:10px;top:8px}
+    .lesson-card b{padding-right:26px;font-size:15px}
+    .lesson-card em{font:normal 12px/1.4 "PingFang SC",sans-serif;color:var(--muted)}
+    .route{display:grid;grid-template-columns:repeat(4,1fr);gap:0;align-items:stretch}
+    .phase{padding:24px 19px;min-height:280px;border-top:6px solid var(--red);background:rgba(255,255,255,.48)}
+    .phase:nth-child(2){border-color:var(--gold)}.phase:nth-child(3){border-color:var(--blue)}.phase:nth-child(4){border-color:var(--board)}
+    .phase .big{font:900 clamp(50px,7vw,100px)/.8 "Baskerville",serif;opacity:.16}
+    .phase ul{padding-left:1em}
+    .phase li{font-size:14px}
+    .timeline{display:flex;gap:8px;align-items:center;margin:25px 0}
+    .timeline span{height:8px;flex:1;background:var(--red)}.timeline span:nth-child(2){background:var(--gold)}.timeline span:nth-child(3){background:var(--blue)}.timeline span:nth-child(4){background:var(--board)}
+    .formula{font:700 clamp(24px,3.2vw,48px)/1.35 "Kaiti SC","STKaiti",serif;color:var(--red);padding:18px 22px;border-left:5px solid var(--red);background:rgba(255,255,255,.45);margin:14px 0}
+    .board .formula{color:#f7dc91;border-color:#f0c766;background:rgba(0,0,0,.12)}
+    .example{border-top:1px solid currentColor;padding-top:13px}
+    .example .tag{font:800 12px "PingFang SC",sans-serif;color:var(--red);letter-spacing:.12em}
+    .board .example .tag{color:#f0c766}
+    .mini{font-size:clamp(12px,1.15vw,16px);line-height:1.48}
+    .answer{filter:blur(7px);opacity:.38;transition:.2s;cursor:pointer;user-select:none}
+    .answer:hover,.answer.revealed{filter:none;opacity:1;user-select:auto}
+    .tree{font-family:"Kaiti SC","STKaiti",serif;font-size:clamp(17px,2vw,26px);line-height:1.75;padding:22px;border:1px dashed currentColor}
+    .diagram{width:100%;max-height:48vh}
+    .chalkline{stroke:#f7f1dc;stroke-width:4;fill:none;stroke-linecap:round}
+    .inkline{stroke:var(--ink);stroke-width:3;fill:none;stroke-linecap:round}
+    .quiz{counter-reset:q;display:grid;gap:12px}
+    .quiz>div{display:grid;grid-template-columns:34px 1fr;gap:8px;align-items:start}
+    .quiz>div:before{counter-increment:q;content:counter(q);width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--red);color:white;font:700 14px sans-serif}
+    .board .quiz>div:before{background:#f0c766;color:var(--board)}
+    .footer{position:fixed;z-index:10;left:26px;right:26px;bottom:16px;display:flex;align-items:center;gap:16px;color:var(--chalk);font:600 12px "PingFang SC",sans-serif;mix-blend-mode:difference}
+    .progress{height:2px;background:rgba(255,255,255,.35);flex:1}.progress i{height:100%;display:block;background:white;width:0;transition:.35s}
+    .nav{display:flex;gap:8px}.nav button{width:36px;height:32px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;border-radius:50%;font-size:16px}
+    .nav button:hover{background:currentColor;color:#111}
+    .hint{position:fixed;right:30px;top:22px;z-index:12;color:rgba(255,255,255,.75);font:11px "PingFang SC",sans-serif;mix-blend-mode:difference}
+    .dots{position:fixed;z-index:12;right:12px;top:50%;transform:translateY(-50%);display:grid;gap:5px}
+    .dots button{width:5px;height:5px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.35);mix-blend-mode:difference}.dots button.active{height:18px;border-radius:6px;background:white}
+    .section-no{position:absolute;right:6vw;bottom:9vh;font:900 clamp(80px,16vw,220px)/.7 "Baskerville",serif;opacity:.06;pointer-events:none}
+    .teacher{background:#fff3c9;border:1px solid #d8b864;padding:10px 14px;font:14px/1.45 "Kaiti SC",serif;transform:rotate(-.5deg)}
+    .board .teacher{background:rgba(240,199,102,.12);border-color:rgba(240,199,102,.5)}
+    @media(max-width:800px){
+      .slide{align-content:start;padding:64px 22px 72px}
+      .hero-grid,.two,.three,.four,.route{grid-template-columns:1fr}
+      .cards{grid-template-columns:repeat(2,1fr)}
+      .route{gap:8px}.phase{min-height:0;padding:13px}.phase .big{font-size:42px;float:right}
+      .card{padding:13px}.lesson-card{min-height:104px}
+      .diagram{max-height:36vh}.hint{display:none}.dots{display:none}
+    }
+    @media(prefers-reduced-motion:reduce){.slide{transition:none}}
+  </style>
+</head>
+<body>
+<main class="deck" id="deck">
+  <section class="slide board active">
+    <div class="hero-grid">
+      <div>
+        <div class="kicker">NEW STYLE · MATH OLYMPIAD</div>
+        <h1>新派<br>奥数</h1>
+        <p class="lead">四年级提高 · 兼顾五年级衔接<br>不是背“套路”，而是学会画图、解释与检验。</p>
+        <span class="stamp">原创 41 讲课程</span>
+      </div>
+      <svg viewBox="0 0 520 420" class="diagram" aria-label="线段模型装饰图">
+        <path class="chalkline" d="M55 105H460M55 105v-18M460 105v-18M55 215H355M55 215v-18M355 215v-18"/>
+        <path class="chalkline" d="M355 215h105M355 197v36M460 197v36"/>
+        <text x="216" y="78" fill="#f7f1dc" font-size="28">总量</text><text x="382" y="260" fill="#f0c766" font-size="24">差</text>
+        <circle cx="105" cy="335" r="42" fill="none" stroke="#f7f1dc" stroke-width="3"/>
+        <circle cx="158" cy="335" r="42" fill="none" stroke="#f0c766" stroke-width="3"/>
+        <text x="252" y="350" fill="#f7f1dc" font-size="34">图 → 式 → 验</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">使用说明 · 80—100 分钟</div><h2>一堂课，走完 7 个模块</h2>
+    <div class="four">
+      <div class="card"><b>01 故事</b><p>5 分钟<br>把问题放进真实情境</p></div>
+      <div class="card"><b>02 知识树</b><p>5 分钟<br>先看“今天学什么”</p></div>
+      <div class="card"><b>03 小热身</b><p>5 分钟<br>唤醒旧经验</p></div>
+      <div class="card"><b>04 一例一练</b><p>45 分钟<br>4 个模型，边讲边做</p></div>
+      <div class="card"><b>05 作业</b><p>10 分钟<br>基础＋变式</p></div>
+      <div class="card"><b>06 选做</b><p>10 分钟<br>挑战、讨论、讲题</p></div>
+      <div class="card"><b>07 课堂内外</b><p>10 分钟<br>反思、迁移、检验</p></div>
+      <div class="card teacher"><b>教师口令</b><p>先画图或列表；先说思路，再写答案；一题至少检验一次。</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">课程全景</div><h2>41 讲，是四次能力跃迁</h2>
+    <div class="route">
+      <div class="phase"><div class="big">01</div><h3>模型与计算</h3><p>第 1—10 讲</p><ul><li>线段模型</li><li>基础行程</li><li>计算策略</li></ul></div>
+      <div class="phase"><div class="big">02</div><h3>行程与代数</h3><p>第 11—20 讲</p><ul><li>周期运动</li><li>方程表达</li><li>数列、小数</li></ul></div>
+      <div class="phase"><div class="big">03</div><h3>几何与整数</h3><p>第 21—30 讲</p><ul><li>割补转化</li><li>整数性质</li><li>数字推理</li></ul></div>
+      <div class="phase"><div class="big">04</div><h3>组合与策略</h3><p>第 31—41 讲</p><ul><li>计数逻辑</li><li>统筹最值</li><li>复杂运动</li></ul></div>
+    </div>
+    <div class="timeline"><span></span><span></span><span></span><span></span></div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">完整地图 · 第一阶段</div><h2>01—10｜先把问题“画出来”</h2>
+    <div class="cards">
+      <div class="card lesson-card"><i class="num">01</i><b>较难的和差倍问题</b><em>线段图 · 先还原</em></div>
+      <div class="card lesson-card"><i class="num">02</i><b>包含与排除</b><em>集合圈 · 不重不漏</em></div>
+      <div class="card lesson-card"><i class="num">03</i><b>年龄问题</b><em>年龄差不变</em></div>
+      <div class="card lesson-card"><i class="num">04</i><b>相遇问题初步</b><em>速度和</em></div>
+      <div class="card lesson-card"><i class="num">05</i><b>追及问题初步</b><em>速度差</em></div>
+      <div class="card lesson-card"><i class="num">06</i><b>行程问题综合</b><em>事件分段</em></div>
+      <div class="card lesson-card"><i class="num">07</i><b>特殊乘法</b><em>拆分 · 分配律</em></div>
+      <div class="card lesson-card"><i class="num">08</i><b>等差数列</b><em>通项 · 配对</em></div>
+      <div class="card lesson-card"><i class="num">09</i><b>四则混合运算</b><em>顺序 · 运算律</em></div>
+      <div class="card lesson-card"><i class="num">10</i><b>公式类计算</b><em>整体 · 逆向</em></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">完整地图 · 第二阶段</div><h2>11—20｜把图翻译成“关系式”</h2>
+    <div class="cards">
+      <div class="card lesson-card"><i class="num">11</i><b>流水问题</b><em>船速 ± 水速</em></div><div class="card lesson-card"><i class="num">12</i><b>环形跑道</b><em>一圈 · 周期</em></div>
+      <div class="card lesson-card"><i class="num">13</i><b>火车过桥</b><em>车长＋桥长</em></div><div class="card lesson-card"><i class="num">14</i><b>解方程</b><em>等式性质 · 检验</em></div>
+      <div class="card lesson-card"><i class="num">15</i><b>高斯记号</b><em>数轴 · 区间</em></div><div class="card lesson-card"><i class="num">16</i><b>数列与数表</b><em>差分 · 定位</em></div>
+      <div class="card lesson-card"><i class="num">17</i><b>定义新运算</b><em>规则翻译</em></div><div class="card lesson-card"><i class="num">18</i><b>平均数</b><em>移多补少</em></div>
+      <div class="card lesson-card"><i class="num">19</i><b>方程应用题</b><em>设 · 列 · 解 · 验</em></div><div class="card lesson-card"><i class="num">20</i><b>小数运算</b><em>对齐 · 估算</em></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">完整地图 · 第三阶段</div><h2>21—30｜看见图形与整数的结构</h2>
+    <div class="cards">
+      <div class="card lesson-card"><i class="num">21</i><b>角度初识</b><em>量角 · 旋转</em></div><div class="card lesson-card"><i class="num">22</i><b>图形计数</b><em>分类 · 固定端点</em></div>
+      <div class="card lesson-card"><i class="num">23</i><b>三角形问题</b><em>内角和 · 边角</em></div><div class="card lesson-card"><i class="num">24</i><b>平行四边形</b><em>底高 · 割补</em></div>
+      <div class="card lesson-card"><i class="num">25</i><b>梯形</b><em>拼合 · 面积</em></div><div class="card lesson-card"><i class="num">26</i><b>一半模型</b><em>同底等高</em></div>
+      <div class="card lesson-card"><i class="num">27</i><b>质数与合数</b><em>分解 · 配对</em></div><div class="card lesson-card"><i class="num">28</i><b>整除特征</b><em>筛选 · 验证</em></div>
+      <div class="card lesson-card"><i class="num">29</i><b>数字谜一</b><em>位值 · 进退位</em></div><div class="card lesson-card"><i class="num">30</i><b>数字谜二</b><em>分支 · 唯一性</em></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">完整地图 · 第四阶段</div><h2>31—41｜从“找到答案”到“证明最好”</h2>
+    <div class="cards">
+      <div class="card lesson-card"><i class="num">31</i><b>加乘原理</b><em>分类加 · 分步乘</em></div><div class="card lesson-card"><i class="num">32</i><b>数列与图形规律</b><em>周期 · 递推</em></div>
+      <div class="card lesson-card"><i class="num">33</i><b>逻辑推理</b><em>表格 · 反证</em></div><div class="card lesson-card"><i class="num">34</i><b>消去问题</b><em>对齐 · 消元</em></div>
+      <div class="card lesson-card"><i class="num">35</i><b>小数应用题</b><em>单位 · 精度</em></div><div class="card lesson-card"><i class="num">36</i><b>最值问题</b><em>极端 · 证明</em></div>
+      <div class="card lesson-card"><i class="num">37</i><b>统筹与规划</b><em>流程 · 关键路径</em></div><div class="card lesson-card"><i class="num">38</i><b>比赛中的数学</b><em>总分守恒</em></div>
+      <div class="card lesson-card"><i class="num">39</i><b>几何剪拼</b><em>平移 · 旋转</em></div><div class="card lesson-card"><i class="num">40</i><b>游戏策略</b><em>倒推 · 不变量</em></div>
+      <div class="card lesson-card"><i class="num">41</i><b>多人多次相遇</b><em>时间线 · 最小公倍数</em></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">LESSON 01 · 开篇故事</div><div class="section-no">01</div>
+    <div class="two"><div><h2>失去标签的<br>两只箱子</h2><p class="lead">两箱共有 <strong>86</strong> 块积木，甲箱比乙箱多 <strong>18</strong> 块。不开箱逐块数，能找回每箱数量吗？</p><span class="stamp">任务：把文字翻译成线段</span></div>
+      <svg viewBox="0 0 600 390" class="diagram"><path class="chalkline" d="M55 110H525M55 110v-18M525 110v-18M55 230H400M55 230v-18M400 230v-18"/><path d="M400 230h125" stroke="#f0c766" stroke-width="8"/><text x="255" y="75" fill="#f7f1dc" font-size="30">甲？</text><text x="225" y="285" fill="#f7f1dc" font-size="30">乙？</text><text x="430" y="275" fill="#f0c766" font-size="28">18</text><text x="55" y="350" fill="#f7f1dc" font-size="26">两条合起来：86</text></svg>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 01 · 知识树与热身</div><h2>先认模型，再选动作</h2>
+    <div class="two">
+      <div class="tree">和差倍问题<br>├─ 和差：总和 ＋ 相差<br>├─ 和倍：总和 ＋ 倍数<br>├─ 差倍：相差 ＋ 倍数<br>└─ 复合：先还原变化<br>　 ├ 增减后相等<br>　 └ 增减后成倍</div>
+      <div><div class="quiz"><div><p>和为 40，差为 8。去掉“多出的 8”后，剩下平均分成几份？</p></div><div><p>红球是蓝球的 3 倍。合起来是几份？</p></div><div><p>甲比乙多 24，甲是乙的 4 倍。24 对应几份？</p></div></div><p class="answer teacher" onclick="this.classList.add('revealed')">点按揭晓：2 份；4 份；3 份。</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 01 · 例 1 / 练 1</div><h2>和差：先拿走“多出的”</h2>
+    <div class="two">
+      <div><div class="formula">小数＝（和－差）÷ 2<br>大数＝（和＋差）÷ 2</div><div class="example"><span class="tag">例 1</span><p>两箱积木共 86 块，甲比乙多 18 块。各有多少？</p><p><b>乙：</b>（86－18）÷2＝34<br><b>甲：</b>34＋18＝52</p><p class="mini">检验：52＋34＝86，52－34＝18。</p></div></div>
+      <div class="card"><h3>随堂练 1</h3><p>两条彩带共长 124 厘米，长彩带比短彩带长 36 厘米。各长多少？</p><p class="answer" onclick="this.classList.add('revealed')"><b>答案：</b>长 80 厘米，短 44 厘米。</p></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">LESSON 01 · 例 2 / 练 2</div><h2>和倍：把小数看作 1 份</h2>
+    <div class="two"><div><div class="formula">总份数＝倍数＋1<br>1 份量＝总数÷总份数</div><div class="example"><span class="tag">例 2</span><p>144 枚徽章中，星形是圆形的 3 倍。</p><p>圆形：144÷4＝<b>36</b> 枚<br>星形：36×3＝<b>108</b> 枚</p></div></div>
+      <div><svg viewBox="0 0 540 260" class="diagram"><g fill="#f0c766"><rect x="40" y="45" width="95" height="48"/><rect x="145" y="45" width="95" height="48"/><rect x="250" y="45" width="95" height="48"/></g><rect x="40" y="145" width="95" height="48" fill="#f7f1dc"/><text x="370" y="80" fill="#f0c766" font-size="26">星形 3份</text><text x="155" y="180" fill="#f7f1dc" font-size="26">圆形 1份</text></svg><div class="card"><h3>随堂练 2</h3><p>大、小收纳盒共 175 个，大盒是小盒的 4 倍。各多少？</p><p class="answer" onclick="this.classList.add('revealed')">大盒 140 个，小盒 35 个。</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 01 · 例 3 / 练 3</div><h2>差倍：相差的是“几份”？</h2>
+    <div class="two"><div><div class="formula">相差份数＝倍数－1<br>1 份量＝差÷相差份数</div><div class="example"><span class="tag">例 3</span><p>合唱队是器乐队的 5 倍，多 72 人。</p><p>相差 4 份 → 器乐队 72÷4＝<b>18</b> 人<br>合唱队 18×5＝<b>90</b> 人</p></div></div>
+      <div class="card"><h3>随堂练 3</h3><p>蓝色笔是绿色笔的 4 倍，蓝色比绿色多 84 支。各多少？</p><p class="answer" onclick="this.classList.add('revealed')">蓝色 112 支，绿色 28 支。</p><p class="teacher">追问：84 为什么不是 4 份？</p></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">LESSON 01 · 例 4 / 练 4</div><h2>转移：总量不变，差变两倍</h2>
+    <div class="two"><div><div class="example"><span class="tag">例 4</span><p>红、蓝两筐共 156 张卡片。红筐拿 12 张放入蓝筐后，两筐相等。原来各多少？</p><p>转移后各有：156÷2＝<b>78</b><br>红原有：78＋12＝<b>90</b><br>蓝原有：78－12＝<b>66</b></p></div><div class="formula">原来的差＝12 × 2＝24</div></div>
+      <div class="card"><h3>随堂练 4</h3><p>两箱零件共 210 个。从甲移 15 个到乙后相等。原来各多少？</p><p class="answer" onclick="this.classList.add('revealed')">甲 120 个，乙 90 个。</p><p class="teacher">关键三问：什么不变？谁增谁减？原来的差是多少？</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 01 · 课后作业</div><h2>从基本模型，到“先还原”</h2>
+    <div class="three">
+      <div class="card"><h3>基础巩固</h3><p class="mini">① 两袋种子共 168 粒，相差 32 粒。<br>② 两本书共 240 页，故事书是科普书的 3 倍。<br>③ 梨树是桃树 6 倍，多 125 棵。</p></div>
+      <div class="card"><h3>变式提升</h3><p class="mini">④ 两仓共 460 千克。甲运出 30 后仍比乙多 40。<br>⑤ 两班共收 186 个瓶。一班再收 8、二班少收 4 后，一班多 30。<br>⑥ 两数和 132。甲减 12、乙增 6 后，甲是乙 2 倍。</p></div>
+      <div class="card"><h3>选做挑战</h3><p class="mini">两筐共 264 个球。先从甲拿出 18 个，再把乙中 12 个放入甲，此时甲是乙的 2 倍。原来各多少？</p><p class="teacher">提示：最终总数只减少了 18。</p></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">LESSON 01 · 答案与反思</div><h2>答案不是终点，检验才是</h2>
+    <div class="two"><div class="quiz"><div><p>100 粒、68 粒</p></div><div><p>故事书 180 页、科普书 60 页</p></div><div><p>梨树 150 棵、桃树 25 棵</p></div><div><p>甲 265 千克、乙 195 千克</p></div><div><p>一班 102 个、二班 84 个</p></div><div><p>甲 96、乙 36</p></div></div>
+      <div><div class="formula">选做：甲 170 个，乙 94 个</div><p>变化后总数 246；乙 246÷3＝82，甲 164；再反向还原。</p><div class="teacher">一分钟反思：看到“转移”，为什么差会改变两倍？你能编一道“变化后成 3 倍”的题吗？</div></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">LESSON 02 · 开篇故事</div><div class="section-no">02</div>
+    <div class="two"><div><h2>重复的<br>报名表</h2><p class="lead">天文观察 <strong>25</strong> 人，植物拓印 <strong>19</strong> 人，两项都报 <strong>8</strong> 人。为什么参加人数不是 44？</p><span class="stamp">任务：做到不重不漏</span></div>
+      <svg viewBox="0 0 560 420" class="diagram" aria-label="两个集合的韦恩图"><circle cx="220" cy="210" r="135" fill="rgba(70,122,135,.28)" stroke="#f7f1dc" stroke-width="4"/><circle cx="340" cy="210" r="135" fill="rgba(240,199,102,.22)" stroke="#f0c766" stroke-width="4"/><text x="130" y="105" fill="#f7f1dc" font-size="26">天文 25</text><text x="338" y="105" fill="#f0c766" font-size="26">拓印 19</text><text x="266" y="224" fill="#fff" font-size="42">8</text><path d="M278 250v70" stroke="#fff" stroke-width="2"/><text x="218" y="355" fill="#fff" font-size="23">被数了两次</text></svg>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 02 · 知识树与热身</div><h2>交叉的地方，藏着“重复”</h2>
+    <div class="two"><div class="tree">包含与排除<br>├─ 两类<br>│　├ 至少一类 / 两类都参加<br>│　└ 只参加一类 / 都不参加<br>└─ 三类<br>　　├ 两两交叉<br>　　└ 从最中心向外填写</div>
+      <div><div class="formula">|A∪B|＝|A|＋|B|－|A∩B|</div><div class="quiz"><div><p>一个人两项都会，相加时被数几次？</p></div><div><p>全班 40 人，至少参加一项 33 人，都不参加几人？</p></div><div><p>18 人爱苹果、15 人爱梨、6 人都爱。至少爱一种多少人？</p></div></div><p class="answer teacher" onclick="this.classList.add('revealed')">2 次；7 人；27 人。</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 02 · 例 1 / 练 1</div><h2>“至少一种”＝相加，再去重</h2>
+    <div class="two"><div><div class="example"><span class="tag">例 1</span><p>42 人体验社团。国际象棋 25 人，书法 19 人，两项都选 8 人。</p><div class="formula">至少一项：25＋19－8＝36</div><p>两项都没选：42－36＝<b>6</b> 人</p></div></div>
+      <div class="card"><h3>随堂练 1</h3><p>50 人中，31 人喜欢足球，24 人喜欢游泳，12 人都喜欢。至少喜欢一项？都不喜欢？</p><p class="answer" onclick="this.classList.add('revealed')">至少一项 43 人；都不喜欢 7 人。</p><p class="teacher">圈外人数＝总人数－圈内人数。</p></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">LESSON 02 · 例 2 / 练 2</div><h2>从圈外，反推交叉部分</h2>
+    <div class="two"><div><div class="example"><span class="tag">例 2</span><p>60 人中，科学营 29 人，艺术营 34 人，7 人都没报名。两项都报多少人？</p><p>至少一项：60－7＝<b>53</b><br>两项都报：29＋34－53＝<b>10</b></p></div><div class="formula">交集＝A＋B－并集</div></div>
+      <div class="card"><h3>随堂练 2</h3><p>72 人中，38 人参加合唱，35 人参加器乐，9 人都没参加。两项都参加多少人？</p><p class="answer" onclick="this.classList.add('revealed')">至少一项 63 人；两项都参加 10 人。</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 02 · 三类容斥视觉</div><h2>先填中心，再向外</h2>
+    <div class="two">
+      <svg viewBox="0 0 560 430" class="diagram" aria-label="三个集合的韦恩图"><circle cx="220" cy="190" r="135" fill="rgba(70,122,135,.28)" stroke="#467a87" stroke-width="4"/><circle cx="340" cy="190" r="135" fill="rgba(213,166,61,.25)" stroke="#d5a63d" stroke-width="4"/><circle cx="280" cy="292" r="135" fill="rgba(198,75,53,.18)" stroke="#c64b35" stroke-width="4"/><text x="150" y="70" font-size="25">A</text><text x="395" y="70" font-size="25">B</text><text x="270" y="420" font-size="25">C</text><text x="270" y="242" font-size="42" font-weight="bold">＋</text></svg>
+      <div><div class="formula mini">|A∪B∪C|<br>＝A＋B＋C<br>－AB－AC－BC<br>＋ABC</div><p>中心被加了 3 次，又被减了 3 次，变成 0 次；所以最后必须<strong>加回 1 次</strong>。</p><p class="teacher">填写顺序：三类共同 → 只属于两类 → 只属于一类 → 圈外。</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 02 · 例 3 / 练 3</div><h2>三类容斥：加、减、再加回</h2>
+    <div class="two"><div><div class="example"><span class="tag">例 3</span><p class="mini">80 人中，喜欢科幻、历史、自然的有 44、37、30 人；两两都喜欢有 18、14、11 人；三类都喜欢 6 人。</p><div class="formula mini">44＋37＋30－18－14－11＋6＝74</div><p>至少一类 74 人；都不喜欢 <b>6</b> 人。</p></div></div>
+      <div class="card"><h3>随堂练 3</h3><p class="mini">100 人中，喜欢跑步、骑车、球类有 56、48、35 人；两两有 24、20、16 人；三类都有 9 人。求至少一类和都不喜欢。</p><p class="answer" onclick="this.classList.add('revealed')">至少一类 88 人；都不喜欢 12 人。</p></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">LESSON 02 · 例 4 / 练 4</div><h2>“只参加一种”要拆开算</h2>
+    <div class="two"><div><div class="example"><span class="tag">例 4</span><p>68 人中，机器人课 40 人，木工课 35 人，两门都选 17 人。</p><p>只机器人：40－17＝23<br>只木工：35－17＝18<br><b>只选一门：23＋18＝41</b><br>两门都不选：68－(40＋35－17)＝10</p></div></div>
+      <div class="card"><h3>随堂练 4</h3><p>90 人中，52 人会围棋，46 人会象棋，23 人两种都会。只会一种？两种都不会？</p><p class="answer" onclick="this.classList.add('revealed')">只会一种 52 人；两种都不会 15 人。</p><p class="teacher">“只会一种”不包括交叉区域。</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">LESSON 02 · 课后作业</div><h2>圈图里，每一块都有名字</h2>
+    <div class="three">
+      <div class="card"><h3>基础巩固</h3><p class="mini">① 45 人，读甲书 28、乙书 21、两本都读 9。求至少一本、都没读。<br>② 64 人，跑步队 36、跳绳队 33，8 人都没参加。求两队都参加。<br>③ 75 人，拼图 43、数独 38、两者都爱 20。求只爱一种。</p></div>
+      <div class="card"><h3>变式提升</h3><p class="mini">④ 人人至少会一种乐器：口琴 26、尤克里里 22、两者都会 11。全班多少？<br>⑤ 120 人参加三项科技体验：62、54、49；两两 28、23、21；三项 12。求至少一项与都没参加。</p></div>
+      <div class="card"><h3>选做挑战</h3><p class="mini">90 人选三门校本课：48、42、36；两两 20、17、15；三门都选 8。求恰好两门、恰好一门、都不选。</p><p class="teacher">从正中央的 8 开始填。</p></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">LESSON 02 · 答案与反思</div><h2>每个对象，恰好数一次</h2>
+    <div class="two"><div class="quiz"><div><p>至少一本 40；都没读 5</p></div><div><p>两队都参加 13</p></div><div><p>只喜欢一种 41</p></div><div><p>全班 37</p></div><div><p>至少一项 105；都没参加 15</p></div></div>
+      <div><div class="formula">选做：恰好两门 28<br>恰好一门 46<br>都不选 8</div><p class="mini">只选两门：12＋9＋7＝28；只选一门：19＋15＋12＝46；圈内共 82。</p><div class="teacher">一分钟反思：两类交集为何只减一次？三类中心为何最后加回？</div></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">阶段测试一 · 第 1—10 讲</div><h2>测答案，更测“你怎么知道”</h2>
+    <div class="four">
+      <div class="card"><b>A 模型辨识 · 12</b><p>4 题｜和、差、速度和、速度差</p></div>
+      <div class="card"><b>B 灵活计算 · 25</b><p>5 题｜特殊乘法、运算律、整体代入</p></div>
+      <div class="card"><b>C 数列规律 · 12</b><p>2 题｜项数、末项、求和</p></div>
+      <div class="card"><b>D 基础应用 · 24</b><p>4 题｜和差倍、年龄、相遇、追及</p></div>
+      <div class="card"><b>E 综合建模 · 17</b><p>2 题｜两种以上模型组合</p></div>
+      <div class="card"><b>F 开放挑战 · 10</b><p>1 题｜多解法、证明或反向编题</p></div>
+      <div class="card"><b>规格</b><p>90 分钟｜18 题｜100 分</p></div>
+      <div class="card teacher"><b>四维评分</b><p>模型 30% · 表达 30% · 计算 25% · 检验 15%</p></div>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">阶段测试一 · 错因诊断</div><h2>错题不是红叉，是路线图</h2>
+    <div class="four">
+      <div class="card"><b>M · 模型</b><p>不知道使用哪种关系<br>→ 重画线段、集合圈、运动图</p></div>
+      <div class="card"><b>R · 读题</b><p>遗漏时间、方向、重复部分<br>→ 圈关键词，逐句标图</p></div>
+      <div class="card"><b>C · 计算</b><p>方法对，运算失误<br>→ 限时计算＋估算</p></div>
+      <div class="card"><b>E / V</b><p>说不清过程 / 没有检验<br>→ 学生讲题，代回条件</p></div>
+    </div>
+    <div class="formula">原则：同一模型连续两题正确，再进入跨模型综合题。</div>
+  </section>
+
+  <section class="slide">
+    <div class="kicker">下一站</div><h2>从 2 个模型，走向 41 种视角</h2>
+    <div class="hero-grid"><div><p class="lead">下一讲：<strong>年龄问题</strong><br>不变的是年龄差，变化的是倍数。</p><p>再往后，我们会让线段动起来，进入相遇、追及与复杂行程；让图形剪开重组；让策略从终点倒推回来。</p><span class="stamp">先画 · 再说 · 后算 · 必验</span></div>
+      <svg viewBox="0 0 520 380" class="diagram"><path class="inkline" d="M45 295C125 295 135 85 230 85s100 210 205 210"/><circle cx="45" cy="295" r="13" fill="#c64b35"/><circle cx="230" cy="85" r="13" fill="#d5a63d"/><circle cx="435" cy="295" r="13" fill="#173a31"/><text x="25" y="338" font-size="22">模型</text><text x="205" y="58" font-size="22">推理</text><text x="410" y="338" font-size="22">策略</text></svg>
+    </div>
+  </section>
+
+  <section class="slide board">
+    <div class="kicker">END · 新派奥数</div><h1>把“会做”<br>变成“会想”</h1><p class="lead">四年级提高 · 五年级衔接<br>原创课程设计｜第 1—2 讲完整课件＋41 讲路线图</p>
+  </section>
+</main>
+<div class="hint">← → / 空格翻页 · 点击模糊答案揭晓</div>
+<div class="dots" id="dots" aria-label="幻灯片导航"></div>
+<footer class="footer"><span id="counter">01 / 28</span><div class="progress"><i id="bar"></i></div><div class="nav"><button id="prev" aria-label="上一页">←</button><button id="next" aria-label="下一页">→</button></div></footer>
+<script>
+  (()=>{const slides=[...document.querySelectorAll('.slide')],dots=document.getElementById('dots'),counter=document.getElementById('counter'),bar=document.getElementById('bar');let current=0,startX=0;
+    slides.forEach((_,i)=>{const b=document.createElement('button');b.setAttribute('aria-label',`第${i+1}页`);b.onclick=()=>go(i);dots.appendChild(b)});
+    const dotButtons=[...dots.children];
+    function go(n){n=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,i)=>{s.classList.toggle('active',i===n);s.classList.toggle('exit',i<n)});current=n;counter.textContent=`${String(n+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}`;bar.style.width=`${(n+1)/slides.length*100}%`;dotButtons.forEach((d,i)=>d.classList.toggle('active',i===n));location.hash=`slide-${n+1}`}
+    document.getElementById('prev').onclick=()=>go(current-1);document.getElementById('next').onclick=()=>go(current+1);
+    addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();go(current+1)}if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(current-1)}if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1)});
+    document.getElementById('deck').addEventListener('click',e=>{if(e.target.closest('button,.answer'))return;go(current+(e.clientX>innerWidth*.35?1:-1))});
+    addEventListener('touchstart',e=>startX=e.changedTouches[0].clientX,{passive:true});addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>45)go(current+(dx<0?1:-1))},{passive:true});
+    const initial=parseInt(location.hash.replace('#slide-',''),10);go(Number.isFinite(initial)?initial-1:0);
+  })();
+</script>
+</body>
+</html>
