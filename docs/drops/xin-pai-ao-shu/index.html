@@ -80,6 +80,20 @@
     .section-no{position:absolute;right:6vw;bottom:9vh;font:900 clamp(80px,16vw,220px)/.7 "Baskerville",serif;opacity:.06;pointer-events:none}
     .teacher{background:#fff3c9;border:1px solid #d8b864;padding:10px 14px;font:14px/1.45 "Kaiti SC",serif;transform:rotate(-.5deg)}
     .board .teacher{background:rgba(240,199,102,.12);border-color:rgba(240,199,102,.5)}
+    .lesson-pack{align-content:start;padding-top:clamp(58px,7vh,82px)}
+    .lesson-pack h2{font-size:clamp(28px,4vw,54px);margin-bottom:15px}
+    .lesson-pack .three{align-items:stretch}
+    .lesson-pack .card{min-height:0}
+    .lesson-pack ul{margin:0;padding-left:1.1em}
+    .lesson-pack li,.lesson-pack p{font-size:clamp(12px,1.15vw,16px);line-height:1.48}
+    .lesson-pack .answer{display:block;margin-top:7px;padding:7px 9px;background:rgba(198,75,53,.08);border-left:3px solid var(--red)}
+    .lesson-pack.board .answer{background:rgba(240,199,102,.09);border-color:#f0c766}
+    .toc-open{position:fixed;z-index:30;left:22px;top:18px;border:1px solid currentColor;border-radius:18px;padding:7px 12px;background:rgba(23,58,49,.88);color:#fff;cursor:pointer;font:700 12px "PingFang SC",sans-serif}
+    .toc{position:fixed;z-index:40;inset:0;background:rgba(12,24,20,.93);color:var(--chalk);padding:clamp(28px,5vw,70px);overflow:auto;display:none}
+    .toc.open{display:block}.toc h2{margin-bottom:18px}.toc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:9px}
+    .toc-grid button{min-height:68px;border:1px solid rgba(247,241,220,.3);background:rgba(255,255,255,.06);color:inherit;padding:8px;cursor:pointer;text-align:left;border-radius:3px}
+    .toc-grid button:hover{background:rgba(240,199,102,.2);border-color:#f0c766}.toc-grid b{display:block;color:#f0c766}
+    .toc-close{position:absolute;right:28px;top:22px;background:none;color:inherit;border:1px solid currentColor;border-radius:50%;width:38px;height:38px;cursor:pointer}
     @media(max-width:800px){
       .slide{align-content:start;padding:64px 22px 72px}
       .hero-grid,.two,.three,.four,.route{grid-template-columns:1fr}
@@ -87,6 +101,7 @@
       .route{gap:8px}.phase{min-height:0;padding:13px}.phase .big{font-size:42px;float:right}
       .card{padding:13px}.lesson-card{min-height:104px}
       .diagram{max-height:36vh}.hint{display:none}.dots{display:none}
+      .lesson-pack .three{grid-template-columns:1fr}.toc-grid{grid-template-columns:repeat(3,1fr)}.toc-open{left:12px;top:12px}
     }
     @media(prefers-reduced-motion:reduce){.slide{transition:none}}
   </style>
@@ -119,8 +134,8 @@
       <div class="card"><b>02 知识树</b><p>5 分钟<br>先看“今天学什么”</p></div>
       <div class="card"><b>03 小热身</b><p>5 分钟<br>唤醒旧经验</p></div>
       <div class="card"><b>04 一例一练</b><p>45 分钟<br>4 个模型，边讲边做</p></div>
-      <div class="card"><b>05 作业</b><p>10 分钟<br>基础＋变式</p></div>
-      <div class="card"><b>06 选做</b><p>10 分钟<br>挑战、讨论、讲题</p></div>
+      <div class="card"><b>05 附近练习</b><p>10 分钟<br>基础＋变式</p></div>
+      <div class="card"><b>06 拔高题</b><p>10 分钟<br>挑战、讨论、讲题</p></div>
       <div class="card"><b>07 课堂内外</b><p>10 分钟<br>反思、迁移、检验</p></div>
       <div class="card teacher"><b>教师口令</b><p>先画图或列表；先说思路，再写答案；一题至少检验一次。</p></div>
     </div>
@@ -195,7 +210,7 @@
   </section>
 
   <section class="slide">
-    <div class="kicker">LESSON 01 · 知识树与热身</div><h2>先认模型，再选动作</h2>
+    <div class="kicker">LESSON 01 · 内容知识点</div><h2>先认模型，再选动作</h2>
     <div class="two">
       <div class="tree">和差倍问题<br>├─ 和差：总和 ＋ 相差<br>├─ 和倍：总和 ＋ 倍数<br>├─ 差倍：相差 ＋ 倍数<br>└─ 复合：先还原变化<br>　 ├ 增减后相等<br>　 └ 增减后成倍</div>
       <div><div class="quiz"><div><p>和为 40，差为 8。去掉“多出的 8”后，剩下平均分成几份？</p></div><div><p>红球是蓝球的 3 倍。合起来是几份？</p></div><div><p>甲比乙多 24，甲是乙的 4 倍。24 对应几份？</p></div></div><p class="answer teacher" onclick="this.classList.add('revealed')">点按揭晓：2 份；4 份；3 份。</p></div>
@@ -232,11 +247,11 @@
   </section>
 
   <section class="slide">
-    <div class="kicker">LESSON 01 · 课后作业</div><h2>从基本模型，到“先还原”</h2>
+    <div class="kicker">LESSON 01 · 附近练习题</div><h2>从基本模型，到“先还原”</h2>
     <div class="three">
       <div class="card"><h3>基础巩固</h3><p class="mini">① 两袋种子共 168 粒，相差 32 粒。<br>② 两本书共 240 页，故事书是科普书的 3 倍。<br>③ 梨树是桃树 6 倍，多 125 棵。</p></div>
       <div class="card"><h3>变式提升</h3><p class="mini">④ 两仓共 460 千克。甲运出 30 后仍比乙多 40。<br>⑤ 两班共收 186 个瓶。一班再收 8、二班少收 4 后，一班多 30。<br>⑥ 两数和 132。甲减 12、乙增 6 后，甲是乙 2 倍。</p></div>
-      <div class="card"><h3>选做挑战</h3><p class="mini">两筐共 264 个球。先从甲拿出 18 个，再把乙中 12 个放入甲，此时甲是乙的 2 倍。原来各多少？</p><p class="teacher">提示：最终总数只减少了 18。</p></div>
+      <div class="card"><h3>拔高题</h3><p class="mini">两筐共 264 个球。先从甲拿出 18 个，再把乙中 12 个放入甲，此时甲是乙的 2 倍。原来各多少？</p><p class="teacher">提示：最终总数只减少了 18。</p></div>
     </div>
   </section>
 
@@ -255,7 +270,7 @@
   </section>
 
   <section class="slide">
-    <div class="kicker">LESSON 02 · 知识树与热身</div><h2>交叉的地方，藏着“重复”</h2>
+    <div class="kicker">LESSON 02 · 内容知识点</div><h2>交叉的地方，藏着“重复”</h2>
     <div class="two"><div class="tree">包含与排除<br>├─ 两类<br>│　├ 至少一类 / 两类都参加<br>│　└ 只参加一类 / 都不参加<br>└─ 三类<br>　　├ 两两交叉<br>　　└ 从最中心向外填写</div>
       <div><div class="formula">|A∪B|＝|A|＋|B|－|A∩B|</div><div class="quiz"><div><p>一个人两项都会，相加时被数几次？</p></div><div><p>全班 40 人，至少参加一项 33 人，都不参加几人？</p></div><div><p>18 人爱苹果、15 人爱梨、6 人都爱。至少爱一种多少人？</p></div></div><p class="answer teacher" onclick="this.classList.add('revealed')">2 次；7 人；27 人。</p></div>
     </div>
@@ -298,11 +313,11 @@
   </section>
 
   <section class="slide">
-    <div class="kicker">LESSON 02 · 课后作业</div><h2>圈图里，每一块都有名字</h2>
+    <div class="kicker">LESSON 02 · 附近练习题</div><h2>圈图里，每一块都有名字</h2>
     <div class="three">
       <div class="card"><h3>基础巩固</h3><p class="mini">① 45 人，读甲书 28、乙书 21、两本都读 9。求至少一本、都没读。<br>② 64 人，跑步队 36、跳绳队 33，8 人都没参加。求两队都参加。<br>③ 75 人，拼图 43、数独 38、两者都爱 20。求只爱一种。</p></div>
       <div class="card"><h3>变式提升</h3><p class="mini">④ 人人至少会一种乐器：口琴 26、尤克里里 22、两者都会 11。全班多少？<br>⑤ 120 人参加三项科技体验：62、54、49；两两 28、23、21；三项 12。求至少一项与都没参加。</p></div>
-      <div class="card"><h3>选做挑战</h3><p class="mini">90 人选三门校本课：48、42、36；两两 20、17、15；三门都选 8。求恰好两门、恰好一门、都不选。</p><p class="teacher">从正中央的 8 开始填。</p></div>
+      <div class="card"><h3>拔高题</h3><p class="mini">90 人选三门校本课：48、42、36；两两 20、17、15；三门都选 8。求恰好两门、恰好一门、都不选。</p><p class="teacher">从正中央的 8 开始填。</p></div>
     </div>
   </section>
 
@@ -346,19 +361,147 @@
   </section>
 
   <section class="slide board">
-    <div class="kicker">END · 新派奥数</div><h1>把“会做”<br>变成“会想”</h1><p class="lead">四年级提高 · 五年级衔接<br>原创课程设计｜第 1—2 讲完整课件＋41 讲路线图</p>
+    <div class="kicker">END · 新派奥数</div><h1>把“会做”<br>变成“会想”</h1><p class="lead">四年级提高 · 五年级衔接<br>原创课程设计｜41 讲知识点＋附近练习＋拔高题</p>
   </section>
 </main>
+<button class="toc-open" id="tocOpen" aria-label="打开讲次目录">讲次 1—41</button>
+<aside class="toc" id="toc" aria-label="41讲目录"><button class="toc-close" id="tocClose" aria-label="关闭目录">×</button><h2>跳到任意一讲</h2><div class="toc-grid" id="tocGrid"></div></aside>
 <div class="hint">← → / 空格翻页 · 点击模糊答案揭晓</div>
 <div class="dots" id="dots" aria-label="幻灯片导航"></div>
 <footer class="footer"><span id="counter">01 / 28</span><div class="progress"><i id="bar"></i></div><div class="nav"><button id="prev" aria-label="上一页">←</button><button id="next" aria-label="下一页">→</button></div></footer>
 <script>
-  (()=>{const slides=[...document.querySelectorAll('.slide')],dots=document.getElementById('dots'),counter=document.getElementById('counter'),bar=document.getElementById('bar');let current=0,startX=0;
+  (()=>{const lessons=[
+    [1,'较难的和差倍问题'],[2,'包含与排除'],
+    [3,'年龄问题',['年龄差始终不变','每过一年，每人都增加 1 岁','用“今年／过去／未来”三列表','倍数关系要放在同一时点'],
+      [['今年姐姐 16 岁，弟弟 10 岁。5 年后两人各几岁，年龄差多少？','21 岁、15 岁；年龄差仍是 6 岁。'],['妈妈今年 36 岁，小乐 9 岁。几年后妈妈年龄是小乐的 2 倍？','18 年后：54＝2×27。']],
+      ['哥哥比弟弟大 24 岁，4 年前哥哥年龄是弟弟的 4 倍。现在各几岁？','设4年前弟弟为1份，年龄差对应3份。','哥哥 36 岁，弟弟 12 岁。']],
+    [4,'相遇问题初步',['相向而行用速度和','相遇路程＝甲路程＋乙路程','相遇时间＝总路程÷速度和','画线标方向、起点与相遇点'],
+      [['两地相距 840 米，两人每分钟走 70 米和 50 米，同时相向而行，几分钟相遇？','840÷(70＋50)＝7 分钟。'],['两人 10 分钟相遇，速度分别为每分钟 80 米和 70 米，两地多远？','(80＋70)×10＝1500 米。']],
+      ['两地相距 900 米，甲每分钟 60 米先走 3 分钟，乙再以每分钟 90 米相向出发。乙出发后多久相遇？','先扣除甲已走的路程，再用速度和。','(900－180)÷150＝4.8 分钟。']],
+    [5,'追及问题初步',['同向追及用速度差','追上时快者多走的路程等于领先距离','追及时间＝领先距离÷速度差','先出发造成的领先要先算'],
+      [['前者每分钟 60 米，后者每分钟 90 米，领先 600 米。多久追上？','600÷30＝20 分钟。'],['小车每分钟 70 米先走 8 分钟，大车每分钟 110 米。大车多久追上？','560÷40＝14 分钟。']],
+      ['400 米环形跑道，两人同点同向，速度每分钟 90 米和 70 米。快者首次追上慢者要多久？','首次追上要多跑整整一圈。','400÷20＝20 分钟。']],
+    [6,'行程问题综合',['按出发、停留、变速等事件分段','每段坚持路程＝速度×时间','同一段内运动状态不变','最后用总路程或总时间核验'],
+      [['骑行前 30 分钟每分钟 200 米，后 20 分钟每分钟 150 米，共行多少米？','6000＋3000＝9000 米。'],['全程 12 千米，前 6 千米每小时 6 千米，后 6 千米每小时 4 千米，共用多久？','1＋1.5＝2.5 小时。']],
+      ['甲先以每分钟 80 米走 5 分钟，停 3 分钟，再以每分钟 100 米走 7 分钟。全程平均每分钟行多少米？','平均速度要用总路程÷总时间，停留也计时。','(400＋700)÷15＝73又1/3 米/分。']],
+    [7,'特殊乘法',['用分配律拆成整十、整百','乘 25 可先乘 100 再除 4','乘 125 可先乘 1000 再除 8','速算后用估算检查数量级'],
+      [['计算 48×25。','48÷4×100＝1200。'],['计算 99×37。','(100－1)×37＝3663。']],
+      ['不用竖式计算 125×32×25。','把 32 拆成 8×4，分别配对。','(125×8)×(4×25)＝100000。']],
+    [8,'等差数列',['相邻两项之差叫公差','末项＝首项＋(项数－1)×公差','项数＝(末项－首项)÷公差＋1','和＝(首项＋末项)×项数÷2'],
+      [['5，10，15，…，65 共多少项？和是多少？','13 项，和为 455。'],['4，10，16，… 的第 12 项是多少？','4＋11×6＝70。']],
+      ['求 3＋7＋11＋…＋99。','先求项数，再用首末配对。','25 项，和为 (3＋99)×25÷2＝1275。']],
+    [9,'四则混合运算',['先括号，再乘除，后加减','同级运算从左到右','交换律、结合律只改变合法顺序','分配律把共同因数提出来'],
+      [['计算 125×8＋75×8。','(125＋75)×8＝1600。'],['计算 720÷(9×8)。','720÷72＝10。']],
+      ['计算 999×37＋37。','把 37 看作共同因数。','(999＋1)×37＝37000。']],
+    [10,'公式类计算',['先认清字母代表的量','同类结构可整体代入','已知结果时可逆向求未知量','代入后检查单位和范围'],
+      [['按 F＝3n＋2，n＝8 时 F 是多少？','26。'],['长方形周长 30 厘米，长 9 厘米，宽多少？','30÷2－9＝6 厘米。']],
+      ['规则 T＝(a＋b)×a。已知 a＝6，T＝66，求 b。','先求括号整体。','a＋b＝11，所以 b＝5。']],
+    [11,'流水问题',['顺水速度＝船速＋水速','逆水速度＝船速－水速','船速＝(顺速＋逆速)÷2','水速＝(顺速－逆速)÷2'],
+      [['顺水每小时 18 千米，逆水每小时 10 千米。船速、水速各多少？','船速 14，水速 4 千米/时。'],['顺水速度每小时 12 千米，行 72 千米要多久？','6 小时。']],
+      ['一船顺水 96 千米用 4 小时，逆水返回用 8 小时。船速、水速各多少？','先分别求顺、逆水速度。','船速 18，水速 6 千米/时。']],
+    [12,'环形跑道',['反向相遇：一圈÷速度和','同向追及：一圈÷速度差','每次事件间隔通常相同','第 n 次时间＝首次间隔×n'],
+      [['600 米跑道，两人反向速度每分钟 90、60 米，首次相遇多久？','600÷150＝4 分钟。'],['500 米跑道，同向速度每分钟 85、60 米，首次追上多久？','500÷25＝20 分钟。']],
+      ['400 米跑道，两人反向速度每分钟 100、60 米。第 3 次相遇在出发后多久？','每次合走一圈。','间隔 2.5 分钟，第 3 次是 7.5 分钟。']],
+    [13,'火车过桥',['过一个点：路程等于车长','完全过桥：路程＝车长＋桥长','统一米与秒等单位','车头进入到车尾离开是完整过程'],
+      [['120 米长火车以每秒 12 米通过电线杆，要几秒？','120÷12＝10 秒。'],['120 米长火车每秒 15 米，完全通过 180 米桥要多久？','(120＋180)÷15＝20 秒。']],
+      ['火车过电线杆用 8 秒，过 220 米隧道用 30 秒。求车速和车长。','设每秒速度为 v；两次路程相差 220 米。','车速 10 米/秒，车长 80 米。']],
+    [14,'解方程',['等式两边同时做相同运算','优先把含未知数的部分看成整体','移项本质是等式性质','解出后代回原式检验'],
+      [['解 3x＋7＝34。','x＝9。'],['解 5(x－2)＝40。','x＝10。']],
+      ['解 4x－18＝2x＋16。','先让未知数集中到一边。','2x＝34，x＝17。']],
+    [15,'高斯记号',['[x] 表示不超过 x 的最大整数','在数轴上定位相邻整数','[x]＝n 等价于 n≤x＜n＋1','边界是否取到要特别检查'],
+      [['[3.7] 与 [8] 分别是多少？','3，8。'],['若 [x]＝6，x 的范围是什么？','6≤x＜7。']],
+      ['同时满足 [x]＝4、[2x]＝9，x 的范围是什么？','把两个条件各化成区间，再取重叠。','4.5≤x＜5。']],
+    [16,'数列与数表',['先看相邻差、倍数与周期','数表同时检查行规律和列规律','用组号与组内位置定位','至少用后两项验证猜想'],
+      [['2，5，10，17，26，下一项？','相邻增加 3、5、7、9，下一项 37。'],['每行 6 个数顺序排，数字 35 在第几行第几列？','第 6 行第 5 列。']],
+      ['第1组有1个数，第2组有2个数……按自然数连续填写。数字 47 在第几组第几个？','先比较三角数 1＋…＋n。','前9组45个，所以是第10组第2个。']],
+    [17,'定义新运算',['先把新符号翻译成普通算式','括号内的新运算先算','不能默认交换律或结合律成立','反求时按定义列方程'],
+      [['规定 a★b＝2a＋b，求 6★3。','15。'],['同一规则下，求 (2★4)★1。','2★4＝8，再算 8★1＝17。']],
+      ['规定 a△b＝a×b－b，若 x△5＝35，求 x。','严格把 x、5 放进对应位置。','5x－5＝35，x＝8。']],
+    [18,'平均数',['平均数＝总量÷份数','总量＝平均数×份数','移多补少不改变总量','加入或移除数据先改总量与份数'],
+      [['5 个数平均是 18，总和是多少？','90。'],['四人平均 16 岁，加入一位 20 岁的人，新平均数？','(64＋20)÷5＝16.8 岁。']],
+      ['6 次测验平均 85 分，第 7 次后平均提高到 87 分。第 7 次多少分？','比较新旧总分。','87×7－85×6＝99 分。']],
+    [19,'方程应用题',['设未知数并写明单位','找出题中的等量关系','列式、解方程、检验、作答','优先设最基础或较小的量'],
+      [['3 本相同笔记本共 27 元，设每本 x 元，列方程并求解。','3x＝27，x＝9 元。'],['一数的 4 倍减 7 等于 29，求这个数。','4x－7＝29，x＝9。']],
+      ['鸡和兔共 18 只，共有 50 条腿。鸡兔各多少？','设兔 x 只，用总腿数列方程。','4x＋2(18－x)＝50，兔7只、鸡11只。']],
+    [20,'小数运算',['加减法小数点对齐','乘法先算整数再确定小数位','除法可同时移动小数点','先估算范围再精算'],
+      [['计算 12.6＋3.75。','16.35。'],['计算 4.8×0.5。','2.4。']],
+      ['计算 7.25×3.6＋2.75×3.6。','提取共同因数 3.6。','(7.25＋2.75)×3.6＝36。']],
+    [21,'角度初识',['一周角 360°，平角 180°，直角 90°','同一顶点可用角的和差','先估角，再量角','钟面每大格对应 30°'],
+      [['一个角比直角小 28°，它是多少度？','62°。'],['钟面 3 时整，时针与分针夹角？','90°。']],
+      ['钟面 2 时整，较小夹角是多少？4 时整呢？两者和是多少？','每跨一大格是 30°。','60°、120°，和为 180°。']],
+    [22,'图形计数',['按大小或类型分类','线段计数可固定左端点','n 个点两两连线有 n(n－1)÷2 条','列表核对避免重复和遗漏'],
+      [['一条直线上有 5 个点，可组成多少条线段？','5×4÷2＝10 条。'],['由 4 个小正方形排成一行，共有多少个不同正方形？','4 个。']],
+      ['2×3 方格中共有多少个长方形？','横向选两条边、纵向选两条边。','(3×2÷2)×(4×3÷2)＝18 个。']],
+    [23,'三角形问题',['三角形内角和 180°','等腰三角形两底角相等','任意两边之和大于第三边','外角等于不相邻两内角之和'],
+      [['三角形两角为 48°、67°，第三角？','65°。'],['等腰三角形顶角 40°，每个底角？','70°。']],
+      ['等腰三角形一个角是 100°，另两个角各是多少？','100°只能是顶角，否则角和超出。','另两个角各 40°。']],
+    [24,'平行四边形',['面积＝底×对应高','同底等高面积相等','斜边不是对应高','割补可转成长方形'],
+      [['底 12 厘米、高 7 厘米，面积？','84 平方厘米。'],['面积 96 平方厘米、底 12 厘米，高？','8 厘米。']],
+      ['两个平行四边形同底 10 厘米，顶边都在同一条平行线上。形状不同，面积关系怎样？','比较共同的底与高。','面积相等。']],
+    [25,'梯形',['面积＝(上底＋下底)×高÷2','两个相同梯形可拼成平行四边形','中位平均长度是上下底平均','组合图先找公共高'],
+      [['上底 6、下底 10、高 5 厘米，面积？','40 平方厘米。'],['面积 54、高 6、上底 7 厘米，下底？','11 厘米。']],
+      ['梯形上下底和为 24 厘米，面积 84 平方厘米，高是多少？','直接把“上下底和”看成整体。','84×2÷24＝7 厘米。']],
+    [26,'一半模型',['三角形面积＝底×高÷2','同底等高三角形面积相等','对角线把平行四边形分成面积相等两半','补形与差不变可发现一半关系'],
+      [['平行四边形面积 72，沿对角线分成两个三角形，每个面积？','36。'],['同底等高的三角形与平行四边形，面积关系？','三角形是平行四边形的一半。']],
+      ['长方形中连接一个顶点与对边中点，所得三角形面积占长方形几分之几？','三角形的底取整条对边，高等于长方形另一边。','二分之一。']],
+    [27,'质数与合数',['质数只有 1 和自身两个因数','合数有两个以上因数','1 既不是质数也不是合数','分解质因数可用短除法'],
+      [['判断 29、39 哪个是质数。','29 是质数；39＝3×13。'],['把 84 分解质因数。','84＝2²×3×7。']],
+      ['两个质数的和是 31，这两个质数可能是多少？','奇数和要求一个质数是 2。','2 和 29。']],
+    [28,'整除特征',['末位判断 2、5、10 的整除','各位数字和判断 3、9','末两位判断 4','奇数位和与偶数位和之差可判断 11'],
+      [['438 能被 3 整除吗？能被 9 整除吗？','数字和15：能被3整除，不能被9整除。'],['7□2 能被 9 整除，□是多少？','□＝0 或 9。']],
+      ['四位数 3□84 同时被 4 和 9 整除，□是多少？','末两位84已能被4整除，再看数字和。','3＋□＋8＋4＝15＋□，所以 □＝3。']],
+    [29,'数字谜一',['按位值写清个位、十位、百位','从限制最强的个位开始','关注进位与退位','每找到解都代回竖式'],
+      [['两位数十位比个位大 3，数字和为 9，求此数。','63。'],['一个两位数加 27 得到 65，原数？','38。']],
+      ['两位数交换十位与个位后，变大 27；两位数字和为 11。原数是多少？','设原数为 10a＋b。','47；交换后 74。']],
+    [30,'数字谜二',['多条件时分支枚举','结合奇偶与整除缩小范围','重复数字限制要单独记录','最后检查解是否唯一'],
+      [['用不同数字组成最小的三位偶数，百位不能为0。','102。'],['三位数 4□6 能被 3 整除，□有哪些？','2、5、8。']],
+      ['用 1、2、3、4 各一次组成两个两位数，使它们的差最小，最小差是多少？','十位尽量接近，个位反向补偿。','31－24＝7（或 42－13＝29 非最小）。']],
+    [31,'加乘原理',['分类完成用加法','分步完成用乘法','各类方案必须互斥','每一步选择数相乘前先画树状图'],
+      [['有 3 种面包和 2 种牛奶，各选一种，有多少搭配？','3×2＝6 种。'],['从东门或南门入馆，东门2条路、南门3条路，共几种？','2＋3＝5 种。']],
+      ['用数字 1、2、3、4 组成无重复数字的三位偶数，有多少个？','先选个位，再选百位、十位。','个位2种，百位3种，十位2种，共12种。']],
+    [32,'数列与图形规律',['先观察差、倍数、周期','图形规律要把“图”翻成“数”','递推关系说明后一项如何产生','用至少两个后续位置检验'],
+      [['1，4，9，16，下一项？','25。'],['红蓝蓝循环排列，第 20 个是什么颜色？','20÷3余2，是蓝色。']],
+      ['第 n 个图形用 4n＋1 根小棒。第 25 个用多少根？反过来 81 根是第几个？','分别正向代入与逆向求 n。','第25个101根；81根是第20个。']],
+    [33,'逻辑推理',['把人物与属性列成表格','确定信息先填，否定信息先划掉','每一步注明使用的条件','可用反证排除矛盾分支'],
+      [['甲、乙、丙分别爱棋、画、球；甲不爱棋，乙爱画，丙不爱球。甲爱什么？','甲爱球，丙爱棋。'],['A比B高，B比C高，谁最高？','A。']],
+      ['三盒分别装苹果、梨、混合，标签全贴错。只从一盒取一个水果，如何确定全部？','应从贴“混合”的盒中取，因为它实际不是混合。','取出种类确定该盒，再利用“全错”依次确定其余。']],
+    [34,'消去问题',['把同一种未知量倍数对齐','两式相加或相减消去一个量','也可整体替换重复部分','解出后代回另一式'],
+      [['2盒彩笔＋1本书＝26元；1盒彩笔＋1本书＝17元。彩笔多少钱？','9 元。'],['3个苹果＝2个梨；6个苹果＝几个梨？','4 个梨。']],
+      ['2杯果汁＋3块蛋糕＝42元；4杯果汁＋3块蛋糕＝54元。各多少钱？','相减先消去蛋糕。','果汁6元，蛋糕10元。']],
+    [35,'小数应用题',['单价×数量＝总价','换算单位后再列式','钱数通常保留到分','结果要结合情境判断精度'],
+      [['铅笔每支 1.8 元，买 5 支多少钱？','9 元。'],['2.5 千克苹果每千克 6.4 元，共多少钱？','16 元。']],
+      ['带 50 元买 3 本 8.5 元的书和 2 支 4.2 元的笔，还剩多少？','分项算总价。','50－25.5－8.4＝16.1 元。']],
+    [36,'最值问题',['先明确变量范围与限制','从极端情形开始尝试','调整法比较相邻方案','找到方案后还要证明不能更好'],
+      [['两个正整数和为 20，乘积最大是多少？','两数最接近时最大：10×10＝100。'],['用 24 米围三边靠墙长方形，宽各 6 米，长多少？面积？','长12米，面积72平方米。']],
+      ['四个不同正整数和为 18，最大的数最小可能是多少？','先看若最大不超过5，四个不同正整数之和最多是2＋3＋4＋5＝14。','取3、4、5、6恰好为18，所以最小可能是6。']],
+    [37,'统筹与规划',['区分必须先后与可以并行','画流程图标每步耗时','总时间由关键路径决定','等待时间可穿插其他任务'],
+      [['烧水8分钟、洗杯2分钟、泡茶1分钟，怎样最快喝到茶？','烧水时洗杯，最少9分钟。'],['两口锅各煎一张饼，每面3分钟，4张饼多久？','分两批，每批6分钟，共12分钟。']],
+      ['3张饼，锅每次放2张，每面2分钟，最少多久？','每2分钟完成两个“面”，共需6个面。','分3轮翻换，最少6分钟。']],
+    [38,'比赛中的数学',['单循环总场次＝队数×(队数－1)÷2','胜平负积分先算每场总分','用总分守恒反推平局数','排名条件常需分类讨论'],
+      [['5队单循环比赛，共多少场？','5×4÷2＝10 场。'],['篮球胜得2分、负得1分，6场全有胜负，共发多少积分？','每场3分，共18分。']],
+      ['足球胜3分、平各1分。8场比赛总积分22分，有几场平局？','胜负场发3分，平局发2分；每场先按3分算。','24－22＝2，所以有2场平局。']],
+    [39,'几何图形剪拼',['平移、旋转、翻折不改变面积','剪拼前后面积守恒','先寻找等长边与对应角','画剪线后说明为何能严密拼合'],
+      [['一个面积 48 的平行四边形剪拼成长方形，面积是多少？','仍是48。'],['两个相同直角三角形可拼成哪些常见图形？','可拼成长方形、平行四边形或大三角形。']],
+      ['把底10、高6的平行四边形剪拼成长方形，若长方形长取10，宽是多少？','面积守恒。','面积60，宽60÷10＝6。']],
+    [40,'游戏策略',['从终局倒推必胜位置','寻找总数、奇偶或余数不变量','设计对手每种行动后的回应','策略要覆盖对手所有合法选择'],
+      [['桌上10颗棋子，每次取1或2颗，取到最后者胜。先手怎样走？','先取1颗，此后与对手合取3颗。'],['若有12颗，每次取1或2颗，谁有必胜策略？','后手；始终与先手合取3颗。']],
+      ['有 21 颗棋子，每次可取 1—4 颗，取到最后者胜。先手怎么保证胜？','控制每轮双方合取5颗。','先取1颗，之后取 5－对手所取数。']],
+    [41,'多人多次相遇与追及',['对每一对人使用相对速度','用事件时间线记录先后','周期重复可借助最小公倍数','区分相遇、追上与超越次数'],
+      [['600米跑道，甲乙同点反向每分钟80、70米，10分钟相遇几次？','每4分钟一次，10分钟内2次。'],['400米跑道，甲乙同点同向每分钟90、70米，40分钟快者追上几次？','每20分钟一次，共2次。']],
+      ['600米环道，甲乙丙同点出发，速度每分钟100、75、50米。甲同时追上乙和丙最早在多久后？','甲乙追及周期24分，甲丙周期12分，取最小公倍数。','最早24分钟后。']]
+  ];
+  const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const testSlide=[...document.querySelectorAll('.slide')].find(s=>s.querySelector('.kicker')?.textContent.startsWith('阶段测试一'));
+  lessons.slice(2).forEach((d,i)=>{const [n,title,k,p,s]=d,sec=document.createElement('section');sec.className=`slide lesson-pack ${n%2===0?'board':''}`;sec.dataset.lesson=n;sec.innerHTML=`<div class="kicker">LESSON ${String(n).padStart(2,'0')} · 一讲三练</div><div class="section-no">${String(n).padStart(2,'0')}</div><h2>${esc(title)}</h2><div class="three"><div class="card"><h3>内容知识点</h3><ul>${k.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div><div class="card"><h3>附近练习题</h3>${p.map((x,j)=>`<p><b>${j+1}.</b> ${esc(x[0])}<span class="answer" onclick="this.classList.add('revealed')"><b>答案：</b>${esc(x[1])}</span></p>`).join('')}</div><div class="card"><h3>拔高题</h3><p>${esc(s[0])}</p><p class="teacher"><b>提示：</b>${esc(s[1])}</p><span class="answer" onclick="this.classList.add('revealed')"><b>答案：</b>${esc(s[2])}</span></div></div>`;testSlide.before(sec)});
+  [...document.querySelectorAll('.slide')].forEach(s=>{const k=s.querySelector('.kicker')?.textContent||'';if(k.includes('LESSON 01 · 开篇'))s.dataset.lesson='1';if(k.includes('LESSON 02 · 开篇'))s.dataset.lesson='2'});
+  const slides=[...document.querySelectorAll('.slide')],dots=document.getElementById('dots'),counter=document.getElementById('counter'),bar=document.getElementById('bar'),toc=document.getElementById('toc'),tocGrid=document.getElementById('tocGrid');let current=0,startX=0;
     slides.forEach((_,i)=>{const b=document.createElement('button');b.setAttribute('aria-label',`第${i+1}页`);b.onclick=()=>go(i);dots.appendChild(b)});
     const dotButtons=[...dots.children];
     function go(n){n=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,i)=>{s.classList.toggle('active',i===n);s.classList.toggle('exit',i<n)});current=n;counter.textContent=`${String(n+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}`;bar.style.width=`${(n+1)/slides.length*100}%`;dotButtons.forEach((d,i)=>d.classList.toggle('active',i===n));location.hash=`slide-${n+1}`}
+    lessons.forEach(([n,title])=>{const b=document.createElement('button');b.innerHTML=`<b>${String(n).padStart(2,'0')}</b>${esc(title)}`;b.onclick=()=>{const target=document.querySelector(`[data-lesson="${n}"]`);toc.classList.remove('open');go(slides.indexOf(target))};tocGrid.appendChild(b)});
+    document.getElementById('tocOpen').onclick=()=>toc.classList.add('open');document.getElementById('tocClose').onclick=()=>toc.classList.remove('open');
     document.getElementById('prev').onclick=()=>go(current-1);document.getElementById('next').onclick=()=>go(current+1);
-    addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();go(current+1)}if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(current-1)}if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1)});
+    addEventListener('keydown',e=>{if(e.key==='Escape')toc.classList.remove('open');if(toc.classList.contains('open'))return;if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();go(current+1)}if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(current-1)}if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1)});
     document.getElementById('deck').addEventListener('click',e=>{if(e.target.closest('button,.answer'))return;go(current+(e.clientX>innerWidth*.35?1:-1))});
     addEventListener('touchstart',e=>startX=e.changedTouches[0].clientX,{passive:true});addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>45)go(current+(dx<0?1:-1))},{passive:true});
     const initial=parseInt(location.hash.replace('#slide-',''),10);go(Number.isFinite(initial)?initial-1:0);
