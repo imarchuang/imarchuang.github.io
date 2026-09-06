@@ -24,15 +24,15 @@
       position:absolute;inset:0;
       padding:clamp(28px,5vw,72px) clamp(22px,6vw,96px) clamp(60px,8vh,88px);
       display:grid;align-content:center;gap:10px;
-      opacity:0;transform:translateY(10px);pointer-events:none;
+      opacity:0;transform:translateY(10px);pointer-events:none;visibility:hidden;z-index:0;
       transition:.4s cubic-bezier(.22,.8,.25,1);overflow:auto;
       background:
         radial-gradient(1200px 500px at 10% -10%,rgba(232,184,109,.28),transparent 50%),
         repeating-linear-gradient(90deg,transparent 0 47px,rgba(27,54,93,.035) 47px 48px),
         linear-gradient(165deg,var(--paper),var(--kraft));
     }
-    .slide.active{opacity:1;transform:none;pointer-events:auto;z-index:2}
-    .slide.exit{opacity:0;transform:translateY(-8px)}
+    .slide.active{opacity:1;transform:none;pointer-events:auto;visibility:visible;z-index:2}
+    .slide.exit{opacity:0;transform:translateY(-8px);visibility:hidden}
     .slide.ink{
       color:var(--white);
       background:
@@ -301,12 +301,12 @@
     <div class="kicker">再认识（二）</div>
     <h2>搭一座分数墙</h2>
     <p>点每一行的空格，填上单位分数。同一行拼满，合起来就是 1。</p>
-    <canvas id="wall" class="stage" width="920" height="340" style="max-width:100%"></canvas>
     <div class="toolbar">
       <button type="button" id="wallFill">自动填满</button>
       <button type="button" id="wallClear">清空</button>
       <span class="tiny" id="wallLab">观察：2 个 1/2＝1，3 个 1/3＝1……同一竖线对齐的格子表示同样长。</span>
     </div>
+    <canvas id="wall" class="stage" width="920" height="280" style="max-width:100%"></canvas>
   </section>
 
   <section class="slide ink" data-toc="再认识二 · 单位">
@@ -709,12 +709,12 @@
   filled[0][0]=true;
   function drawWall(){
     const w=wall._lw,h=wall._lh; wx.clearRect(0,0,w,h); wx.fillStyle='#fffdf8'; wx.fillRect(0,0,w,h);
-    const left=70, top=24, barH=44, total=820;
+    const left=70, top=16, barH=36, total=820;
     const cols=['#1b365d','#c45c26','#2c7a6e','#e07a4a','#274a78','#e8b86d'];
     denoms.forEach((d,row)=>{
-      const y=top+row*(barH+8);
+      const y=top+row*(barH+6);
       wx.fillStyle='#1b365d'; wx.font='700 13px Noto Sans SC'; wx.textAlign='right';
-      wx.fillText(d===1?'1':('1/'+d+' ×'+d), left-8, y+28);
+      wx.fillText(d===1?'1':('1/'+d+' ×'+d), left-8, y+24);
       wx.textAlign='left';
       for(let i=0;i<d;i++){
         const x=left+i*(total/d), bw=total/d-4;
@@ -724,16 +724,16 @@
         if(filled[row][i]){
           wx.fillStyle = row===0||row===5 ? '#1b2430' : '#fff';
           wx.font='700 14px Noto Sans SC';
-          wx.fillText(d===1?'1':('1/'+d), x+8, y+28);
+          wx.fillText(d===1?'1':('1/'+d), x+8, y+24);
         }
       }
     });
   }
   wall.addEventListener('click',e=>{
     const {x,y}=hit(wall,e);
-    const left=70, top=24, barH=44, total=820;
+    const left=70, top=16, barH=36, total=820;
     denoms.forEach((d,row)=>{
-      const yy=top+row*(barH+8);
+      const yy=top+row*(barH+6);
       if(y>=yy&&y<=yy+barH){
         const i=Math.floor((x-left)/(total/d));
         if(i>=0&&i<d){ filled[row][i]=!filled[row][i]; drawWall(); }
