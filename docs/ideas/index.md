@@ -24,6 +24,7 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Drops
 
+* [fen-shu-de-yi-yi](/drops/fen-shu-de-yi-yi/ ':ignore') — 分数的意义：再认识、分数单位、十分之几（原创课件）
 * [xin-pai-ao-shu](/drops/xin-pai-ao-shu/ ':ignore') — 新派奥数课件：四年级提高原创讲次（第1–2讲＋41讲课程地图）
 * [grade-5-math-thinking-olympiad](/drops/grade-5-math-thinking-olympiad/ ':ignore') — 五年级数学思维训练：14单元奥数题型教材，含诊断、检测与答案
 * [grade-5-computer-science-html-course](/drops/grade-5-computer-science-html-course/ ':ignore') — 五年级 Computer Science 中英互动教材：信息与二进制、算法调试、编程概念、搜索与网络安全

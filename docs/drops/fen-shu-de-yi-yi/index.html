@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1b365d">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>分数的意义｜折纸工坊课件</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;800&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ink:#1b2430; --navy:#1b365d; --navy2:#274a78; --paper:#f6efe4; --kraft:#ead9c2;
+      --terra:#c45c26; --coral:#e07a4a; --teal:#2c7a6e; --gold:#e8b86d; --muted:#6b6258;
+      --white:#fffdf8;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--navy);color:var(--ink)}
+    body{font-family:"Noto Sans SC",sans-serif}
+    button{font:inherit}
+    .deck{width:100%;height:100%;position:relative}
+    .slide{
+      position:absolute;inset:0;
+      padding:clamp(28px,5vw,72px) clamp(22px,6vw,96px) clamp(60px,8vh,88px);
+      display:grid;align-content:center;gap:10px;
+      opacity:0;transform:translateY(10px);pointer-events:none;
+      transition:.4s cubic-bezier(.22,.8,.25,1);overflow:auto;
+      background:
+        radial-gradient(1200px 500px at 10% -10%,rgba(232,184,109,.28),transparent 50%),
+        repeating-linear-gradient(90deg,transparent 0 47px,rgba(27,54,93,.035) 47px 48px),
+        linear-gradient(165deg,var(--paper),var(--kraft));
+    }
+    .slide.active{opacity:1;transform:none;pointer-events:auto;z-index:2}
+    .slide.exit{opacity:0;transform:translateY(-8px)}
+    .slide.ink{
+      color:var(--white);
+      background:
+        radial-gradient(circle at 88% 12%,rgba(232,184,109,.22),transparent 32%),
+        repeating-linear-gradient(-18deg,rgba(255,255,255,.03) 0 12px,transparent 12px 28px),
+        linear-gradient(145deg,var(--navy),var(--navy2) 55%,#16304f);
+    }
+    .kicker{font-size:12px;font-weight:800;letter-spacing:.28em;color:var(--terra);margin-bottom:6px}
+    .ink .kicker{color:var(--gold)}
+    h1,h2,h3,p{margin:0 0 .45em}
+    h1{font-family:"ZCOOL XiaoWei",serif;font-size:clamp(52px,10vw,118px);line-height:.92;font-weight:400}
+    h2{font-family:"ZCOOL XiaoWei",serif;font-size:clamp(30px,5vw,58px);line-height:1.12;font-weight:400}
+    h3{font-size:clamp(16px,1.8vw,22px)}
+    p,li{font-size:clamp(15px,1.55vw,21px);line-height:1.62}
+    .lead{font-size:clamp(18px,2.1vw,28px);max-width:42rem}
+    .seal{display:inline-block;border:2px solid var(--terra);color:var(--terra);padding:6px 12px;font-weight:800;letter-spacing:.18em;transform:rotate(-2deg)}
+    .ink .seal{border-color:var(--gold);color:var(--gold)}
+    .two{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(16px,4vw,48px);align-items:center}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .four{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .card{background:rgba(255,253,248,.72);border:1px solid rgba(27,54,93,.12);border-radius:18px;padding:16px 18px;box-shadow:0 10px 0 rgba(27,54,93,.06)}
+    .ink .card{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);box-shadow:none;color:var(--white)}
+    .card b{display:block;margin-bottom:6px;font-size:clamp(16px,1.6vw,22px)}
+    .card p,.card li{font-size:clamp(13px,1.2vw,16px);margin:0}
+    .rule{font-family:"ZCOOL XiaoWei",serif;font-size:clamp(22px,2.6vw,34px);color:var(--navy);padding:12px 16px;border-left:6px solid var(--terra);background:rgba(196,92,38,.08)}
+    .ink .rule{color:var(--gold);background:rgba(0,0,0,.18);border-color:var(--gold)}
+    .hintbox{font-size:14px;color:var(--muted);margin-top:8px}
+    .ink .hintbox{color:rgba(255,253,248,.72)}
+    canvas.stage{width:100%;max-width:560px;height:auto;display:block;background:var(--white);border-radius:16px;border:1px solid rgba(27,54,93,.14);cursor:pointer;touch-action:manipulation}
+    .stage-wrap{display:grid;gap:8px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .toolbar button,.chip{
+      border:0;background:var(--navy);color:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:13px
+    }
+    .chip{background:var(--white);color:var(--navy);border:1px solid rgba(27,54,93,.2)}
+    .chip.on,.chip.picked{background:var(--terra);color:#fff;border-color:var(--terra)}
+    .chip.in0{background:#2c7a6e;color:#fff;border-color:#2c7a6e}
+    .chip.in1{background:#c45c26;color:#fff;border-color:#c45c26}
+    .bins{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .bin{min-height:120px;border:2px dashed rgba(27,54,93,.28);border-radius:16px;padding:12px;background:rgba(255,253,248,.5)}
+    .bin h3{margin-bottom:8px}
+    .answer{filter:blur(8px);opacity:.4;transition:.2s;cursor:pointer;user-select:none;display:inline-block;background:rgba(196,92,38,.1);padding:4px 10px;border-radius:8px}
+    .answer:hover,.answer.revealed{filter:none;opacity:1}
+    .quiz{display:grid;gap:12px}
+    .quiz>div{background:rgba(255,253,248,.65);border-radius:14px;padding:12px 14px;border:1px solid rgba(27,54,93,.1)}
+    .ink .quiz>div{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+    .footer{position:fixed;z-index:10;left:22px;right:22px;bottom:14px;display:flex;align-items:center;gap:14px;color:#fff;font:700 12px "Noto Sans SC",sans-serif;mix-blend-mode:difference}
+    .progress{height:3px;background:rgba(255,255,255,.28);flex:1;border-radius:9px;overflow:hidden}
+    .progress i{height:100%;display:block;background:#fff;width:0;transition:.3s}
+    .nav{display:flex;gap:8px}
+    .nav button{width:38px;height:34px;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;border-radius:999px}
+    .hint{position:fixed;right:24px;top:18px;z-index:12;color:rgba(255,255,255,.78);font:11px/1.3 "Noto Sans SC",sans-serif;mix-blend-mode:difference;text-align:right}
+    .dots{position:fixed;z-index:12;right:10px;top:50%;transform:translateY(-50%);display:grid;gap:5px}
+    .dots button{width:6px;height:6px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.35);mix-blend-mode:difference}
+    .dots button.active{height:16px;border-radius:8px;background:#fff}
+    .toc-open{position:fixed;z-index:30;left:18px;top:16px;border:0;border-radius:999px;padding:8px 14px;background:var(--navy);color:#fff;cursor:pointer;font-weight:800;font-size:12px;letter-spacing:.12em}
+    .toc{position:fixed;z-index:40;inset:0;background:rgba(16,28,48,.94);color:#fff;padding:clamp(28px,5vw,70px);overflow:auto;display:none}
+    .toc.open{display:block}
+    .toc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .toc-grid button{min-height:64px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:inherit;padding:10px;cursor:pointer;text-align:left;border-radius:12px}
+    .toc-grid button:hover{background:rgba(196,92,38,.35)}
+    .toc-close{position:absolute;right:24px;top:18px;background:none;color:inherit;border:1px solid currentColor;border-radius:50%;width:38px;height:38px;cursor:pointer}
+    .mark{font-family:"ZCOOL XiaoWei",serif;font-size:clamp(28px,4vw,48px);color:var(--terra)}
+    .tiny{font-size:13px;color:var(--muted)}
+    @media(max-width:860px){
+      .slide{align-content:start;padding:68px 16px 78px}
+      .two,.three,.four,.toc-grid{grid-template-columns:1fr}
+      .hint,.dots{display:none}
+    }
+    @media(prefers-reduced-motion:reduce){.slide{transition:none}}
+  </style>
+</head>
+<body>
+<button class="toc-open" id="tocOpen">目录</button>
+<div class="hint">← → 或空格翻页 · 点模糊处看答案 · 点画布互动</div>
+<div class="dots" id="dots"></div>
+<nav class="toc" id="toc" aria-label="目录">
+  <button class="toc-close" id="tocClose">×</button>
+  <h2>这节课怎么走</h2>
+  <div class="toc-grid" id="tocGrid"></div>
+</nav>
+<main class="deck" id="deck">
+
+  <section class="slide ink active" data-toc="封面">
+    <div class="two">
+      <div>
+        <div class="kicker">折纸工坊 · 三年级／四年级</div>
+        <h1>分数<br>的意义</h1>
+        <p class="lead">把一个整体平均分开，再数出其中的几份。今天用格子、集合、纸条和数轴，把分数重新看清楚。</p>
+        <span class="seal">原创互动课</span>
+      </div>
+      <canvas id="heroPie" class="stage" width="560" height="420" aria-label="可点击的四分之三圆"></canvas>
+    </div>
+    <p class="hintbox">点一圈里的扇形，看看几份被涂上了颜色。</p>
+  </section>
+
+  <section class="slide" data-toc="学习目标">
+    <div class="kicker">25—40 分钟</div>
+    <h2>今天要能说清楚四件事</h2>
+    <div class="four">
+      <div class="card"><b>再认识（一）</b><p>同一分数可以表示面积、个数，也可以表示一组东西里的几份。</p></div>
+      <div class="card"><b>练一练（一）</b><p>在线段、圆和一堆物品上，认出几分之几。</p></div>
+      <div class="card"><b>再认识（二）</b><p>用纸条量东西，余下的写成分数；认识分数墙和分数单位。</p></div>
+      <div class="card"><b>练一练（二）</b><p>十分之几：厘米与分米、角与元、0 到 1 的数轴，以及谁更靠近 0 或 1。</p></div>
+    </div>
+    <p class="rule">记住一句话：先问「谁是 1」，再平均分，再数份数。</p>
+  </section>
+
+  <section class="slide ink" data-toc="再认识一 · 知识">
+    <div class="kicker">再认识（一）· 知识点</div>
+    <h2>先把「1」看清楚</h2>
+    <div class="three">
+      <div class="card"><b>1 可以是一块</b><p>一张正方形卡纸、一块蛋糕、一条彩带，都可以当作整体。</p></div>
+      <div class="card"><b>1 也可以是一群</b><p>8 颗棋子、12 只纸鹤、一盒蜡笔，整群就是 1。</p></div>
+      <div class="card"><b>平均分才是分数</b><p>分成的每一份必须同样大、同样多。3/4 读作四分之三：平均分成 4 份，取 3 份。</p></div>
+    </div>
+    <p class="rule">分母告诉你「平均分成几份」，分子告诉你「取了几份」。</p>
+  </section>
+
+  <section class="slide" data-toc="再认识一 · 3/4">
+    <div class="kicker">再认识（一）</div>
+    <h2>3/4 可以表示什么？</h2>
+    <div class="two">
+      <div class="stage-wrap">
+        <canvas id="sq34" class="stage" width="520" height="320"></canvas>
+        <div class="toolbar">
+          <button type="button" data-reset="sq34">清空格子</button>
+          <span class="tiny" id="sq34lab">点格子涂色 · 目标：3/4</span>
+        </div>
+      </div>
+      <div>
+        <p>左边这块卡纸是 1。平均分成 4 个一样大的小正方形，涂 3 个，就是这块纸的 3/4。</p>
+        <p>右边 8 颗星是另一类 1。平均分成 4 组，每组 2 颗；取 3 组，就是 6 颗，还是 3/4。</p>
+        <p class="hintbox">面积模型和集合模型说的是同一个分数，只是「1」换了样子。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="再认识一 · 外形">
+    <div class="kicker">再认识（一）</div>
+    <h2>外形不同，也可以是同一个 1/4</h2>
+    <p>下面三块图形都由 8 个小方格拼成。涂色的 2 格都占整块的 1/4。点小格试试。</p>
+    <canvas id="poly14" class="stage" width="920" height="280" style="max-width:100%"></canvas>
+    <p class="hintbox" id="poly14lab">三块都是 8 格，涂 2 格就是 1/4。形状可以弯、可以长，份数不变。</p>
+  </section>
+
+  <section class="slide ink" data-toc="再认识一 · 一半">
+    <div class="kicker">再认识（一）</div>
+    <h2>拿出全部贴纸的 1/2</h2>
+    <div class="two">
+      <canvas id="halfSet" class="stage" width="520" height="300"></canvas>
+      <div>
+        <p>小禾有 4 张贴纸，拿出 1/2，是 2 张。</p>
+        <p>阿南有 10 张贴纸，拿出 1/2，是 5 张。</p>
+        <p>两人拿出的张数不同，但都是「自己全部贴纸」的一半。分数相同，整体不同，具体个数就不同。</p>
+        <p class="rule">比较分数前，先问：他们的 1 一样大吗？</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="再认识一 · 练习">
+    <div class="kicker">再认识（一）· 附近练习</div>
+    <h2>说一说，再点开答案</h2>
+    <div class="quiz">
+      <div>把一条彩带平均分成 5 段，用了 2 段做书签。用了这条彩带的几分之几？
+        <span class="answer" data-ans>2/5</span></div>
+      <div>12 只纸鹤里，黄色占 3/4。黄色有几只？
+        <span class="answer" data-ans>9 只（12÷4×3）</span></div>
+      <div>两块蛋糕都切成 4 等份。甲吃了 3 份，乙吃了 2 份。谁吃的一定更多？
+        <span class="answer" data-ans>不一定。要看两块蛋糕是不是一样大。</span></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <b>拔高</b>
+      <p>一个图形由 12 个同样大的小格组成，已经涂了 3 格。如果这 3 格恰好是整个图形的 1/4，对吗？如果要把涂色改成正好 1/3，还要再涂几格？</p>
+      <span class="answer" data-ans>3 格是 3/12＝1/4，对。1/3 应涂 4 格，再涂 1 格。</span>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="练一练一 · 知识">
+    <div class="kicker">练一练（一）· 知识点</div>
+    <h2>在图上认出「几分之几」</h2>
+    <div class="three">
+      <div class="card"><b>线段</b><p>整段是 1。看涂色长度占整段的几分之几，份要一样长。</p></div>
+      <div class="card"><b>圆</b><p>整个圆是 1。扇形要同样大。3/4 就是涂了四个同样扇形里的三个。</p></div>
+      <div class="card"><b>一堆物品</b><p>先数总数，再按分母分组，分子告诉你取几组。</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="练一练一 · 线段圆">
+    <div class="kicker">练一练（一）</div>
+    <h2>哪一段是整根棒的 1/3？圆的 3/4 涂在哪？</h2>
+    <div class="two">
+      <div class="stage-wrap">
+        <canvas id="sticks" class="stage" width="520" height="220"></canvas>
+        <p class="tiny" id="stickslab">点一根棒：只有真正占整根 1/3 的那根才算对。</p>
+      </div>
+      <div class="stage-wrap">
+        <canvas id="pies" class="stage" width="520" height="220"></canvas>
+        <p class="tiny" id="pieslab">点一个圆：找出涂了 3/4 的那个。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="练一练一 · 集合">
+    <div class="kicker">练一练（一）</div>
+    <h2>这些贝壳的 2/3 是几个？</h2>
+    <div class="two">
+      <canvas id="shells" class="stage" width="560" height="300"></canvas>
+      <div>
+        <p>点下方三个盒子，切换 6、9、15 枚贝壳。每次先把总数平均分成 3 份，再取 2 份。</p>
+        <div class="toolbar">
+          <button type="button" data-shells="6">6 枚</button>
+          <button type="button" data-shells="9">9 枚</button>
+          <button type="button" data-shells="15">15 枚</button>
+        </div>
+        <p class="mark" id="shellAns">？</p>
+        <p class="hintbox">想一想：总数必须能被 3 整除，才能正好分成三组。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="练一练一 · 生活">
+    <div class="kicker">练一练（一）</div>
+    <h2>生活里的分数，说的是哪一个 1？</h2>
+    <div class="quiz">
+      <div>校园开放日海报：版面的 1/3 用来画路线图。这里的 1 是什么？
+        <span class="answer" data-ans>整张海报的面积。</span></div>
+      <div>班级义卖筹到的钱，拿出 2/5 买绘本。这里的 1 是什么？
+        <span class="answer" data-ans>这次义卖筹到的全部钱。</span></div>
+      <div>操场跑步，小禾跑了全程的 3/4。这里的 1 是什么？
+        <span class="answer" data-ans>这次跑的全程长度。</span></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <b>拔高</b>
+      <p>阿南捐出零花钱的 1/4，小禾捐出零花钱的 3/4。小禾捐的一定更多吗？</p>
+      <span class="answer" data-ans>不一定。如果阿南原来有 40 元，捐 10 元；小禾原来有 8 元，捐 6 元。分数大，不等于实际数量大。</span>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="再认识二 · 纸条">
+    <div class="kicker">再认识（二）· 知识点</div>
+    <h2>用一张纸条当尺子</h2>
+    <div class="two">
+      <canvas id="strip" class="stage" width="520" height="300"></canvas>
+      <div>
+        <p>把一张固定长度的纸条当作 1。量封面的宽：刚好量了 3 次，宽就是 3 个纸条长。</p>
+        <p>量封面的长：量了 4 次还剩一小截。这一截不够 1 张纸条，就把它写成纸条的几分之几。</p>
+        <div class="toolbar">
+          <button type="button" id="foldBtn">再对折一次</button>
+          <button type="button" id="foldReset">恢复整张</button>
+        </div>
+        <p class="tiny" id="foldLab">现在纸条还是「1」。对折后，每一小段是 1/2；再折是 1/4……</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="再认识二 · 剩余">
+    <div class="kicker">再认识（二）</div>
+    <h2>量不完的那一截，也是分数</h2>
+    <p class="lead">整张纸条是 1。对折一次，每一段是 1/2；再对折，每一段是 1/4。如果剩余差不多是纸条的 1/4，就可以记作「4 张纸条再加 1/4 张」。</p>
+    <p class="rule">余下的长度 ÷ 纸条全长 ＝ 一个真分数。</p>
+    <p>量的时候要保持纸条不拉伸，对齐端点，折痕要尽量平均，这样每一份才真的一样长。</p>
+  </section>
+
+  <section class="slide" data-toc="再认识二 · 分数墙">
+    <div class="kicker">再认识（二）</div>
+    <h2>搭一座分数墙</h2>
+    <p>点每一行的空格，填上单位分数。同一行拼满，合起来就是 1。</p>
+    <canvas id="wall" class="stage" width="920" height="340" style="max-width:100%"></canvas>
+    <div class="toolbar">
+      <button type="button" id="wallFill">自动填满</button>
+      <button type="button" id="wallClear">清空</button>
+      <span class="tiny" id="wallLab">观察：2 个 1/2＝1，3 个 1/3＝1……同一竖线对齐的格子表示同样长。</span>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="再认识二 · 单位">
+    <div class="kicker">再认识（二）· 分数单位</div>
+    <h2>1/2，1/3，1/4，1/5……叫分数单位</h2>
+    <div class="two">
+      <canvas id="cmp" class="stage" width="520" height="260"></canvas>
+      <div>
+        <p>把同样长的 1 平均分成的份数越多，每一份就越小。所以 1/2 比 1/3 大。</p>
+        <p>几个相同的分数单位可以合成 1：9 个 1/9 就是 1。</p>
+        <p class="rule">几分之几，就是几个这样的分数单位。</p>
+        <p>例如 3/5 里有 3 个 1/5；5 个 1/5 是 1。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="再认识二 · 练习">
+    <div class="kicker">再认识（二）· 附近练习</div>
+    <h2>填一填</h2>
+    <div class="quiz">
+      <div>（　）个 1/6 是 1；4/6 里有（　）个 1/6。
+        <span class="answer" data-ans>6；4</span></div>
+      <div>不用算乘法，只看分数墙：1/4 和 1/5 谁更大？
+        <span class="answer" data-ans>1/4 更大。份数少，每一份更长。</span></div>
+      <div>用一张纸条量桌面，量了 5 次还剩大约半张纸条。桌面大约是几张纸条长？
+        <span class="answer" data-ans>5 又 1/2 张纸条长。</span></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <b>拔高</b>
+      <p>在分数墙上，2 个 1/4 和 1 个 1/2 一样长吗？3 个 1/6 和 1 个 1/2 呢？</p>
+      <span class="answer" data-ans>2 个 1/4＝1/2，一样长。3 个 1/6＝1/2，也一样长。这就是「相等的分数」的直观样子。</span>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="练一练二 · 十分之几">
+    <div class="kicker">练一练（二）· 知识点</div>
+    <h2>把 1 平均分成 10 份</h2>
+    <div class="three">
+      <div class="card"><b>长度</b><p>1 分米＝10 厘米，所以 1 厘米是 1 分米的 1/10，3 厘米是 3/10 分米。</p></div>
+      <div class="card"><b>钱币</b><p>1 元＝10 角，所以 1 角是 1 元的 1/10，7 角是 7/10 元。</p></div>
+      <div class="card"><b>数轴</b><p>从 0 到 1 均分成 10 段，每一小段是 1/10。几个 1/10 就是十分之几。</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="练一练二 · 厘米角">
+    <div class="kicker">练一练（二）</div>
+    <h2>尺子和一排小票</h2>
+    <div class="two">
+      <div class="stage-wrap">
+        <canvas id="ruler" class="stage" width="520" height="200"></canvas>
+        <p>点尺子上的刻度。10 厘米＝1 分米。选中的长度是 1 分米的几分之几？</p>
+        <p class="mark" id="rulerLab">0/10</p>
+      </div>
+      <div class="stage-wrap">
+        <canvas id="tickets" class="stage" width="520" height="200"></canvas>
+        <p>10 张同样的入场券合成 1 元。点亮几张，就是几角，也是 1 元的几分之几。</p>
+        <p class="mark" id="tickLab">0 角＝0/10 元</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="练一练二 · 数轴">
+    <div class="kicker">练一练（二）</div>
+    <h2>0 到 1，十分之几</h2>
+    <canvas id="nline" class="stage" width="920" height="220" style="max-width:100%"></canvas>
+    <p>点刻度：3 个 1/10 是 <b id="n1">？</b>；7/10 里有 <b id="n2">？</b> 个 1/10；<b id="n3">？</b> 个 1/10 是 1。</p>
+    <p class="hintbox">越靠近 0 的分数越小，越靠近 1 的分数越大。先看分母是不是 10，再看分子。</p>
+    <div class="toolbar">
+      <button type="button" data-tick="3">跳到 3/10</button>
+      <button type="button" data-tick="7">跳到 7/10</button>
+      <button type="button" data-tick="10">跳到 1</button>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="练一练二 · 靠近">
+    <div class="kicker">练一练（二）</div>
+    <h2>哪些更靠近 0？哪些更靠近 1？</h2>
+    <p>先点分数，再点左边或右边的圈。想一想：分子和分母差不多大，就靠近 1；分子很小，就靠近 0。</p>
+    <div class="toolbar" id="fracPool"></div>
+    <div class="bins">
+      <div class="bin" id="bin0" data-bin="0"><h3>更靠近 0</h3></div>
+      <div class="bin" id="bin1" data-bin="1"><h3>更靠近 1</h3></div>
+    </div>
+    <div class="toolbar" style="margin-top:10px">
+      <button type="button" id="checkSort">核对</button>
+      <button type="button" id="resetSort">重来</button>
+      <span class="tiny" id="sortLab">还没核对</span>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="练一练二 · 练习">
+    <div class="kicker">练一练（二）· 附近练习</div>
+    <h2>最后一组</h2>
+    <div class="quiz">
+      <div>4 厘米是 1 分米的（　）；9 厘米是 1 分米的（　）。
+        <span class="answer" data-ans>4/10；9/10</span></div>
+      <div>3 角是 1 元的（　）。8 个 1/10 是（　）。
+        <span class="answer" data-ans>3/10；8/10</span></div>
+      <div>在 1/10、4/10、9/10 里，最靠近 0 的是（　），最靠近 1 的是（　）。
+        <span class="answer" data-ans>1/10；9/10</span></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <b>拔高</b>
+      <p>把 2/9、7/8、1/7、5/6 分成「靠近 0」和「靠近 1」两类，并说明你怎么判断，不必先通分。</p>
+      <span class="answer" data-ans>靠近 0：2/9、1/7（分子远小于分母）。靠近 1：7/8、5/6（再加一份就到 1）。</span>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="小结">
+    <div class="kicker">带回教室的三句话</div>
+    <h2>分数，是在说「份」</h2>
+    <div class="three">
+      <div class="card"><b>1. 先找整体</b><p>一块、一群、一条、一圆、一元，都可以是 1。</p></div>
+      <div class="card"><b>2. 必须平均分</b><p>分母是份数，分子是取走的份数。分数单位就是「这样的一份」。</p></div>
+      <div class="card"><b>3. 十分之几特别好用</b><p>厘米、角、数轴都在帮你把 1 切成 10 份。</p></div>
+    </div>
+    <p class="rule">下一题先问自己：谁是 1？分成几份？取了几份？</p>
+  </section>
+</main>
+
+<footer class="footer">
+  <span id="counter">01 / 22</span>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="nav">
+    <button type="button" id="prev" aria-label="上一页">←</button>
+    <button type="button" id="next" aria-label="下一页">→</button>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  function prep(c){
+    const cssW = c.getBoundingClientRect().width || c.width;
+    const ratio = cssW / c.width;
+    const w = c.width, h = c.height;
+    c.style.height = (h * ratio) + 'px';
+    c.width = w * dpr; c.height = h * dpr;
+    const ctx = c.getContext('2d');
+    ctx.scale(dpr, dpr);
+    ctx._w = w; ctx._h = h;
+    return ctx;
+  }
+  function hit(c, e){
+    const r = c.getBoundingClientRect();
+    const x = (e.clientX - r.left) * (c._lw / r.width);
+    const y = (e.clientY - r.top) * (c._lh / r.height);
+    return {x,y};
+  }
+  function bindHit(c){
+    c._lw = c.width / dpr; c._lh = c.height / dpr;
+  }
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+  }
+
+  /* ---- hero pie ---- */
+  const hero = document.getElementById('heroPie');
+  const hctx = prep(hero); bindHit(hero);
+  const heroOn = [true,true,true,false];
+  function drawHero(){
+    const w=hero._lw,h=hero._lh,cx=w/2,cy=h/2+6,R=Math.min(w,h)*0.36;
+    hctx.clearRect(0,0,w,h);
+    hctx.fillStyle='#f6efe4'; hctx.fillRect(0,0,w,h);
+    heroOn.forEach((on,i)=>{
+      hctx.beginPath(); hctx.moveTo(cx,cy);
+      hctx.arc(cx,cy,R,-Math.PI/2+i*Math.PI/2,-Math.PI/2+(i+1)*Math.PI/2);
+      hctx.closePath();
+      hctx.fillStyle = on ? '#c45c26' : '#ead9c2';
+      hctx.fill(); hctx.strokeStyle='#1b365d'; hctx.lineWidth=3; hctx.stroke();
+    });
+    hctx.fillStyle='#1b365d'; hctx.font='600 22px Noto Sans SC'; hctx.textAlign='center';
+    const n = heroOn.filter(Boolean).length;
+    hctx.fillText(n+'/4', cx, h-28);
+  }
+  hero.addEventListener('click',e=>{
+    const {x,y}=hit(hero,e); const w=hero._lw,h=hero._lh,cx=w/2,cy=h/2+6;
+    const a = Math.atan2(y-cy,x-cx); let t=(a+Math.PI/2+Math.PI*2)%(Math.PI*2);
+    const i=Math.floor(t/(Math.PI/2))%4; heroOn[i]=!heroOn[i]; drawHero();
+  });
+  drawHero();
+
+  /* ---- 3/4 square + stars ---- */
+  const sq = document.getElementById('sq34');
+  const sctx = prep(sq); bindHit(sq);
+  const cells = [1,1,1,0];
+  const stars = Array(8).fill(0).map((_,i)=> i<6?1:0);
+  function starPath(ctx,x,y,r){
+    ctx.beginPath();
+    for(let i=0;i<5;i++){
+      const a=-Math.PI/2+i*2*Math.PI/5, b=a+Math.PI/5;
+      ctx.lineTo(x+Math.cos(a)*r, y+Math.sin(a)*r);
+      ctx.lineTo(x+Math.cos(b)*r*0.4, y+Math.sin(b)*r*0.4);
+    }
+    ctx.closePath();
+  }
+  function drawSq(){
+    const w=sq._lw,h=sq._lh; sctx.clearRect(0,0,w,h);
+    sctx.fillStyle='#fffdf8'; sctx.fillRect(0,0,w,h);
+    const g=118, ox=36, oy=70;
+    cells.forEach((on,i)=>{
+      const x=ox+(i%2)*g, y=oy+Math.floor(i/2)*g;
+      sctx.fillStyle=on?'#2c7a6e':'#ead9c2';
+      sctx.fillRect(x,y,g-8,g-8);
+      sctx.strokeStyle='#1b365d'; sctx.lineWidth=3; sctx.strokeRect(x,y,g-8,g-8);
+    });
+    sctx.fillStyle='#1b365d'; sctx.font='600 16px Noto Sans SC';
+    sctx.fillText('一张卡纸 = 1', ox, 42);
+    const n=cells.reduce((a,b)=>a+b,0);
+    sctx.fillText(n+'/4', ox+70, h-18);
+    stars.forEach((on,i)=>{
+      const x=310+(i%4)*50, y=100+Math.floor(i/4)*70;
+      starPath(sctx,x,y,22);
+      sctx.fillStyle=on?'#e8b86d':'#ead9c2'; sctx.fill();
+      sctx.strokeStyle='#1b365d'; sctx.lineWidth=2; sctx.stroke();
+    });
+    sctx.fillText('8 颗星 = 1', 310, 42);
+    const m=stars.reduce((a,b)=>a+b,0);
+    sctx.fillText(m+'/8 = '+(m/2)+'/4', 310, h-18);
+    document.getElementById('sq34lab').textContent = `卡纸 ${n}/4 · 星星 ${m}/8`;
+  }
+  sq.addEventListener('click',e=>{
+    const {x,y}=hit(sq,e);
+    const g=118, ox=36, oy=70;
+    for(let i=0;i<4;i++){
+      const cx=ox+(i%2)*g, cy=oy+Math.floor(i/2)*g;
+      if(x>=cx&&x<=cx+g-8&&y>=cy&&y<=cy+g-8){cells[i]^=1; drawSq(); return;}
+    }
+    stars.forEach((_,i)=>{
+      const sx=310+(i%4)*50, sy=100+Math.floor(i/4)*70;
+      if((x-sx)**2+(y-sy)**2<26*26){stars[i]^=1; drawSq();}
+    });
+  });
+  document.querySelector('[data-reset="sq34"]').onclick=()=>{cells.fill(0);stars.fill(0);drawSq();};
+  drawSq();
+
+  /* ---- polyominoes ---- */
+  const poly = document.getElementById('poly14');
+  const pctx = prep(poly); bindHit(poly);
+  const shapes = [
+    {ox:30, oy:70, cells:[[0,0],[1,0],[2,0],[3,0],[0,1],[1,1],[2,1],[3,1]]},
+    {ox:340, oy:40, cells:[[0,0],[0,1],[0,2],[1,2],[2,2],[2,1],[2,0],[1,0]]},
+    {ox:640, oy:50, cells:[[1,0],[0,1],[1,1],[2,1],[3,1],[1,2],[1,3],[2,3]]}
+  ];
+  const polyOn = shapes.map(s=>s.cells.map((_,i)=> i<2?1:0));
+  function drawPoly(){
+    const w=poly._lw,h=poly._lh,s=42;
+    pctx.clearRect(0,0,w,h); pctx.fillStyle='#fffdf8'; pctx.fillRect(0,0,w,h);
+    const names=['长条','弯折','台阶'];
+    shapes.forEach((sh,k)=>{
+      pctx.fillStyle='#1b365d'; pctx.font='600 15px Noto Sans SC';
+      pctx.fillText(names[k]+' · 涂 '+polyOn[k].reduce((a,b)=>a+b,0)+'/8', sh.ox, sh.oy-12);
+      sh.cells.forEach((c,i)=>{
+        const x=sh.ox+c[0]*s, y=sh.oy+c[1]*s;
+        pctx.fillStyle=polyOn[k][i]?'#c45c26':'#ead9c2';
+        pctx.fillRect(x,y,s-4,s-4);
+        pctx.strokeStyle='#1b365d'; pctx.lineWidth=2; pctx.strokeRect(x,y,s-4,s-4);
+      });
+    });
+    const ok = polyOn.every(row=>row.reduce((a,b)=>a+b,0)===2);
+    document.getElementById('poly14lab').textContent = ok
+      ? '三块都涂了 2 格，都是 1/4。外形可以完全不一样。'
+      : '每块一共 8 格。涂 2 格就是 1/4。再点一格试试。';
+  }
+  poly.addEventListener('click',e=>{
+    const {x,y}=hit(poly,e), s=42;
+    shapes.forEach((sh,k)=>{
+      sh.cells.forEach((c,i)=>{
+        const px=sh.ox+c[0]*s, py=sh.oy+c[1]*s;
+        if(x>=px&&x<=px+s-4&&y>=py&&y<=py+s-4){polyOn[k][i]^=1; drawPoly();}
+      });
+    });
+  });
+  drawPoly();
+
+  /* ---- half stickers ---- */
+  const half = document.getElementById('halfSet');
+  const hx = prep(half); bindHit(half);
+  function drawHalf(){
+    const w=half._lw,h=half._lh; hx.clearRect(0,0,w,h); hx.fillStyle='#16304f'; hx.fillRect(0,0,w,h);
+    function row(n,take,y,label){
+      hx.fillStyle='#e8b86d'; hx.font='600 14px Noto Sans SC'; hx.fillText(label, 24, y-12);
+      for(let i=0;i<n;i++){
+        hx.beginPath(); hx.arc(40+i*44, y+18, 16, 0, Math.PI*2);
+        hx.fillStyle = i<take ? '#e07a4a' : '#ead9c2'; hx.fill();
+        hx.strokeStyle='#f6efe4'; hx.stroke();
+      }
+    }
+    row(4,2,70,'小禾 4 张，拿出 1/2');
+    row(10,5,180,'阿南 10 张，拿出 1/2');
+  }
+  drawHalf();
+
+  /* ---- sticks & pies ---- */
+  const sticks = document.getElementById('sticks');
+  const sk = prep(sticks); bindHit(sticks);
+  const stickLens = [120, 200, 80];
+  const full = 360;
+  let stickPick = -1;
+  function drawSticks(){
+    const w=sticks._lw,h=sticks._lh; sk.clearRect(0,0,w,h); sk.fillStyle='#fffdf8'; sk.fillRect(0,0,w,h);
+    sk.fillStyle='#1b365d'; sk.font='600 14px Noto Sans SC'; sk.fillText('整根棒', 24, 28);
+    sk.strokeStyle='#1b365d'; sk.lineWidth=10; sk.lineCap='round';
+    sk.beginPath(); sk.moveTo(24,48); sk.lineTo(24+full,48); sk.stroke();
+    stickLens.forEach((len,i)=>{
+      const y=100+i*36;
+      sk.strokeStyle = stickPick===i ? '#c45c26' : '#2c7a6e';
+      sk.beginPath(); sk.moveTo(24,y); sk.lineTo(24+len,y); sk.stroke();
+      roundRect(sk, 400, y-12, 86, 24, 8);
+      sk.fillStyle = stickPick===i ? '#c45c26' : '#ead9c2'; sk.fill();
+      sk.fillStyle='#1b365d'; sk.font='700 12px Noto Sans SC'; sk.fillText('选 '+['甲','乙','丙'][i], 418, y+5);
+    });
+  }
+  sticks.addEventListener('click',e=>{
+    const {y}=hit(sticks,e);
+    stickLens.forEach((_,i)=>{ const yy=100+i*36; if(y>yy-18&&y<yy+18) stickPick=i; });
+    drawSticks();
+    const ok = stickPick===0;
+    document.getElementById('stickslab').textContent = stickPick<0 ? '点一根棒' : (ok ? '对，甲棒正好是整根的 1/3。' : '再比一比和整根的长度。');
+  });
+  drawSticks();
+
+  const pies = document.getElementById('pies');
+  const pk = prep(pies); bindHit(pies);
+  const pieShades = [3,2,1];
+  let piePick=-1;
+  function drawPies(){
+    const w=pies._lw,h=pies._lh; pk.clearRect(0,0,w,h); pk.fillStyle='#fffdf8'; pk.fillRect(0,0,w,h);
+    pieShades.forEach((n,i)=>{
+      const cx=90+i*160, cy=110, R=62;
+      for(let k=0;k<4;k++){
+        pk.beginPath(); pk.moveTo(cx,cy);
+        pk.arc(cx,cy,R,-Math.PI/2+k*Math.PI/2,-Math.PI/2+(k+1)*Math.PI/2);
+        pk.closePath();
+        pk.fillStyle = k<n ? '#e07a4a' : '#ead9c2'; pk.fill();
+        pk.strokeStyle='#1b365d'; pk.lineWidth=2; pk.stroke();
+      }
+      if(piePick===i){ pk.strokeStyle='#c45c26'; pk.lineWidth=4; pk.beginPath(); pk.arc(cx,cy,72,0,Math.PI*2); pk.stroke(); }
+    });
+  }
+  pies.addEventListener('click',e=>{
+    const {x}=hit(pies,e);
+    piePick = x<180?0:x<340?1:2;
+    drawPies();
+    document.getElementById('pieslab').textContent = piePick===0 ? '对，左边涂了 3 个同样大的 1/4，就是 3/4。' : '数一数涂了几个 1/4。';
+  });
+  drawPies();
+
+  /* ---- shells ---- */
+  const shells = document.getElementById('shells');
+  const shx = prep(shells); bindHit(shells);
+  let shellN = 6;
+  function drawShells(){
+    const w=shells._lw,h=shells._lh; shx.clearRect(0,0,w,h); shx.fillStyle='#fffdf8'; shx.fillRect(0,0,w,h);
+    const take = shellN/3*2;
+    for(let i=0;i<shellN;i++){
+      const x=50+(i%5)*90, y=70+Math.floor(i/5)*80;
+      shx.beginPath(); shx.ellipse(x,y,28,18, -0.4, 0, Math.PI*2);
+      shx.fillStyle = i<take ? '#2c7a6e' : '#ead9c2'; shx.fill();
+      shx.strokeStyle='#1b365d'; shx.stroke();
+    }
+    document.getElementById('shellAns').textContent = take + ' 个';
+  }
+  document.querySelectorAll('[data-shells]').forEach(b=>b.onclick=()=>{shellN=+b.dataset.shells; drawShells();});
+  drawShells();
+
+  /* ---- strip measure ---- */
+  const strip = document.getElementById('strip');
+  const stx = prep(strip); bindHit(strip);
+  let folds = 0;
+  function drawStrip(){
+    const w=strip._lw,h=strip._lh; stx.clearRect(0,0,w,h); stx.fillStyle='#fffdf8'; stx.fillRect(0,0,w,h);
+    const bookW=360, bookH=210, ox=80, oy=40;
+    stx.fillStyle='#1b365d'; roundRect(stx,ox,oy,bookW,bookH,8); stx.fill();
+    stx.fillStyle='#e8b86d'; stx.font='700 28px ZCOOL XiaoWei, serif'; stx.fillText('数学', ox+24, oy+50);
+    const unit = 90 / Math.pow(2, folds);
+    const parts = Math.pow(2, folds);
+    let x=ox;
+    for(let i=0;i<5*parts && x<ox+bookW+2;i++){
+      stx.fillStyle = i%2? '#e07a4a':'#f6efe4';
+      stx.fillRect(x, oy+bookH+8, Math.min(unit, ox+bookW-x), 18);
+      x+=unit;
+    }
+    stx.fillStyle='#1b365d'; stx.font='600 14px Noto Sans SC';
+    const label = folds===0 ? '整张纸条 = 1' : ('每一小段 = 1/' + parts);
+    stx.fillText(label, ox, h-16);
+    document.getElementById('foldLab').textContent = label + '。剩余不足一段时，就用更小的分数单位去量。';
+  }
+  document.getElementById('foldBtn').onclick=()=>{folds=Math.min(3,folds+1); drawStrip();};
+  document.getElementById('foldReset').onclick=()=>{folds=0; drawStrip();};
+  drawStrip();
+
+  /* ---- fraction wall ---- */
+  const wall = document.getElementById('wall');
+  const wx = prep(wall); bindHit(wall);
+  const denoms = [1,2,3,4,5,6];
+  const filled = denoms.map(d=>Array(d).fill(false));
+  filled[0][0]=true;
+  function drawWall(){
+    const w=wall._lw,h=wall._lh; wx.clearRect(0,0,w,h); wx.fillStyle='#fffdf8'; wx.fillRect(0,0,w,h);
+    const left=70, top=24, barH=44, total=820;
+    const cols=['#1b365d','#c45c26','#2c7a6e','#e07a4a','#274a78','#e8b86d'];
+    denoms.forEach((d,row)=>{
+      const y=top+row*(barH+8);
+      wx.fillStyle='#1b365d'; wx.font='700 13px Noto Sans SC'; wx.textAlign='right';
+      wx.fillText(d===1?'1':('1/'+d+' ×'+d), left-8, y+28);
+      wx.textAlign='left';
+      for(let i=0;i<d;i++){
+        const x=left+i*(total/d), bw=total/d-4;
+        wx.fillStyle = filled[row][i] ? cols[row] : '#ead9c2';
+        roundRect(wx,x,y,bw,barH,6); wx.fill();
+        wx.strokeStyle='#1b365d'; wx.lineWidth=1.5; wx.stroke();
+        if(filled[row][i]){
+          wx.fillStyle = row===0||row===5 ? '#1b2430' : '#fff';
+          wx.font='700 14px Noto Sans SC';
+          wx.fillText(d===1?'1':('1/'+d), x+8, y+28);
+        }
+      }
+    });
+  }
+  wall.addEventListener('click',e=>{
+    const {x,y}=hit(wall,e);
+    const left=70, top=24, barH=44, total=820;
+    denoms.forEach((d,row)=>{
+      const yy=top+row*(barH+8);
+      if(y>=yy&&y<=yy+barH){
+        const i=Math.floor((x-left)/(total/d));
+        if(i>=0&&i<d){ filled[row][i]=!filled[row][i]; drawWall(); }
+      }
+    });
+  });
+  document.getElementById('wallFill').onclick=()=>{filled.forEach(r=>r.fill(true)); drawWall();};
+  document.getElementById('wallClear').onclick=()=>{filled.forEach((r,i)=>r.fill(i===0)); drawWall();};
+  drawWall();
+
+  /* ---- compare 1/2 1/3 ---- */
+  const cmp = document.getElementById('cmp');
+  const cx = prep(cmp);
+  (function(){
+    const w=cmp._lw,h=cmp._lh; cx.clearRect(0,0,w,h); cx.fillStyle='#16304f'; cx.fillRect(0,0,w,h);
+    const total=400, left=50, y1=70, y2=150;
+    cx.fillStyle='#e8b86d'; cx.fillRect(left,y1,total/2-4,48);
+    cx.fillStyle='#ead9c2'; cx.fillRect(left+total/2,y1,total/2-4,48);
+    cx.fillStyle='#e07a4a'; cx.fillRect(left,y2,total/3-4,48);
+    cx.fillStyle='#ead9c2'; cx.fillRect(left+total/3,y2,total/3-4,48);
+    cx.fillStyle='#ead9c2'; cx.fillRect(left+2*total/3,y2,total/3-4,48);
+    cx.fillStyle='#f6efe4'; cx.font='700 16px Noto Sans SC';
+    cx.fillText('1/2', left+70, y1+30); cx.fillText('1/3', left+40, y2+30);
+    cx.fillText('同样的 1 里，1/2 > 1/3', left, h-24);
+  })();
+
+  /* ---- ruler ---- */
+  const ruler = document.getElementById('ruler');
+  const rx = prep(ruler); bindHit(ruler);
+  let cm = 3;
+  function drawRuler(){
+    const w=ruler._lw,h=ruler._lh; rx.clearRect(0,0,w,h); rx.fillStyle='#fffdf8'; rx.fillRect(0,0,w,h);
+    const left=40, top=80, total=440;
+    rx.fillStyle='#ead9c2'; rx.fillRect(left, top, total, 28);
+    rx.fillStyle='#2c7a6e'; rx.fillRect(left, top, total*cm/10, 28);
+    rx.strokeStyle='#1b365d'; rx.strokeRect(left, top, total, 28);
+    for(let i=0;i<=10;i++){
+      const x=left+i*(total/10);
+      rx.beginPath(); rx.moveTo(x,top); rx.lineTo(x, top+(i%5?16:28)); rx.stroke();
+      rx.fillStyle='#1b365d'; rx.font='12px Noto Sans SC'; rx.textAlign='center';
+      rx.fillText(String(i), x, top+48);
+    }
+    rx.textAlign='left'; rx.font='600 14px Noto Sans SC'; rx.fillText('厘米（10 厘米 = 1 分米）', left, 36);
+    document.getElementById('rulerLab').textContent = cm+'/10 分米';
+  }
+  ruler.addEventListener('click',e=>{
+    const {x}=hit(ruler,e); const left=40,total=440;
+    cm = Math.max(0, Math.min(10, Math.round((x-left)/total*10)));
+    drawRuler();
+  });
+  drawRuler();
+
+  /* ---- tickets ---- */
+  const tickets = document.getElementById('tickets');
+  const tx = prep(tickets); bindHit(tickets);
+  const lit = Array(10).fill(false).map((_,i)=>i<7);
+  function drawTickets(){
+    const w=tickets._lw,h=tickets._lh; tx.clearRect(0,0,w,h); tx.fillStyle='#fffdf8'; tx.fillRect(0,0,w,h);
+    for(let i=0;i<10;i++){
+      const x=24+(i%5)*96, y=36+Math.floor(i/5)*76;
+      roundRect(tx,x,y,84,64,8);
+      tx.fillStyle = lit[i] ? '#e8b86d' : '#ead9c2'; tx.fill();
+      tx.strokeStyle='#1b365d'; tx.stroke();
+      tx.fillStyle='#1b365d'; tx.font='700 13px Noto Sans SC'; tx.fillText('1 角', x+22, y+38);
+    }
+    const n=lit.filter(Boolean).length;
+    document.getElementById('tickLab').textContent = n+' 角＝'+n+'/10 元';
+  }
+  tickets.addEventListener('click',e=>{
+    const {x,y}=hit(tickets,e);
+    for(let i=0;i<10;i++){
+      const px=24+(i%5)*96, py=36+Math.floor(i/5)*76;
+      if(x>=px&&x<=px+84&&y>=py&&y<=py+64){lit[i]=!lit[i]; drawTickets();}
+    }
+  });
+  drawTickets();
+
+  /* ---- number line ---- */
+  const nline = document.getElementById('nline');
+  const nx = prep(nline); bindHit(nline);
+  let tick = 3;
+  function drawLine(){
+    const w=nline._lw,h=nline._lh; nx.clearRect(0,0,w,h); nx.fillStyle='#fffdf8'; nx.fillRect(0,0,w,h);
+    const left=50, right=w-50, y=110, total=right-left;
+    nx.strokeStyle='#1b365d'; nx.lineWidth=4; nx.beginPath(); nx.moveTo(left,y); nx.lineTo(right,y); nx.stroke();
+    for(let i=0;i<=10;i++){
+      const x=left+i*total/10;
+      nx.beginPath(); nx.moveTo(x,y-14); nx.lineTo(x,y+14); nx.lineWidth=2; nx.stroke();
+      nx.fillStyle='#1b365d'; nx.font='12px Noto Sans SC'; nx.textAlign='center';
+      nx.fillText(i===10?'1': (i+'/10'), x, y+36);
+    }
+    const px=left+tick*total/10;
+    nx.fillStyle='#c45c26'; nx.beginPath(); nx.arc(px,y,10,0,Math.PI*2); nx.fill();
+    nx.font='700 18px Noto Sans SC'; nx.fillText(tick===10?'1':tick+'/10', px, 48);
+    document.getElementById('n1').textContent = tick===3 ? '3/10' : '点 3/10 看看';
+    document.getElementById('n2').textContent = tick===7 ? '7' : '点 7/10 看看';
+    document.getElementById('n3').textContent = tick===10 ? '10' : '点 1 看看';
+  }
+  nline.addEventListener('click',e=>{
+    const {x}=hit(nline,e); const left=50, total=nline._lw-100;
+    tick = Math.max(0, Math.min(10, Math.round((x-left)/total*10)));
+    drawLine();
+  });
+  document.querySelectorAll('[data-tick]').forEach(b=>b.onclick=()=>{tick=+b.dataset.tick; drawLine();});
+  drawLine();
+
+  /* ---- sort ---- */
+  const pool = [
+    {t:'1/5', near:0},{t:'4/5', near:1},{t:'5/6', near:1},{t:'6/7', near:1},
+    {t:'3/8', near:0},{t:'1/8', near:0},{t:'2/9', near:0}
+  ];
+  let picked = null;
+  const place = {};
+  const fracPool = document.getElementById('fracPool');
+  function renderPool(){
+    fracPool.innerHTML='';
+    pool.forEach((f,i)=>{
+      if(place[i]!=null) return;
+      const b=document.createElement('button'); b.className='chip'+(picked===i?' picked':''); b.type='button'; b.textContent=f.t;
+      b.onclick=()=>{picked=i; renderPool();};
+      fracPool.appendChild(b);
+    });
+  }
+  function refreshBins(){
+    document.getElementById('bin0').querySelectorAll('.chip').forEach(n=>n.remove());
+    document.getElementById('bin1').querySelectorAll('.chip').forEach(n=>n.remove());
+    Object.entries(place).forEach(([i,b])=>{
+      const chip=document.createElement('button'); chip.className='chip in'+b; chip.type='button'; chip.textContent=pool[i].t;
+      chip.onclick=()=>{ delete place[i]; renderPool(); refreshBins(); };
+      document.getElementById('bin'+b).appendChild(chip);
+    });
+  }
+  function putIn(bin){
+    if(picked==null) return;
+    place[picked]=bin; picked=null; renderPool(); refreshBins();
+  }
+  document.getElementById('bin0').addEventListener('click',e=>{ if(e.target.closest('.chip')) return; putIn(0); });
+  document.getElementById('bin1').addEventListener('click',e=>{ if(e.target.closest('.chip')) return; putIn(1); });
+  document.getElementById('checkSort').onclick=()=>{
+    const keys=Object.keys(place);
+    if(keys.length<pool.length){ document.getElementById('sortLab').textContent='先把 7 个分数都放进去。'; return; }
+    const wrong=keys.filter(i=>place[i]!==pool[i].near);
+    document.getElementById('sortLab').textContent = wrong.length? ('有 '+wrong.length+' 个再想想：分子远小于分母就靠近 0。') : '全对！靠近 1 的，再加一点点就到整体了。';
+  };
+  document.getElementById('resetSort').onclick=()=>{ Object.keys(place).forEach(k=>delete place[k]); picked=null; renderPool(); refreshBins(); document.getElementById('sortLab').textContent='还没核对'; };
+  renderPool();
+
+  /* ---- deck nav ---- */
+  document.querySelectorAll('[data-ans]').forEach(el=>{
+    el.addEventListener('click',e=>{ e.stopPropagation(); el.classList.toggle('revealed'); });
+  });
+  const slides=[...document.querySelectorAll('.slide')];
+  const dots=document.getElementById('dots'), counter=document.getElementById('counter'), bar=document.getElementById('bar');
+  const toc=document.getElementById('toc'), tocGrid=document.getElementById('tocGrid');
+  let current=0, startX=0;
+  slides.forEach((s,i)=>{
+    const b=document.createElement('button'); b.setAttribute('aria-label','第'+(i+1)+'页'); b.onclick=()=>go(i); dots.appendChild(b);
+    const tb=document.createElement('button'); tb.innerHTML='<b>'+String(i+1).padStart(2,'0')+'</b> '+(s.dataset.toc||'');
+    tb.onclick=()=>{toc.classList.remove('open'); go(i);}; tocGrid.appendChild(tb);
+  });
+  const dotButtons=[...dots.children];
+  function go(n){
+    n=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,i)=>{s.classList.toggle('active',i===n); s.classList.toggle('exit',i<n)});
+    current=n;
+    counter.textContent=String(n+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+    bar.style.width=((n+1)/slides.length*100)+'%';
+    dotButtons.forEach((d,i)=>d.classList.toggle('active',i===n));
+    location.hash='slide-'+(n+1);
+  }
+  document.getElementById('tocOpen').onclick=()=>toc.classList.add('open');
+  document.getElementById('tocClose').onclick=()=>toc.classList.remove('open');
+  document.getElementById('prev').onclick=()=>go(current-1);
+  document.getElementById('next').onclick=()=>go(current+1);
+  addEventListener('keydown',e=>{
+    if(e.key==='Escape') toc.classList.remove('open');
+    if(toc.classList.contains('open')) return;
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault(); go(current+1)}
+    if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault(); go(current-1)}
+    if(e.key==='Home') go(0); if(e.key==='End') go(slides.length-1);
+  });
+  document.getElementById('deck').addEventListener('click',e=>{
+    if(e.target.closest('button,canvas,.answer,.chip,.bin,.toolbar,.stage-wrap')) return;
+    go(current+(e.clientX>innerWidth*.38?1:-1));
+  });
+  addEventListener('touchstart',e=>startX=e.changedTouches[0].clientX,{passive:true});
+  addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX; if(Math.abs(dx)>45) go(current+(dx<0?1:-1));},{passive:true});
+  const initial=parseInt(location.hash.replace('#slide-',''),10);
+  go(Number.isFinite(initial)?initial-1:0);
+})();
+</script>
+</body>
+</html>
