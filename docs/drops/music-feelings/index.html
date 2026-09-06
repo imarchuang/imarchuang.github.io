@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1a1030">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>How does music make us feel?｜英语互动课</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#120a22; --panel:#1e1434; --ink:#f7f1ff; --muted:#b7a8d4;
+      --pink:#ff6b9d; --mint:#7ee0c8; --gold:#ffd166; --lilac:#c9b6ff; --sky:#7eb8ff;
+      --card:rgba(255,255,255,.08); --line:rgba(255,255,255,.16);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink)}
+    body{font-family:Outfit,sans-serif}
+    button{font:inherit}
+    .deck{width:100%;height:100%;position:relative}
+    .slide{
+      position:absolute;inset:0;
+      padding:clamp(28px,5vw,64px) clamp(20px,5.5vw,88px) clamp(62px,8vh,86px);
+      display:grid;align-content:center;gap:12px;
+      opacity:0;transform:translateY(12px);pointer-events:none;visibility:hidden;z-index:0;
+      transition:.42s cubic-bezier(.22,.8,.25,1);overflow:auto;
+      background:
+        radial-gradient(900px 420px at 8% -8%,rgba(255,107,157,.22),transparent 55%),
+        radial-gradient(700px 380px at 100% 0%,rgba(126,224,200,.14),transparent 50%),
+        linear-gradient(160deg,#120a22,#1a1030 55%,#241448);
+    }
+    .slide.active{opacity:1;transform:none;pointer-events:auto;visibility:visible;z-index:2}
+    .slide.dawn{
+      background:
+        radial-gradient(800px 380px at 90% 10%,rgba(255,209,102,.18),transparent 45%),
+        radial-gradient(700px 400px at 0% 80%,rgba(126,184,255,.16),transparent 50%),
+        linear-gradient(165deg,#1b1233,#2a1850);
+    }
+    .kicker{font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--mint);margin-bottom:4px}
+    h1,h2,h3,p{margin:0 0 .4em}
+    h1{font-family:Fraunces,serif;font-size:clamp(38px,7.2vw,86px);line-height:.98;font-weight:700}
+    h1 em{font-style:italic;color:var(--pink);font-weight:500}
+    h2{font-family:Fraunces,serif;font-size:clamp(26px,4.4vw,48px);line-height:1.12;font-weight:700}
+    h3{font-size:clamp(15px,1.6vw,20px);color:var(--gold)}
+    p,li{font-size:clamp(15px,1.5vw,20px);line-height:1.58;color:var(--ink)}
+    .lead{font-size:clamp(17px,2vw,26px);max-width:40rem;color:var(--lilac)}
+    .zh{font-size:clamp(12px,1.15vw,15px);color:var(--muted);margin-top:4px}
+    .two{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(14px,3.5vw,40px);align-items:center}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .four{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .grid8{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .card{
+      background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;
+      backdrop-filter:blur(8px);
+    }
+    .card b{display:block;margin-bottom:6px;font-size:clamp(15px,1.5vw,20px)}
+    .card p,.card li{font-size:clamp(13px,1.15vw,16px);margin:0;color:var(--lilac)}
+    .rule{
+      font-family:Fraunces,serif;font-size:clamp(18px,2.2vw,28px);color:var(--gold);
+      padding:10px 14px;border-left:5px solid var(--pink);background:rgba(255,107,157,.12);border-radius:0 12px 12px 0
+    }
+    canvas.stage{
+      width:100%;max-width:520px;height:auto;display:block;border-radius:50%;
+      cursor:pointer;touch-action:manipulation;background:transparent;
+    }
+    canvas.board{
+      width:100%;max-width:640px;height:auto;display:block;border-radius:18px;
+      cursor:pointer;touch-action:manipulation;background:#160e2c;border:1px solid var(--line)
+    }
+    .hintbox{font-size:13px;color:var(--muted)}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .chip,.toolbar button,.nav button,.toc-open,.qbtn{
+      border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);
+      border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:13px
+    }
+    .chip.on{background:var(--pink);border-color:var(--pink);color:#1a1030}
+    .chip.ok{background:var(--mint);border-color:var(--mint);color:#10221c}
+    .chip.bad{background:#ff8a7a;border-color:#ff8a7a;color:#2a1010}
+    .answer{filter:blur(7px);opacity:.45;transition:.2s;cursor:pointer;user-select:none;display:inline-block;background:rgba(255,209,102,.16);padding:3px 9px;border-radius:8px}
+    .answer:hover,.answer.revealed{filter:none;opacity:1}
+    .quiz{display:grid;gap:10px}
+    .quiz>div{background:var(--card);border-radius:14px;padding:12px 14px;border:1px solid var(--line)}
+    .dialogue{display:grid;gap:10px}
+    .bubble{background:rgba(126,224,200,.12);border:1px solid rgba(126,224,200,.28);border-radius:18px 18px 18px 6px;padding:12px 16px}
+    .bubble.b{background:rgba(255,107,157,.12);border-color:rgba(255,107,157,.3);border-radius:18px 18px 6px 18px}
+    .bubble .who{font-size:12px;letter-spacing:.12em;color:var(--gold);font-weight:700;margin-bottom:4px}
+    .post{
+      background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04));
+      border:1px solid var(--line);border-radius:22px;padding:18px 20px
+    }
+    .post .meta{font-size:12px;color:var(--muted);letter-spacing:.08em;margin-bottom:8px}
+    .match{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .footer{position:fixed;z-index:10;left:22px;right:22px;bottom:14px;display:flex;align-items:center;gap:14px;color:#fff;font:700 12px Outfit,sans-serif}
+    .progress{height:3px;background:rgba(255,255,255,.22);flex:1;border-radius:9px;overflow:hidden}
+    .progress i{height:100%;display:block;background:linear-gradient(90deg,var(--pink),var(--gold));width:0;transition:.3s}
+    .nav{display:flex;gap:8px}
+    .nav button{width:38px;height:34px;padding:0}
+    .hint{position:fixed;right:24px;top:18px;z-index:12;color:rgba(255,255,255,.72);font:11px/1.3 Outfit,sans-serif;text-align:right}
+    .dots{position:fixed;z-index:12;right:10px;top:50%;transform:translateY(-50%);display:grid;gap:5px}
+    .dots button{width:6px;height:6px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.35)}
+    .dots button.active{height:16px;border-radius:8px;background:var(--mint)}
+    .toc-open{position:fixed;z-index:30;left:18px;top:16px;letter-spacing:.12em}
+    .toc{position:fixed;z-index:40;inset:0;background:rgba(12,8,22,.96);color:#fff;padding:clamp(28px,5vw,70px);overflow:auto;display:none}
+    .toc.open{display:block}
+    .toc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .toc-grid button{min-height:64px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:inherit;padding:10px;cursor:pointer;text-align:left;border-radius:12px}
+    .toc-grid button:hover{background:rgba(255,107,157,.28)}
+    .toc-close{position:absolute;right:24px;top:18px;background:none;color:inherit;border:1px solid currentColor;border-radius:50%;width:38px;height:38px;cursor:pointer}
+    .writebox{width:100%;min-height:88px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--ink);padding:12px;font:inherit;resize:vertical}
+    .tiny{font-size:13px;color:var(--muted)}
+    .blank{border-bottom:2px dashed var(--gold);min-width:4.5em;display:inline-block;text-align:center;cursor:pointer;padding:0 6px}
+    .blank.filled{border-style:solid;color:var(--mint)}
+    @media(max-width:860px){
+      .slide{align-content:start;padding:68px 16px 78px}
+      .two,.three,.four,.grid8,.match,.toc-grid{grid-template-columns:1fr}
+      .hint,.dots{display:none}
+      canvas.stage{max-width:320px;margin:0 auto}
+    }
+    @media(prefers-reduced-motion:reduce){.slide{transition:none}}
+  </style>
+</head>
+<body>
+<button class="toc-open" id="tocOpen">目录</button>
+<div class="hint">← → 或空格翻页 · 点模糊处看答案 · 点画布互动</div>
+<div class="dots" id="dots"></div>
+<nav class="toc" id="toc" aria-label="目录">
+  <button class="toc-close" id="tocClose" type="button">×</button>
+  <h2>40-minute playlist</h2>
+  <p class="zh">点标题跳转到对应环节</p>
+  <div class="toc-grid" id="tocGrid"></div>
+</nav>
+<main class="deck" id="deck">
+
+  <section class="slide active" data-toc="封面">
+    <div class="two">
+      <div>
+        <div class="kicker">Unit 2 · Grade 7 English</div>
+        <h1>How does <em>music</em><br>make us feel?</h1>
+        <p class="lead">One song can calm you down. Another can make you jump. Today we name feelings, talk about music types, and write about our own playlists.</p>
+        <p class="zh">一节课走完：情绪词 → 音乐类型 → 对话 → 阅读 → -ed/-ing 语法 → 写作分享。</p>
+      </div>
+      <div>
+        <svg viewBox="0 0 360 280" width="100%" height="auto" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ff6b9d"/><stop offset="1" stop-color="#ffd166"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="180" cy="210" rx="120" ry="18" fill="rgba(0,0,0,.28)"/>
+          <circle cx="180" cy="150" r="96" fill="#2a1a48" stroke="url(#g1)" stroke-width="8"/>
+          <circle cx="180" cy="150" r="32" fill="#120a22" stroke="#7ee0c8" stroke-width="4"/>
+          <circle cx="180" cy="150" r="8" fill="#ffd166"/>
+          <path d="M248 58 v88 a22 22 0 1 1-8-16 V72 l28-10 v18" fill="none" stroke="#c9b6ff" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide dawn" data-toc="学习目标">
+    <div class="kicker">Learning goals · 约 40 分钟</div>
+    <h2>By the end of class</h2>
+    <div class="four">
+      <div class="card"><b>Feelings</b><p>Name eight feelings and say how a song makes you feel.</p><p class="zh">happy / sad / angry / afraid / excited / worried / nervous / surprised</p></div>
+      <div class="card"><b>Music types</b><p>Talk about classical, country, folk, jazz, pop, and rock.</p><p class="zh">把类型和情绪连起来</p></div>
+      <div class="card"><b>Grammar</b><p>Use -ed for how people feel, -ing for how music is.</p><p class="zh">excited vs exciting</p></div>
+      <div class="card"><b>Write & share</b><p>Write 4–6 sentences about a song you love.</p><p class="zh">用句型支架完成短文</p></div>
+    </div>
+    <p class="rule">Key sentence: This music is … It makes me feel …</p>
+  </section>
+
+  <section class="slide" data-toc="情绪词 · 知识">
+    <div class="kicker">词汇与情绪 · 知识点</div>
+    <h2>Eight feeling words</h2>
+    <div class="grid8">
+      <div class="card"><b>happy 开心</b><p>A bright pop song can make us smile.</p></div>
+      <div class="card"><b>sad 难过</b><p>A slow piano piece may make us quiet.</p></div>
+      <div class="card"><b>angry 生气</b><p>Loud drums can sound like a storm.</p></div>
+      <div class="card"><b>afraid 害怕</b><p>Dark, low sounds can make us jump.</p></div>
+      <div class="card"><b>excited 兴奋</b><p>Fast beats make us want to move.</p></div>
+      <div class="card"><b>worried 担心</b><p>Soft, uneasy music can sit in our chest.</p></div>
+      <div class="card"><b>nervous 紧张</b><p>Before a show, even a familiar song may shake us.</p></div>
+      <div class="card"><b>surprised 惊讶</b><p>A sudden high note can make us look up.</p></div>
+    </div>
+    <p class="zh">同一首歌，不同的人可能有不同的感觉。先学会这些词，再去听、去说。</p>
+  </section>
+
+  <section class="slide dawn" data-toc="情绪轮盘">
+    <div class="kicker">Canvas · Emotion wheel</div>
+    <div class="two">
+      <div>
+        <h2>Tap a feeling</h2>
+        <p>Click a slice on the wheel. You will see an example sentence you can say in class.</p>
+        <p class="zh">点扇形：英文例句会出现在右边。</p>
+        <div class="card" id="wheelOut" style="margin-top:12px;min-height:120px">
+          <b>Ready</b>
+          <p>Choose any colour on the wheel.</p>
+        </div>
+      </div>
+      <canvas id="emotionWheel" class="stage" width="520" height="520" aria-label="Interactive emotion wheel"></canvas>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="情绪 · 练习">
+    <div class="kicker">词汇与情绪 · 练习</div>
+    <h2>Choose the best feeling</h2>
+    <p class="zh">先自己想，再点模糊答案核对。</p>
+    <div class="quiz">
+      <div>1. After a long day, Mei puts on a slow song. She closes her eyes and smiles.<br>She feels <span class="answer">relaxed / happy</span>.</div>
+      <div>2. The lights go out. A low sound starts. The class sits very still.<br>Some students feel <span class="answer">afraid / nervous</span>.</div>
+      <div>3. The school band plays a fast song. Everyone claps and stands up.<br>They feel <span class="answer">excited</span>.</div>
+      <div>4. Leo hears a sudden whistle in the middle of a quiet piece.<br>He feels <span class="answer">surprised</span>.</div>
+    </div>
+  </section>
+
+  <section class="slide dawn" data-toc="情绪 · 拔高">
+    <div class="kicker">词汇与情绪 · 拔高题</div>
+    <h2>Same song, different hearts</h2>
+    <p>Read and discuss. There is no single “right” feeling.</p>
+    <div class="card">
+      <p>A rainy-day violin piece makes Nora think of her grandma’s kitchen. It makes Kai think of a sad film. Both students are listening to the same track.</p>
+    </div>
+    <p><b>Talk:</b> Why can one piece of music make two people feel different things?</p>
+    <p class="answer">Possible ideas: memories, time of day, how we feel before we listen, the stories in our heads.</p>
+    <p class="zh">拔高：音乐不只“规定”情绪，也叫醒我们自己的画面。</p>
+  </section>
+
+  <section class="slide" data-toc="音乐类型 · 知识">
+    <div class="kicker">音乐类型与听力 · 知识点</div>
+    <h2>Six kinds of music</h2>
+    <div class="three">
+      <div class="card"><b>classical</b><p>Orchestra, piano, violin. Often calm or grand.</p></div>
+      <div class="card"><b>country</b><p>Stories about home, roads, and everyday life.</p></div>
+      <div class="card"><b>folk</b><p>Old songs people share. Simple and warm.</p></div>
+      <div class="card"><b>jazz</b><p>Swing, surprise notes, room to improvise.</p></div>
+      <div class="card"><b>pop</b><p>Catchy choruses you can sing on the bus.</p></div>
+      <div class="card"><b>rock</b><p>Strong guitar and drums. Full of energy.</p></div>
+    </div>
+    <p class="rule">We don’t match one type to one feeling forever — we notice a usual mood.</p>
+  </section>
+
+  <section class="slide dawn" data-toc="类型配对">
+    <div class="kicker">音乐类型 · 配对</div>
+    <h2>Tap a type, then a feeling</h2>
+    <p class="zh">先点音乐类型，再点你认为最常对应的情绪。可以改选。参考答案可点下方揭示。</p>
+    <div class="toolbar" id="typeRow" style="margin:8px 0"></div>
+    <div class="toolbar" id="feelRow"></div>
+    <p id="pairMsg" class="hintbox">Pairs you make will show here.</p>
+    <p>Suggested classroom key (not the only truth):</p>
+    <p class="answer">classical → calm; country → warm; folk → peaceful; jazz → surprised / interested; pop → happy; rock → excited</p>
+  </section>
+
+  <section class="slide" data-toc="类型 · 练习拔高">
+    <div class="kicker">音乐类型与听力 · 练习 + 拔高</div>
+    <h2>Complete the talk</h2>
+    <div class="quiz">
+      <div>A: What’s your favourite kind of music?<br>B: I like <span class="answer">folk</span> music. It’s soft. It makes me feel <span class="answer">calm / peaceful</span>.</div>
+      <div>A: How about rock?<br>B: Rock is <span class="answer">loud / fast / exciting</span>. It makes me want to run.</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <b>Stretch 拔高</b>
+      <p>Give a reason with <i>because</i>: I like jazz because the notes keep changing. It makes me feel curious.</p>
+    </div>
+  </section>
+
+  <section class="slide dawn" data-toc="对话脚本">
+    <div class="kicker">对话与角色扮演 · 知识点</div>
+    <h2>Lunchtime Music Club</h2>
+    <p class="zh">原创短对话（不是课本听力原文）。两人讨论社团和周五小演出。</p>
+    <div class="dialogue">
+      <div class="bubble"><div class="who">NOAH</div>Are you coming to the music club after lunch? We’re choosing songs for Friday’s school show.</div>
+      <div class="bubble b"><div class="who">RINA</div>I want to, but I’m a bit nervous. I haven’t played in front of the class before.</div>
+      <div class="bubble"><div class="who">NOAH</div>We can start with a slow folk song. It makes people feel calm. Then we can add a pop chorus.</div>
+      <div class="bubble b"><div class="who">RINA</div>That sounds good. Fast pop makes me excited — maybe that’s better for the last song.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="听力问答">
+    <div class="kicker">对话 · 练习</div>
+    <h2>Listen in your head, then answer</h2>
+    <div class="quiz">
+      <div>1. Where will they meet? <span class="answer">At the music club after lunch</span></div>
+      <div>2. Why is Rina nervous? <span class="answer">She hasn’t played in front of the class before</span></div>
+      <div>3. What kind of song do they choose first? <span class="answer">A slow folk song</span></div>
+      <div>4. What will the last song probably be like? <span class="answer">Fast pop — exciting</span></div>
+    </div>
+  </section>
+
+  <section class="slide dawn" data-toc="角色扮演">
+    <div class="kicker">对话与角色扮演 · 拔高</div>
+    <h2>Role-play cards</h2>
+    <div class="three">
+      <div class="card"><b>Student A</b><p>Invite your partner to a Saturday street concert. Ask what they want to hear and why.</p></div>
+      <div class="card"><b>Student B</b><p>You feel tired. You prefer slow music. Explain how it makes you feel and what you imagine.</p></div>
+      <div class="card"><b>Must use</b><p>I’d like to… / It makes me… / I’ll imagine… / I’m a little…</p></div>
+    </div>
+    <p class="tiny">Switch roles after two minutes. Then change the setting: before a test / on a holiday bus.</p>
+  </section>
+
+  <section class="slide" data-toc="阅读短文">
+    <div class="kicker">阅读 · 知识点</div>
+    <h2>A class post: My three tracks</h2>
+    <article class="post">
+      <div class="meta">FROM TARA · CLASS FORUM · ORIGINAL TEXT</div>
+      <p><b>Track 1.</b> In the morning I put on a bright pop song. The beat is fast. It makes me feel awake and ready for P.E.</p>
+      <p><b>Track 2.</b> When I do homework, I choose soft classical piano. It doesn’t shout. It helps me stay with the page.</p>
+      <p><b>Track 3.</b> Before I sleep, I listen to a folk lullaby my uncle recorded. It is slow. I imagine a river under the moon. The same notes make my little brother laugh — he says they sound like frogs!</p>
+      <p>Music doesn’t give us one feeling only. It opens a door. What we see behind the door is ours.</p>
+    </article>
+  </section>
+
+  <section class="slide dawn" data-toc="阅读理解">
+    <div class="kicker">阅读 · 练习</div>
+    <h2>Match the paragraph idea</h2>
+    <div class="quiz">
+      <div>Track 1 is mainly about music and <span class="answer">energy / morning feelings</span>.</div>
+      <div>Track 2 is mainly about music and <span class="answer">focus / homework</span>.</div>
+      <div>Track 3 is mainly about music and <span class="answer">imagination / different listeners</span>.</div>
+      <div>The last line means: <span class="answer">the same music can paint different pictures for different people</span>.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="阅读拔高">
+    <div class="kicker">阅读 · 拔高题</div>
+    <h2>Find the writer’s idea</h2>
+    <p>Which sentence is closest to Tara’s last paragraph?</p>
+    <div class="quiz">
+      <div>A. Everyone must feel calm when they hear folk music.</div>
+      <div>B. Music is only useful when we do sports.</div>
+      <div>C. Music starts a feeling; our own stories finish it. <span class="answer">← this one</span></div>
+    </div>
+    <p class="zh">讨论：你和朋友听同一首歌时，画面一样吗？</p>
+  </section>
+
+  <section class="slide dawn" data-toc="语法知识">
+    <div class="kicker">语法 -ed / -ing · 知识点</div>
+    <h2>How <em>we</em> feel vs how <em>music</em> is</h2>
+    <div class="two">
+      <div class="card">
+        <b>-ed → people</b>
+        <p>I am <b>excited</b>. She looks <b>interested</b>. We feel <b>relaxed</b>. He was <b>moved</b>. They were <b>amazed</b>.</p>
+        <p class="zh">形容词修饰人的感受。</p>
+      </div>
+      <div class="card">
+        <b>-ing → the music / the thing</b>
+        <p>The song is <b>exciting</b>. Jazz can be <b>interesting</b>. Slow piano is <b>relaxing</b>. The film music is <b>moving</b>. The ending is <b>amazing</b>.</p>
+        <p class="zh">形容词修饰事物的特点。</p>
+      </div>
+    </div>
+    <p class="rule">The concert was exciting, so the students were excited.</p>
+  </section>
+
+  <section class="slide" data-toc="语法画布">
+    <div class="kicker">Canvas · -ed vs -ing</div>
+    <h2>Sort the words, then fill the sentence</h2>
+    <p class="zh">点单词，再点左右箱子分类。下方句子：点空格填入合适的词。</p>
+    <canvas id="edIngBoard" class="board" width="640" height="280" aria-label="-ed versus -ing sorting board"></canvas>
+    <p id="sortHint" class="hintbox">Tap a chip, then tap People (-ed) or Music (-ing).</p>
+    <p style="margin-top:10px">The drum solo was so <span class="blank" data-ans="exciting">______</span> that the whole hall felt <span class="blank" data-ans="excited">______</span>.</p>
+  </section>
+
+  <section class="slide dawn" data-toc="语法练习">
+    <div class="kicker">语法 · 练习</div>
+    <h2>Complete with -ed or -ing</h2>
+    <div class="quiz">
+      <div>1. This folk story-song is really <span class="answer">moving</span>. Many parents look <span class="answer">moved</span>.</div>
+      <div>2. I am <span class="answer">interested</span> in jazz because the rhythm is <span class="answer">interesting</span>.</div>
+      <div>3. Soft rain sounds are <span class="answer">relaxing</span>. After five minutes I feel <span class="answer">relaxed</span>.</div>
+      <div>4. The last high note was <span class="answer">amazing</span>. We were all <span class="answer">amazed</span>.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="语法拔高">
+    <div class="kicker">语法 · 拔高题</div>
+    <h2>Fix the mix-up</h2>
+    <p>Each sentence has one wrong adjective. Say the correct one.</p>
+    <div class="quiz">
+      <div>“The sleepy cat looks relaxing on the sofa.” → <span class="answer">relaxed</span> (the cat is a listener / a being)</div>
+      <div>“I am exciting about the talent show.” → <span class="answer">excited</span></div>
+      <div>Write one pair of your own: The music is ____. I am ____. <span class="answer">e.g. interesting / interested</span></div>
+    </div>
+  </section>
+
+  <section class="slide dawn" data-toc="写作支架">
+    <div class="kicker">写作 · 知识点</div>
+    <h2>Sentence starters</h2>
+    <div class="three">
+      <div class="card"><b>Choose the music</b><p>I’d like to listen to … / My favourite kind of music is …</p></div>
+      <div class="card"><b>Name the feeling</b><p>It makes me feel … and … / I feel … when the beat is …</p></div>
+      <div class="card"><b>Open a picture</b><p>I’ll imagine … / It makes me think of …</p></div>
+    </div>
+    <p class="zh">场景卡（口头热身）：做运动 / 放假 / 快睡着 / 跨年夜——你会选哪一种音乐？为什么？</p>
+  </section>
+
+  <section class="slide" data-toc="动手写">
+    <div class="kicker">写作 · 练习</div>
+    <h2>Write 4–6 sentences</h2>
+    <p class="tiny">This stays on your computer only. Copy it into your notebook if you need to hand it in.</p>
+    <textarea class="writebox" id="writer" placeholder="I am going to listen to … It will make me feel … I will imagine …"></textarea>
+    <p class="zh">提示：写清音乐类型、两个情绪词、一个想象画面。</p>
+  </section>
+
+  <section class="slide dawn" data-toc="分享收尾">
+    <div class="kicker">写作 · 拔高 · 结束</div>
+    <h2>Share with the class</h2>
+    <div class="two">
+      <div>
+        <p>Read your paragraph. Classmates listen for: type of music, two feelings, one picture in the mind.</p>
+        <p class="zh">倾听任务：记下对方的音乐类型和情绪词。</p>
+        <div class="card">
+          <b>Exit ticket</b>
+          <p>One -ed word for you, one -ing word for a song. Example: I am relaxed. The lullaby is relaxing.</p>
+        </div>
+      </div>
+      <div class="card">
+        <b>Tonight</b>
+        <p>Play one track for your family. Ask: How does this music make you feel? Write their answer in English.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="footer">
+  <span id="pg">1</span>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="nav">
+    <button type="button" id="prev" aria-label="Previous">←</button>
+    <button type="button" id="next" aria-label="Next">→</button>
+  </div>
+</div>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0,sx=0;
+  const bar=document.getElementById('bar'), pg=document.getElementById('pg');
+  const dots=document.getElementById('dots'), tocGrid=document.getElementById('tocGrid');
+  const toc=document.getElementById('toc');
+
+  slides.forEach((s,n)=>{
+    const d=document.createElement('button');
+    d.type='button';
+    if(n===0)d.classList.add('active');
+    d.addEventListener('click',()=>go(n));
+    dots.appendChild(d);
+    const b=document.createElement('button');
+    b.type='button';
+    b.textContent=(n+1)+'  '+(s.dataset.toc||'');
+    b.addEventListener('click',()=>{go(n);toc.classList.remove('open')});
+    tocGrid.appendChild(b);
+  });
+
+  function go(n){
+    if(n<0||n>=slides.length)return;
+    slides[i].classList.remove('active');
+    i=n;
+    slides[i].classList.add('active');
+    pg.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    [...dots.children].forEach((d,k)=>d.classList.toggle('active',k===i));
+    if(slides[i].querySelector('#emotionWheel')) drawWheel();
+    if(slides[i].querySelector('#edIngBoard')) drawBoard();
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.getElementById('tocOpen').onclick=()=>toc.classList.add('open');
+  document.getElementById('tocClose').onclick=()=>toc.classList.remove('open');
+  document.addEventListener('keydown',e=>{
+    if(['INPUT','TEXTAREA'].includes(e.target.tagName))return;
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    if(e.key==='Escape')toc.classList.remove('open');
+  });
+  document.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX},{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].screenX-sx;
+    if(Math.abs(dx)>50) go(dx<0?i+1:i-1);
+  },{passive:true});
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('.answer');
+    if(a)a.classList.toggle('revealed');
+  });
+  go(0);
+
+  const feelings=[
+    {id:'happy', label:'happy', zh:'开心', color:'#ffd166', sentence:'This bright pop song makes me feel happy. I want to dance.'},
+    {id:'sad', label:'sad', zh:'难过', color:'#7eb8ff', sentence:'The slow piano makes me feel sad. I think of a rainy window.'},
+    {id:'angry', label:'angry', zh:'生气', color:'#ff6b9d', sentence:'Heavy drums can make me feel angry — like a storm in my chest.'},
+    {id:'afraid', label:'afraid', zh:'害怕', color:'#9b8cff', sentence:'Low, dark sounds make me feel afraid. I imagine a forest at night.'},
+    {id:'excited', label:'excited', zh:'兴奋', color:'#ff9f43', sentence:'Fast rock makes me feel excited. I want to run on the playground.'},
+    {id:'worried', label:'worried', zh:'担心', color:'#7ee0c8', sentence:'Uneasy strings make me feel worried before a test.'},
+    {id:'nervous', label:'nervous', zh:'紧张', color:'#c9b6ff', sentence:'Waiting backstage, even a familiar song can make me nervous.'},
+    {id:'surprised', label:'surprised', zh:'惊讶', color:'#7ed0ff', sentence:'A sudden flute jump makes me feel surprised. I look up!'}
+  ];
+
+  const wheel=document.getElementById('emotionWheel');
+  const wctx=wheel.getContext('2d');
+  let hover=-1, selected=0;
+  function drawWheel(){
+    const cx=260, cy=260, r=230;
+    wctx.clearRect(0,0,520,520);
+    feelings.forEach((f,n)=>{
+      const a0=n*Math.PI*2/8-Math.PI/2;
+      const a1=(n+1)*Math.PI*2/8-Math.PI/2;
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,a0,a1);
+      wctx.closePath();
+      wctx.fillStyle=f.color;
+      wctx.globalAlpha=(n===selected||n===hover)?1:.82;
+      wctx.fill();
+      wctx.globalAlpha=1;
+      wctx.strokeStyle='rgba(18,10,34,.45)';
+      wctx.lineWidth=2;
+      wctx.stroke();
+      const mid=(a0+a1)/2;
+      wctx.fillStyle='#120a22';
+      wctx.font='700 15px Outfit,sans-serif';
+      wctx.textAlign='center';
+      wctx.textBaseline='middle';
+      wctx.fillText(f.label, cx+Math.cos(mid)*r*0.62, cy+Math.sin(mid)*r*0.62);
+    });
+    wctx.beginPath();
+    wctx.arc(cx,cy,54,0,Math.PI*2);
+    wctx.fillStyle='#1a1030';
+    wctx.fill();
+    wctx.fillStyle='#ffd166';
+    wctx.font='700 13px Outfit';
+    wctx.fillText('feel',cx,cy);
+  }
+  function hit(ev){
+    const rect=wheel.getBoundingClientRect();
+    const x=(ev.clientX-rect.left)*wheel.width/rect.width;
+    const y=(ev.clientY-rect.top)*wheel.height/rect.height;
+    const dx=x-260, dy=y-260;
+    const dist=Math.hypot(dx,dy);
+    if(dist<54||dist>230)return -1;
+    let ang=Math.atan2(dy,dx)+Math.PI/2;
+    if(ang<0)ang+=Math.PI*2;
+    return Math.floor(ang/(Math.PI*2/8))%8;
+  }
+  function showFeel(n){
+    const f=feelings[n];
+    const box=document.getElementById('wheelOut');
+    box.innerHTML='<b>'+f.label+' · '+f.zh+'</b><p>'+f.sentence+'</p><p class="zh">跟读：This music makes me feel '+f.label+'.</p>';
+  }
+  wheel.addEventListener('mousemove',e=>{hover=hit(e);drawWheel()});
+  wheel.addEventListener('mouseleave',()=>{hover=-1;drawWheel()});
+  wheel.addEventListener('click',e=>{
+    const n=hit(e); if(n<0)return; selected=n; drawWheel(); showFeel(n);
+  });
+  drawWheel(); showFeel(0);
+
+  const types=['classical','country','folk','jazz','pop','rock'];
+  const feelOpts=['calm','warm','peaceful','curious','happy','excited'];
+  const typeRow=document.getElementById('typeRow');
+  const feelRow=document.getElementById('feelRow');
+  let pickType=null, pairs={};
+  types.forEach(t=>{
+    const c=document.createElement('button');
+    c.className='chip'; c.type='button'; c.textContent=t;
+    c.onclick=()=>{pickType=t;[...typeRow.children].forEach(x=>x.classList.toggle('on',x.textContent===t))};
+    typeRow.appendChild(c);
+  });
+  feelOpts.forEach(f=>{
+    const c=document.createElement('button');
+    c.className='chip'; c.type='button'; c.textContent=f;
+    c.onclick=()=>{
+      if(!pickType){document.getElementById('pairMsg').textContent='先点一个音乐类型。';return}
+      pairs[pickType]=f;
+      document.getElementById('pairMsg').textContent=Object.entries(pairs).map(([k,v])=>k+' → '+v).join(' · ');
+    };
+    feelRow.appendChild(c);
+  });
+
+  const words=[
+    {t:'excited', bin:'ed'},{t:'exciting', bin:'ing'},
+    {t:'interested', bin:'ed'},{t:'interesting', bin:'ing'},
+    {t:'relaxed', bin:'ed'},{t:'relaxing', bin:'ing'},
+    {t:'moved', bin:'ed'},{t:'moving', bin:'ing'},
+    {t:'amazed', bin:'ed'},{t:'amazing', bin:'ing'}
+  ];
+  let wState=words.map(w=>({...w, placed:null}));
+  let hold=null;
+  const board=document.getElementById('edIngBoard');
+  const bctx=board.getContext('2d');
+
+  function layout(){
+    const chips=[];
+    wState.forEach((w,idx)=>{
+      const col=idx%5, row=Math.floor(idx/5);
+      chips.push({...w, idx, x:18+col*124, y:18+row*44, w:114, h:36});
+    });
+    return chips;
+  }
+  function drawBoard(){
+    const W=board.width, H=board.height;
+    bctx.clearRect(0,0,W,H);
+    bctx.fillStyle='#160e2c';
+    bctx.fillRect(0,0,W,H);
+    const bins=[{name:'People  (-ed)',x:20,y:120,w:290,h:140,id:'ed'},{name:'Music  (-ing)',x:330,y:120,w:290,h:140,id:'ing'}];
+    bins.forEach(bn=>{
+      bctx.strokeStyle=bn.id==='ed'?'#7ee0c8':'#ff6b9d';
+      bctx.lineWidth=2;
+      bctx.setLineDash([6,6]);
+      bctx.strokeRect(bn.x,bn.y,bn.w,bn.h);
+      bctx.setLineDash([]);
+      bctx.fillStyle='#c9b6ff';
+      bctx.font='700 14px Outfit';
+      bctx.fillText(bn.name,bn.x+12,bn.y+22);
+      const inBin=wState.filter(w=>w.placed===bn.id);
+      inBin.forEach((w,k)=>{
+        bctx.fillStyle=w.placed===w.bin?'#7ee0c8':'#ff8a7a';
+        bctx.fillRect(bn.x+12+(k%3)*90, bn.y+40+Math.floor(k/3)*40, 84, 32);
+        bctx.fillStyle='#120a22';
+        bctx.font='700 12px Outfit';
+        bctx.fillText(w.t, bn.x+20+(k%3)*90, bn.y+60+Math.floor(k/3)*40);
+      });
+    });
+    layout().forEach(ch=>{
+      if(wState[ch.idx].placed)return;
+      bctx.fillStyle=hold===ch.idx?'#ffd166':'rgba(255,255,255,.12)';
+      bctx.fillRect(ch.x,ch.y,ch.w,ch.h);
+      bctx.strokeStyle='rgba(255,255,255,.25)';
+      bctx.strokeRect(ch.x,ch.y,ch.w,ch.h);
+      bctx.fillStyle=hold===ch.idx?'#120a22':'#f7f1ff';
+      bctx.font='700 13px Outfit';
+      bctx.fillText(ch.t, ch.x+10, ch.y+23);
+    });
+  }
+  function boardPos(ev){
+    const rect=board.getBoundingClientRect();
+    return {x:(ev.clientX-rect.left)*board.width/rect.width, y:(ev.clientY-rect.top)*board.height/rect.height};
+  }
+  board.addEventListener('click',e=>{
+    const p=boardPos(e);
+    const bins=[{id:'ed',x:20,y:120,w:290,h:140},{id:'ing',x:330,y:120,w:290,h:140}];
+    let pickedFromBin=false;
+    bins.forEach(bn=>{
+      wState.map((w,idx)=>({w,idx})).filter(x=>x.w.placed===bn.id).forEach((item,k)=>{
+        const bx=bn.x+12+(k%3)*90, by=bn.y+40+Math.floor(k/3)*40;
+        if(p.x>=bx&&p.x<=bx+84&&p.y>=by&&p.y<=by+32){
+          wState[item.idx].placed=null; hold=item.idx; pickedFromBin=true;
+        }
+      });
+    });
+    if(pickedFromBin){ document.getElementById('sortHint').textContent='Now tap People or Music.'; drawBoard(); return; }
+    const ch=layout().find(c=>!wState[c.idx].placed && p.x>=c.x&&p.x<=c.x+c.w&&p.y>=c.y&&p.y<=c.y+c.h);
+    if(ch){hold=ch.idx; document.getElementById('sortHint').textContent='Now tap People or Music.'; drawBoard(); return}
+    if(hold==null)return;
+    if(p.x>=20&&p.x<=310&&p.y>=120&&p.y<=260) wState[hold].placed='ed';
+    else if(p.x>=330&&p.x<=620&&p.y>=120&&p.y<=260) wState[hold].placed='ing';
+    hold=null;
+    const left=wState.filter(w=>!w.placed).length;
+    const wrong=wState.filter(w=>w.placed&&w.placed!==w.bin).length;
+    document.getElementById('sortHint').textContent=left? (wrong?'有的词放错了，再点箱子外的词重来，或继续分类。':'Keep going.') : (wrong?'Check the red chips — they are in the wrong box.':'All correct. Green means people vs music match.');
+    drawBoard();
+  });
+  board.addEventListener('dblclick',()=>{wState=words.map(w=>({...w, placed:null}));hold=null;drawBoard()});
+  drawBoard();
+
+  const blankCycle={exciting:['exciting','excited'], excited:['excited','exciting']};
+  document.querySelectorAll('.blank').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const ans=el.dataset.ans;
+      const opts=blankCycle[ans]||[ans];
+      const cur=el.textContent.trim();
+      const next=opts[(Math.max(0,opts.indexOf(cur))+1)%opts.length];
+      el.textContent=next;
+      el.classList.toggle('filled', next===ans);
+    });
+  });
+})();
+</script>
+</body>
+</html>
