@@ -9,7 +9,7 @@ export const drops: readonly Drop[] = [
   {
     title: "AI-native 产品版图",
     href: "/drops/ai-native-product-map/",
-    description: "应用、控制面、运行时与训练四层：谁在抢界面，谁在抢上下文和控制权。",
+    description: "六层地图：知识工作空间、coding agent、垂直 Agent、execution/runtime、控制面、训练。",
     kind: "视觉图解",
   },
   {

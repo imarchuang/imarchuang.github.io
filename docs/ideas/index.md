@@ -24,7 +24,7 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Drops
 
-* [ai-native-product-map](/drops/ai-native-product-map/ ':ignore') — 应用、控制面、运行时与训练四层的 AI-native 产品地图
+* [ai-native-product-map](/drops/ai-native-product-map/ ':ignore') — 六层地图：知识工作空间、coding agent、垂直 Agent、execution/runtime、控制面、训练
 * [music-feelings](/drops/music-feelings/ ':ignore') — How does music make us feel? 英语互动课件（原创）
 * [fen-shu-de-yi-yi](/drops/fen-shu-de-yi-yi/ ':ignore') — 分数的意义：再认识、分数单位、十分之几（原创课件）
 * [xin-pai-ao-shu](/drops/xin-pai-ao-shu/ ':ignore') — 新派奥数课件：四年级提高原创讲次（第1–2讲＋41讲课程地图）
