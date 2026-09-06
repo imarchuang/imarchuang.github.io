@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI-native 产品版图 — Marc Huang</title>
+  <meta name="description" content="应用、控制面、运行时与训练四层的 AI-native 产品地图。System of record 正在变成 system of action。" />
+  <style>
+    :root {
+      --ink: #102630;
+      --paper: #f5f8f7;
+      --cobalt: #3658e6;
+      --aqua: #bcece3;
+      --coral: #ff684f;
+      --muted: #60747a;
+      --line: #bac8c5;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      font: 16px/1.5 "Manrope", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    a { color: var(--cobalt); }
+    .page {
+      max-width: 82rem;
+      margin: 0 auto;
+      padding: 1.5rem clamp(1.25rem, 5vw, 4.5rem) 4rem;
+    }
+    .kicker {
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-size: .72rem;
+      color: var(--muted);
+      margin: 0 0 .5rem;
+    }
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      letter-spacing: -.03em;
+      line-height: 1.15;
+      margin: 0 0 .75rem;
+      max-width: 18ch;
+    }
+    .lede { max-width: 62ch; color: var(--muted); margin: 0 0 1.5rem; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .75rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: .9rem 1rem;
+    }
+    .stat b { display: block; font-size: 1.6rem; letter-spacing: -.03em; }
+    .stat span { color: var(--muted); font-size: .8rem; }
+    .callout {
+      background: var(--aqua);
+      padding: 1rem 1.15rem;
+      margin: 0 0 2rem;
+      max-width: 72ch;
+    }
+    h2 { font-size: 1.15rem; margin: 2rem 0 .6rem; letter-spacing: -.02em; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .92rem;
+      background: var(--card);
+    }
+    th, td {
+      text-align: left;
+      padding: .65rem .75rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th { color: var(--muted); font-weight: 600; font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin: 1.25rem 0 .75rem;
+    }
+    input, select {
+      font: inherit;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      padding: .45rem .65rem;
+      min-height: 2.25rem;
+    }
+    input { flex: 1; min-width: 12rem; }
+    .count { color: var(--muted); font-size: .85rem; margin: 0 0 1rem; }
+    .detail {
+      background: var(--card);
+      border: 1px solid var(--ink);
+      padding: 1rem 1.15rem;
+      margin-bottom: 1.25rem;
+    }
+    .detail h3 { margin: 0 0 .35rem; font-size: 1.15rem; }
+    .pills { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .5rem; }
+    .pill {
+      font-size: .72rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      border: 1px solid var(--line);
+      padding: .15rem .45rem;
+    }
+    .pill.pmf { background: var(--aqua); border-color: transparent; }
+    .pill.contested { background: #ffe3dc; border-color: transparent; }
+    .pill.gap { background: #dce4ff; border-color: transparent; }
+    .cat { margin: 0 0 1.5rem; }
+    .cat summary {
+      cursor: pointer;
+      font-weight: 600;
+      padding: .4rem 0;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .45rem .7rem;
+      padding: .35rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    button.prod {
+      font: inherit;
+      background: none;
+      border: 0;
+      color: var(--cobalt);
+      cursor: pointer;
+      padding: 0;
+      text-align: left;
+    }
+    button.prod[aria-pressed="true"] { color: var(--ink); font-weight: 700; }
+    .pmf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .75rem 1.25rem;
+      margin: .5rem 0 2rem;
+    }
+    .pmf-grid small { color: var(--muted); display: block; }
+    footer { color: var(--muted); font-size: .8rem; max-width: 70ch; }
+    @media (max-width: 800px) {
+      .stats, .pmf-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px) {
+      .stats, .pmf-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="kicker">Work / Visual systems · 2026-09-06</p>
+    <h1>AI-native 产品版图</h1>
+    <p class="lede">
+      应用层来自一份热门产品清单；控制面、运行时、训练层是后来补上的。点产品名看注释。
+      状态标签是判断，不是事实。
+    </p>
+    <div class="stats" id="stats"></div>
+    <div class="callout">
+      <strong>下一阶段不是给旧 SaaS 加聊天框。</strong>
+      System of record → system of action：用户描述目标，AI 读上下文、跨系统执行，人审批结果。
+      Action 一旦跨系统，价值会重新沉淀到「谁掌握上下文」（Glean）和「谁掌握控制权」（Agent 365 / QM / Managed Agents）。
+      审批、权限、审计会变成新的 record。
+    </div>
+
+    <h2>四层栈</h2>
+    <table>
+      <thead><tr><th>层</th><th>在抢什么</th><th>代表</th><th>被谁挤压</th></tr></thead>
+      <tbody>
+        <tr><td>应用</td><td>界面与垂直工作流</td><td>Cursor · Sierra · Harvey · Granola</td><td>通用模型工作台把录音、搜索、写代码内置进来</td></tr>
+        <tr><td>控制面 / 上下文</td><td>权限、身份、企业知识图谱</td><td>Glean · Agent 365 · QM · Palantir</td><td>Copilot / Gemini / ChatGPT Enterprise 的捆绑</td></tr>
+        <tr><td>运行时 / 基建</td><td>sandbox、密钥、出口、evals、长任务状态</td><td>E2B · Runta · Langfuse · Temporal</td><td>Managed Agents / AgentCore 自带运行时</td></tr>
+        <tr><td>训练 / Evals</td><td>RL 环境、专家评分、agent 评测</td><td>Mercor · Surge · Harbor</td><td>实验室自建 gym（OpenAI UI Gym）</td></tr>
+      </tbody>
+    </table>
+
+    <h2>为什么有的品类能赢</h2>
+    <table>
+      <thead><tr><th>品类</th><th>Record 在哪</th><th>替换成本</th><th>结果</th></tr></thead>
+      <tbody>
+        <tr><td>代码编辑器</td><td>git</td><td>几乎为零</td><td>Cursor 定义品类</td></tr>
+        <tr><td>会议纪要 / 幻灯片</td><td>可导出的轻文件</td><td>低</td><td>Granola / Gamma 能跑通，护城河也薄</td></tr>
+        <tr><td>Ticket</td><td>票本身就是 SoR</td><td>高（数据+流程）</td><td>没有公认 AI-native Linear 替代</td></tr>
+        <tr><td>总账 / ERP</td><td>必须重做账本</td><td>极高</td><td>Rillet / Campfire 最难，赢了也最深</td></tr>
+        <tr><td>客服执行</td><td>工单仍在旧系统，动作可外包</td><td>中</td><td>Decagon / Fin 按结果收费</td></tr>
+      </tbody>
+    </table>
+
+    <div class="filters">
+      <input id="q" type="search" placeholder="搜索产品、品类或注释…" />
+      <select id="layer"></select>
+      <select id="category"></select>
+      <select id="status"></select>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="detail" id="detail"></div>
+    <div id="list"></div>
+
+    <h2>最明确跑出 PMF 的类别</h2>
+    <div class="pmf-grid">
+      <div><b>Cursor</b><small>代码</small></div>
+      <div><b>Perplexity</b><small>搜索研究</small></div>
+      <div><b>Granola</b><small>会议记忆</small></div>
+      <div><b>Gamma</b><small>演示文稿</small></div>
+      <div><b>Harvey</b><small>法律</small></div>
+      <div><b>Abridge</b><small>医疗记录</small></div>
+      <div><b>Sierra / Decagon</b><small>客服</small></div>
+      <div><b>Glean</b><small>企业知识</small></div>
+      <div><b>Rillet / Campfire</b><small>新一代财务</small></div>
+    </div>
+
+    <footer>
+      <p><a href="/work/">← 视觉作品</a> · <a href="/drops/">drops 目录</a></p>
+      <p>这张图还缺运维 / 安全 / BI agent、中国栈（Coze、Kimi、Qwen）、协议层 A2A、memory 产品。状态标签是判断而非事实，不是投资建议。</p>
+    </footer>
+  </div>
+  <script>
+    const LAYER_LABEL = { app: "应用层", control: "控制面 / 上下文", infra: "运行时 / 基建", train: "训练 / Evals" };
+    const STATUS_LABEL = { pmf: "已跑通 PMF", contested: "仍在缠斗", gap: "公认空缺", infra: "铲子生意" };
+    const PRODUCTS = [
+      { name: "ChatGPT / Claude / Gemini", category: "通用工作空间", layer: "app", status: "pmf", note: "通用思考、写作与执行工作台；正在把录音、浏览、agent 往下压，挤压独立 workspace。" },
+      { name: "Perplexity", category: "通用工作空间", layer: "app", status: "pmf", note: "AI 搜索与研究 workspace。Comet 浏览器把搜索做成可执行动作。" },
+      { name: "NotebookLM", category: "通用工作空间", layer: "app", status: "contested", note: "基于个人资料的研究与学习；Google 分发强，独立品类边界在变薄。" },
+      { name: "Glean", category: "企业知识", layer: "control", status: "pmf", note: "权限感知知识图谱 + 助手 + Agents。赌的是模型与企业系统之间的 context 层，主要对手是 Copilot 捆绑。" },
+      { name: "Hebbia", category: "企业知识", layer: "app", status: "contested", note: "金融、法律等复杂文档研究；垂直深度对冲 Glean / Harvey 的横向扩张。" },
+      { name: "Notion AI", category: "文档与会议", layer: "app", status: "contested", note: "在已有文档 SoR 上加 AI；迁移成本在 wiki 本身，难被纯 AI-native 知识库替换。" },
+      { name: "Tana / Mem", category: "文档与会议", layer: "app", status: "contested", note: "更接近 AI-native 的个人知识库，尚未形成 Cursor 级品类定义。" },
+      { name: "Granola", category: "文档与会议", layer: "app", status: "pmf", note: "AI-native 会议笔记。护城河最薄：ChatGPT/Claude 录音模式与 Notion 正在夹击。" },
+      { name: "Gamma", category: "文档与会议", layer: "app", status: "pmf", note: "AI-native 演示、文档与简单网站。输出物轻、可导出，所以替换成本低。" },
+      { name: "Shortwave", category: "文档与会议", layer: "app", status: "contested", note: "AI-native 邮件。邮件 SoR 在 Gmail/Outlook，独立客户端很难成为默认。" },
+      { name: "Cursor / Windsurf", category: "软件研发", layer: "app", status: "pmf", note: "AI-native IDE。代码的 record 在 git，换编辑器几乎零迁移——这是 Cursor 能赢的结构原因。" },
+      { name: "Claude Code / Codex", category: "软件研发", layer: "app", status: "pmf", note: "终端与代码 Agent；同时是 harness 层，可被 QM 这类多玩家核心调用。" },
+      { name: "Devin", category: "软件研发", layer: "app", status: "contested", note: "相对自治的软件工程 Agent。Cognition 估值高，但日常开发入口仍被 IDE / CLI 占住。" },
+      { name: "Lovable / v0 / Replit Agent", category: "软件研发", layer: "app", status: "pmf", note: "自然语言构建应用。按收入增速看，可能是增长最快的 agent 子类。" },
+      { name: "Linear AI", category: "软件研发", layer: "app", status: "contested", note: "AI-enhanced ticket workspace。Ticket 本身就是 SoR，所以 Linear 加 AI 往往够用。" },
+      { name: "Dart 等", category: "软件研发", layer: "app", status: "gap", note: "Ticket 管理还没有公认的、真正 AI-native 的 Linear 替代者。" },
+      { name: "Lindy", category: "自动化与 Agent", layer: "app", status: "contested", note: "个人及团队 AI 员工。品类热，但和横向 harness / 工作流平台边界模糊。" },
+      { name: "Gumloop", category: "自动化与 Agent", layer: "app", status: "contested", note: "可视化 AI 工作流。" },
+      { name: "Relevance AI", category: "自动化与 Agent", layer: "app", status: "contested", note: "多 Agent 自动化。" },
+      { name: "Zapier Agents / n8n AI", category: "自动化与 Agent", layer: "app", status: "contested", note: "在传统自动化平台上加 Agent。已有连接器是优势，也是旧工作流的惯性。" },
+      { name: "Sierra", category: "客户服务", layer: "app", status: "pmf", note: "面向大型品牌的客服 Agent。~$10B 量级，客服是最成熟的企业 agent 用例。" },
+      { name: "Decagon", category: "客户服务", layer: "app", status: "pmf", note: "可执行退款、改订阅等操作——system of action 的活标本。" },
+      { name: "Intercom Fin", category: "客户服务", layer: "app", status: "pmf", note: "嵌在现有客服系统上。按 resolution 计费，把席位费改成结果费。" },
+      { name: "Ada", category: "客户服务", layer: "app", status: "contested", note: "企业级自动化客服；与 Fin / Decagon / Sierra 抢同一预算。" },
+      { name: "Clay", category: "销售与 CRM", layer: "app", status: "pmf", note: "AI-native 销售研究、数据丰富和外联。在 GTM 数据层先于 CRM 本身跑通。" },
+      { name: "Day.ai", category: "销售与 CRM", layer: "app", status: "contested", note: "从邮件和会议自动维护 CRM——直接打 Salesforce 的 record。" },
+      { name: "Attio", category: "销售与 CRM", layer: "app", status: "contested", note: "AI-forward 的现代 CRM。" },
+      { name: "Gong", category: "销售与 CRM", layer: "app", status: "contested", note: "销售对话分析。会议记忆向（Granola）与 CRM 向都会来抢这块。" },
+      { name: "Rillet", category: "财务与会计", layer: "app", status: "pmf", note: "AI-native ERP/总账。必须重做 SoR，是图上最难也最深的生意。" },
+      { name: "Campfire", category: "财务与会计", layer: "app", status: "pmf", note: "AI-native 会计与结账。" },
+      { name: "Puzzle", category: "财务与会计", layer: "app", status: "contested", note: "面向创业公司的 AI 会计。" },
+      { name: "Numeric", category: "财务与会计", layer: "app", status: "contested", note: "月末结账和对账自动化——在旧总账上做 action，不换 record。" },
+      { name: "Basis", category: "财务与会计", layer: "app", status: "contested", note: "会计 Agent。" },
+      { name: "Harvey", category: "法律", layer: "app", status: "pmf", note: "法律研究、起草与工作流。已有 PMF，但远未到 Cursor 那种定局。" },
+      { name: "Legora", category: "法律", layer: "app", status: "contested", note: "律师协作和文档审查，与 Harvey 缠斗。" },
+      { name: "EvenUp", category: "法律", layer: "app", status: "contested", note: "人身伤害案件材料自动化——垂直场景，不是平台。" },
+      { name: "Spellbook", category: "法律", layer: "app", status: "contested", note: "合同起草与审查，嵌在 Word 工作流里。" },
+      { name: "Abridge", category: "医疗", layer: "app", status: "pmf", note: "医患对话转病历。环境刚需 + 明确节省医生时间。" },
+      { name: "Ambience Healthcare", category: "医疗", layer: "app", status: "contested", note: "临床记录与工作流。" },
+      { name: "Nabla", category: "医疗", layer: "app", status: "contested", note: "AI 医疗助手。" },
+      { name: "Suki", category: "医疗", layer: "app", status: "contested", note: "语音临床助手。" },
+      { name: "Midjourney / Recraft", category: "设计与内容", layer: "app", status: "pmf", note: "图像生成。品类成立，但模型实验室会持续内置。" },
+      { name: "Runway", category: "设计与内容", layer: "app", status: "pmf", note: "视频生成与编辑。" },
+      { name: "ElevenLabs", category: "语音", layer: "app", status: "pmf", note: "语音生成，同时是 conversational agent 平台——不该只归到内容工具。" },
+      { name: "Suno", category: "设计与内容", layer: "app", status: "pmf", note: "音乐生成。" },
+      { name: "Descript", category: "设计与内容", layer: "app", status: "contested", note: "AI 音视频编辑。" },
+      { name: "LiveKit / Pipecat", category: "语音", layer: "infra", status: "infra", note: "语音 agent 的实时基础设施；ChatGPT 语音模式也走这类栈。" },
+      { name: "PolyAI / Parloa", category: "语音", layer: "app", status: "contested", note: "企业语音前台 / 客服入口，与 Sierra 电话渠道重叠。" },
+      { name: "Microsoft Agent 365", category: "控制面", layer: "control", status: "contested", note: "给 agent 发 Entra 身份，治理第一方与第三方 agent。赌控制权。" },
+      { name: "Claude Managed Agents", category: "控制面", layer: "control", status: "contested", note: "Anthropic 托管 harness：sandbox、长会话、权限、定时。公开 beta。" },
+      { name: "AWS AgentCore", category: "控制面", layer: "control", status: "contested", note: "自带框架的托管运行时，模型可换。AWS 工程团队默认选项。" },
+      { name: "Salesforce Agentforce", category: "控制面", layer: "control", status: "contested", note: "CRM-native agent；推理层可用 Claude。既是 Glean/Sierra 的对手，也是伙伴。" },
+      { name: "QM", category: "控制面", layer: "control", status: "contested", note: "YC 开源的公司级多玩家 harness。核心投入在身份、权限、审计，而不是模型循环。" },
+      { name: "Palantir AIP", category: "控制面", layer: "control", status: "pmf", note: "安静但体量大的企业 agent 部署层，绑定本体论与操作决策。" },
+      { name: "E2B", category: "运行时", layer: "infra", status: "infra", note: "Agent sandbox 默认选项。Firecracker microVM，会话有上限。" },
+      { name: "Runta", category: "运行时", layer: "infra", status: "infra", note: "执行层：压缩 token、密钥不进 prompt、治理出口。a16z $20M seed。" },
+      { name: "Daytona / Modal / Blaxel / Runloop", category: "运行时", layer: "infra", status: "infra", note: "sandbox 云。Modal 能把 GPU 放进沙箱；Blaxel 主打零空闲费待机。" },
+      { name: "Langfuse / Braintrust", category: "运行时", layer: "infra", status: "infra", note: "Evals 与 observability。Helicone、Humanloop 已被收购或关停。" },
+      { name: "Temporal / Restate", category: "运行时", layer: "infra", status: "infra", note: "Durable execution：agent 跑数小时不断状态的答案。" },
+      { name: "Harbor / Terminal-Bench", category: "训练", layer: "train", status: "infra", note: "容器化环境里评测和优化 agent 的开源框架；可插 E2B / Runta / Daytona。" },
+      { name: "Mercor", category: "训练", layer: "train", status: "infra", note: "专家网络 + RL environments（收购 Deeptune）。估值快速冲到约 $20B。" },
+      { name: "Surge AI", category: "训练", layer: "train", status: "infra", note: "几乎只服务五家前沿实验室；~$1.2B 营收、未融资。" },
+      { name: "Scale / Turing / Prime Intellect", category: "训练", layer: "train", status: "infra", note: "数据厂商转环境厂商；Prime Intellect 做开放 Environments Hub。" },
+      { name: "Manus", category: "通用工作空间", layer: "app", status: "contested", note: "通用 agent。Meta ~$20 亿收购被中国监管撤销，2026-09-01 恢复独立运营。" },
+      { name: "OpenClaw / 个人 harness", category: "个人 Agent", layer: "app", status: "gap", note: "企业向地图之外的象限。YC 把 QM 对标成「给全公司用的 OpenClaw」。" }
+    ];
+    const CATEGORIES = [...new Set(PRODUCTS.map((p) => p.category))];
+    let selected = "Glean";
+
+    function fillSelect(id, options) {
+      const el = document.getElementById(id);
+      el.innerHTML = options.map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+    }
+    fillSelect("layer", [["all", "全部层"], ...Object.entries(LAYER_LABEL)]);
+    fillSelect("category", [["all", "全部品类"], ...CATEGORIES.map((c) => [c, c])]);
+    fillSelect("status", [["all", "全部状态"], ...Object.entries(STATUS_LABEL)]);
+
+    const counts = { pmf: 0, contested: 0, gap: 0, infra: 0 };
+    PRODUCTS.forEach((p) => { counts[p.status] += 1; });
+    document.getElementById("stats").innerHTML = [
+      [counts.pmf, "已跑通 PMF"],
+      [counts.contested, "仍在缠斗"],
+      [counts.gap, "公认空缺"],
+      [counts.infra, "铲子 / 基建"]
+    ].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
+
+    function matches(p) {
+      const q = document.getElementById("q").value.trim().toLowerCase();
+      const layer = document.getElementById("layer").value;
+      const category = document.getElementById("category").value;
+      const status = document.getElementById("status").value;
+      if (layer !== "all" && p.layer !== layer) return false;
+      if (category !== "all" && p.category !== category) return false;
+      if (status !== "all" && p.status !== status) return false;
+      if (!q) return true;
+      return p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.note.toLowerCase().includes(q);
+    }
+
+    function render() {
+      const filtered = PRODUCTS.filter(matches);
+      document.getElementById("count").textContent = `显示 ${filtered.length} / ${PRODUCTS.length} 个条目`;
+      const sel = PRODUCTS.find((p) => p.name === selected) || filtered[0];
+      if (sel) {
+        selected = sel.name;
+        document.getElementById("detail").innerHTML =
+          `<div class="pills"><span class="pill ${sel.status}">${STATUS_LABEL[sel.status]}</span><span class="pill">${LAYER_LABEL[sel.layer]}</span></div>` +
+          `<h3>${sel.name}</h3><p>${sel.category}</p><p>${sel.note}</p>`;
+      }
+      const groups = [];
+      CATEGORIES.forEach((cat) => {
+        const items = filtered.filter((p) => p.category === cat);
+        if (items.length) groups.push({ cat, items });
+      });
+      document.getElementById("list").innerHTML = groups.map((g) => {
+        const rows = g.items.map((p) =>
+          `<div class="row"><button class="prod" data-name="${p.name.replace(/"/g, "&quot;")}" aria-pressed="${p.name === selected}">${p.name}</button>` +
+          `<span class="pill ${p.status}">${STATUS_LABEL[p.status]}</span><span class="pill">${LAYER_LABEL[p.layer]}</span></div>`
+        ).join("");
+        return `<details class="cat" open><summary>${g.cat} (${g.items.length})</summary>${rows}</details>`;
+      }).join("");
+    }
+
+    document.body.addEventListener("click", (e) => {
+      const btn = e.target.closest("button.prod");
+      if (!btn) return;
+      selected = btn.dataset.name;
+      render();
+    });
+    ["q", "layer", "category", "status"].forEach((id) => {
+      document.getElementById(id).addEventListener("input", render);
+      document.getElementById(id).addEventListener("change", render);
+    });
+    render();
+  </script>
+</body>
+</html>
