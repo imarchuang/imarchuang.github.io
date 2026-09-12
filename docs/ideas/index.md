@@ -24,6 +24,7 @@ In Markdown, skip the Docsify router with `':ignore'`:
 
 ## Drops
 
+* [subsequence-lab](/drops/subsequence-lab/ ':ignore') — 把《子序概论》里的 bitmask、双指针、N×26 矩阵和最小窗口 DP 做成可逐步播放的演示。
 * [ai-native-product-map](/drops/ai-native-product-map/ ':ignore') — 六层地图：知识工作空间、coding agent、垂直 Agent、execution/runtime、控制面、训练
 * [music-feelings](/drops/music-feelings/ ':ignore') — How does music make us feel? 英语互动课件（原创）
 * [fen-shu-de-yi-yi](/drops/fen-shu-de-yi-yi/ ':ignore') — 分数的意义：再认识、分数单位、十分之几（原创课件）

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>子序概论 · 逻辑演示</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --board: #16382b;
+      --board-2: #1f4a39;
+      --chalk: #efe6c9;
+      --mute: #b7c4b0;
+      --match: #7ec8c3;
+      --warn: #e07a7a;
+      --mark: #e8c547;
+      --ink: #0f241c;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--board); color: var(--chalk); }
+    body { font-family: "Noto Sans SC", sans-serif; line-height: 1.45; }
+    code, .mono, .tile, table { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+    header { padding: 28px 28px 12px; max-width: 1120px; margin: 0 auto; }
+    .kicker { letter-spacing: .16em; text-transform: uppercase; font-size: 11px; color: var(--mute); }
+    h1 { font-size: clamp(26px, 4vw, 40px); margin: 8px 0 10px; font-weight: 700; }
+    .lede { max-width: 62ch; color: var(--mute); margin: 0; }
+    .note { margin-top: 12px; font-size: 13px; color: var(--mark); }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 28px; max-width: 1120px; margin: 0 auto 12px; }
+    button.scene {
+      background: transparent; color: var(--chalk); border: 1px solid #3d6a56;
+      padding: 7px 10px; cursor: pointer; font: inherit; font-size: 13px;
+    }
+    button.scene[aria-current="true"] { background: var(--chalk); color: var(--ink); }
+    .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    button.ctrl {
+      background: var(--board-2); color: var(--chalk); border: 1px solid #3d6a56;
+      padding: 7px 12px; cursor: pointer; font: inherit;
+    }
+    main { padding: 0 28px 48px; max-width: 1120px; margin: 0 auto; }
+    .stage { background: var(--board-2); border: 1px solid #2f5a46; padding: 18px; min-height: 420px; }
+    .caption { color: var(--mute); font-size: 14px; min-height: 3.2em; margin: 0 0 14px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+    .label { width: 78px; color: var(--mute); font-size: 12px; }
+    .tile {
+      width: 42px; height: 42px; display: grid; place-items: center;
+      border: 1px dashed #4a7a64; background: #143328; font-size: 18px;
+    }
+    .tile.on { background: var(--match); color: var(--ink); border-style: solid; border-color: var(--match); }
+    .tile.miss { background: var(--warn); color: var(--ink); border-color: var(--warn); }
+    .tile.cur { outline: 2px solid var(--mark); outline-offset: 2px; }
+    .tile.skip { opacity: .4; }
+    .idx { font-size: 11px; color: var(--mute); text-align: center; width: 42px; }
+    table.grid { border-collapse: collapse; font-size: 12px; }
+    table.grid th, table.grid td {
+      border: 1px solid #3d6a56; padding: 6px 8px; text-align: center; min-width: 34px;
+    }
+    table.grid th { color: var(--mute); font-weight: 500; }
+    td.hi { background: var(--match); color: var(--ink); }
+    td.scan { background: var(--mark); color: var(--ink); }
+    td.bad { background: var(--warn); color: var(--ink); }
+    .path { margin-top: 10px; font-size: 14px; }
+    .win { display: inline-block; margin-top: 10px; padding: 6px 10px; border: 1px solid var(--mark); color: var(--mark); }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">敲黑板 · from subsequence note</div>
+    <h1>把笔记后面的遍历做成可见运动</h1>
+    <p class="lede">子序列必须保序、可以不连续。笔记里的 bitmask、双指针、<code>N×26</code> 矩阵和最小窗口 DP，都是在这个约束下把「向后找下一个字符」变得更快。</p>
+    <p class="note">演示用笔记原例：<code>abbacd</code> / <code>[1,2,3]</code> / <code>S=abcdebdde T=bde</code>。自动播放相当于 GIF；也可单步进。</p>
+  </header>
+  <nav>
+    <button class="scene" data-id="def" aria-current="true">1 定义</button>
+    <button class="scene" data-id="bits">2 Bitmask 穷举</button>
+    <button class="scene" data-id="ptr">3 是不是子序</button>
+    <button class="scene" data-id="memo">4 N×26 矩阵</button>
+    <button class="scene" data-id="dp">5 最小窗口 DP</button>
+  </nav>
+  <main>
+    <div class="controls" style="margin-bottom:10px">
+      <button class="ctrl" id="play">暂停</button>
+      <button class="ctrl" id="step">下一步</button>
+      <button class="ctrl" id="reset">重来</button>
+      <span class="mono" id="tick" style="color:var(--mute);font-size:13px"></span>
+    </div>
+    <section class="stage" id="stage"></section>
+  </main>
+  <script>
+    const T = "abbacd";
+    const NUMS = [1, 2, 3];
+    const S = "abcdebdde";
+    const TT = "bde";
+    const LETTERS = "abcd";
+
+    function tiles(str, cls = () => "") {
+      return [...str].map((ch, i) =>
+        `<div><div class="idx">${i}</div><div class="tile ${cls(ch, i)}">${ch}</div></div>`
+      ).join("");
+    }
+
+    function nextMatrix(str) {
+      const n = str.length;
+      const m = Array.from({ length: n }, () => Array(26).fill(-1));
+      const last = Array(26).fill(-1);
+      for (let i = n - 1; i >= 0; i--) {
+        last[str.charCodeAt(i) - 97] = i;
+        for (let c = 0; c < 26; c++) m[i][c] = last[c];
+      }
+      return m;
+    }
+
+    function minWindowDp(s, t) {
+      const m = s.length, n = t.length;
+      const dp = Array.from({ length: m }, () => Array(n).fill(-1));
+      dp[0][0] = s[0] === t[0] ? 0 : -1;
+      for (let i = 1; i < m; i++) dp[i][0] = s[i] === t[0] ? i : dp[i - 1][0];
+      for (let j = 1; j < n; j++) dp[0][j] = -1;
+      const fills = [];
+      for (let j = 0; j < n; j++) {
+        for (let i = 0; i < m; i++) {
+          if (j === 0 || i === 0) {
+            fills.push({ i, j, v: dp[i][j], kind: "base", eq: s[i] === t[j] });
+            continue;
+          }
+          if (s[i] === t[j]) dp[i][j] = dp[i - 1][j - 1];
+          else dp[i][j] = dp[i - 1][j];
+          fills.push({ i, j, v: dp[i][j], kind: s[i] === t[j] ? "diag" : "up", eq: s[i] === t[j] });
+        }
+      }
+      let min = Infinity, best = { k: -1, i: -1, w: "" };
+      const answers = [];
+      for (let i = 0; i < m; i++) {
+        const k = dp[i][n - 1];
+        if (k !== -1) {
+          const len = i - k + 1;
+          const w = s.slice(k, i + 1);
+          answers.push({ i, k, len, w });
+          if (len < min) { min = len; best = { k, i, w, len }; }
+        }
+      }
+      return { dp, fills, answers, best };
+    }
+
+    const MEMO = nextMatrix(T);
+    const DP = minWindowDp(S, TT);
+
+    function bitmaskFrames() {
+      const frames = [];
+      const count = 1 << NUMS.length;
+      for (let mark = 0; mark < count; mark++) {
+        const chosen = [];
+        const bits = [];
+        for (let i = 0; i < NUMS.length; i++) {
+          const on = (mark & (1 << i)) !== 0;
+          bits.push(on);
+          if (on) chosen.push(NUMS[i]);
+        }
+        frames.push({
+          mark,
+          bits,
+          chosen,
+          caption: `mark=${mark} 二进制 ${mark.toString(2).padStart(3, "0")}。每一位对应 nums[i] 选或不选，顺序被下标锁死，所以得到的一定是子序列而不是任意排列。`
+        });
+      }
+      return frames;
+    }
+
+        function isSubseqFrames(needle, hay = T) {
+      const tag = (o) => Object.assign({ needle }, o);
+      const frames = [tag({ i: -1, start: -1, found: null, ok: true, caption: `要判断 ${needle} 是不是 ${hay} 的子序列：对 needle 的每个字符，只在上一次匹配位置之后向右找第一次出现。` })];
+      let start = -1;
+      for (let k = 0; k < needle.length; k++) {
+        const c = needle[k];
+        let found = -1;
+        for (let i = start + 1; i < hay.length; i++) {
+          frames.push(tag({
+            i, start, found: null, looking: c, k,
+            caption: `找 '${c}'，从下标 ${start + 1} 起扫到 ${i}。当前是 '${hay[i]}'。`
+          }));
+          if (hay[i] === c) { found = i; break; }
+        }
+        if (found === -1) {
+          frames.push(tag({ i: -1, start, found: -1, looking: c, k, fail: true,
+            caption: `'${c}' 在位置 ${start} 之后不存在 → ${needle} 不是子序列。` }));
+          return frames;
+        }
+        start = found;
+        frames.push(tag({ i: found, start: found, found, looking: c, k,
+          caption: `命中 ${hay}[${found}]='${c}'。下一轮只能从 ${found + 1} 往后。已匹配 ${needle.slice(0, k + 1)}。` }));
+      }
+      frames.push(tag({ i: start, start, found: start, done: true,
+        caption: `全部字符按原序找齐 → ${needle} 是 ${hay} 的子序列。` }));
+      return frames;
+    }
+
+        function memoQueryFrames(needle) {
+      const frames = [];
+      let row = 0;
+      frames.push({ needle, row: 0, col: null, hit: null, caption: `把 ${T} 扩成「从下标 i 起（含 i）每个字母最早出现位置」。查 ${needle} 时每次 O(1) 跳，不必再扫原串。` });
+      for (let k = 0; k < needle.length; k++) {
+        const col = needle.charCodeAt(k) - 97;
+        if (row >= T.length) {
+          frames.push({ needle, row, col, hit: -1, fail: true, caption: `已经走出串尾，找不到 '${needle[k]}'。` });
+          return frames;
+        }
+        const hit = MEMO[row][col];
+        frames.push({
+          needle, row, col, hit, k,
+          caption: `查第 ${row} 行、列 '${needle[k]}' → ${hit}。` + (hit < 0 ? " 没有这个字母。" : ` 下一个查询从第 ${hit + 1} 行开始。`)
+        });
+        if (hit < 0) return frames;
+        row = hit + 1;
+      }
+      frames.push({ needle, row, col: null, hit: row - 1, done: true, caption: `${needle} 全程命中。10 亿个 S 时：预处理 O(|T|·26)，每个查询 O(|S|)。` });
+      return frames;
+    }
+
+    const SCENES = {
+      def: {
+        frames: [
+          { pick: [0, 1, 5], bad: [], caption: "子序列保相对原序，可以跳格。abbacd 里 abd 合法：a 在 b 前，b 在 d 前。" },
+          { pick: [0, 5, 1], bad: [5, 1], caption: "adb 不合法：原串里 b 从未出现在 d 之后。这是子序列和任意子集/排列的分界。" },
+          { pick: [0, 1, 2], sub: true, caption: "abb 是子串：不仅保序，还必须 consecutive。子串 ⊂ 子序列。" }
+        ],
+        render(f) {
+          const cls = (ch, i) => {
+            if (f.bad && f.bad.includes(i) && f.pick.includes(i)) return "miss cur";
+            if (f.pick.includes(i)) return "on";
+            return "skip";
+          };
+          return `<p class="caption">${f.caption}</p>
+            <div class="row"><span class="label">原串</span>${tiles(T, () => "")}</div>
+            <div class="row"><span class="label">${f.sub ? "子串" : "取出"}</span>${tiles(T, cls)}</div>`;
+        }
+      },
+      bits: {
+        frames: bitmaskFrames(),
+        render(f) {
+          const cells = NUMS.map((n, i) => `<div class="tile ${f.bits[i] ? "on" : ""}">${n}</div>`).join("");
+          const bits = f.bits.map((b) => b ? "1" : "0").join(" ");
+          return `<p class="caption">${f.caption}</p>
+            <div class="row"><span class="label">nums</span>${cells}</div>
+            <div class="path mono">mask bits（低位 = 下标 0）：${bits}　→　子集 [${f.chosen.join(", ")}]</div>
+            <p class="caption" style="margin-top:14px">共 2^n = 8 个 mask。笔记表格里 mark=6（110）应对应 [2,3] 即 0,1,1；原表那一行写成了 0,1,0，是笔误。</p>`;
+        }
+      },
+      ptr: {
+        frames: [...isSubseqFrames("aac"), ...isSubseqFrames("bdc")],
+        render(f) {
+          const use = f.needle;
+          return `<p class="caption">${f.caption}</p>
+            <div class="row"><span class="label">${use}</span>${[...use].map((ch, i) => `<div class="tile ${f.k === i ? "cur" : ""} ${i < (f.k ?? -1) ? "on" : ""}">${ch}</div>`).join("")}</div>
+            <div class="row"><span class="label">${T}</span>${tiles(T, (ch, i) => {
+              if (i === f.i && ch === f.looking) return "on cur";
+              if (i === f.i) return "cur";
+              if (f.start >= 0 && i === f.start) return "on";
+              if (i <= f.start) return "skip";
+              return "";
+            })}</div>`;
+        }
+      },
+      memo: {
+        frames: [...memoQueryFrames("aac"), ...memoQueryFrames("bdc")],
+        render(f) {
+          const head = LETTERS.split("").map((c) => `<th>${c}</th>`).join("");
+          const body = MEMO.map((row, i) => {
+            const tds = LETTERS.split("").map((c, ci) => {
+              const v = row[c.charCodeAt(0) - 97];
+              let cls = "";
+              if (f.row === i && f.col === c.charCodeAt(0) - 97) cls = f.hit < 0 ? "bad" : "hi";
+              else if (f.row === i) cls = "scan";
+              return `<td class="${cls}">${v}</td>`;
+            }).join("");
+            return `<tr><th>${i}/${T[i]}</th>${tds}</tr>`;
+          }).join("");
+          return `<p class="caption">${f.caption}</p>
+            <div class="row"><span class="label">${T}</span>${tiles(T, (_, i) => i === f.hit ? "on cur" : (i === f.row ? "cur" : ""))}</div>
+            <table class="grid"><thead><tr><th>i / 字母</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
+        }
+      },
+      dp: {
+        frames: [
+          { phase: "intro", caption: "最小窗口子序列：在 S 里找最短且最左的连续窗口 W，使 T 是 W 的子序列。S=abcdebdde，T=bde。dp[i][j]=k 表示 T[0..j] 是 S[k..i] 的子序列，k 尽量大。" },
+          ...DP.fills.map((x) => ({ ...x, phase: "fill", caption:
+            x.kind === "base"
+              ? `base：(${x.i},${x.j}) S='${S[x.i]}' T='${TT[x.j]}' → ${x.v}。j=0 时相等记下 k=i，否则继承左边/上边。`
+              : x.kind === "diag"
+                ? `S[i]==T[j]='${S[x.i]}'：两个都留下。k 继承 dp[i-1][j-1]=${x.v}。窗口右端是 i，左端仍是更早配完 T[0..j-1] 的那个 k。`
+                : `S[i]='${S[x.i]}' ≠ T[j]='${TT[x.j]}'：只能跳过 S[i]，k 继承 dp[i-1][j]=${x.v}。T 的进度 j 不能退。`
+          })),
+          ...DP.answers.map((a) => ({ phase: "ans", ...a, caption: `T 配完时看 dp[${a.i}][2]=${a.k}，窗口 S[${a.k}..${a.i}] = "${a.w}"，长度 ${a.len}。` })),
+          { phase: "best", ...DP.best, caption: `长度并列时取最左：答案 "${DP.best.w}"。这就是笔记里那张填满的表：最后一行 e 在 i=4 得到 k=1（bcde），在 i=8 得到 k=5（bdde）。` }
+        ],
+        render(f) {
+          const n = TT.length, m = S.length;
+          const head = [...S].map((ch, i) => `<th>${ch}<div class="idx">${i}</div></th>`).join("");
+          const body = [...TT].map((ch, j) => {
+            const tds = [...S].map((_, i) => {
+              const v = DP.dp[i][j];
+              let cls = "";
+              if (f.phase === "fill" && f.i === i && f.j === j) cls = f.v === -1 ? "bad" : "hi";
+              if (f.phase === "ans" && j === n - 1 && i === f.i) cls = "hi";
+              if (f.phase === "best" && j === n - 1 && i === f.i) cls = "hi";
+              const show = (f.phase === "intro") ? "" : (v === -1 ? "·" : v);
+              const filled = f.phase === "fill" ? (j < f.j || (j === f.j && i <= f.i)) : f.phase !== "intro";
+              return `<td class="${cls}">${filled ? (v === -1 ? "·" : v) : ""}</td>`;
+            }).join("");
+            return `<tr><th>${ch}</th>${tds}</tr>`;
+          }).join("");
+          const win = (f.phase === "ans" || f.phase === "best") && f.w
+            ? `<div class="win">窗口 ${f.w}　k=${f.k} → i=${f.i}</div>` : "";
+          const scls = (ch, i) => {
+            if ((f.phase === "ans" || f.phase === "best") && i >= f.k && i <= f.i) return "on";
+            if (f.phase === "fill" && i === f.i) return "cur";
+            return "";
+          };
+          return `<p class="caption">${f.caption}</p>
+            <div class="row"><span class="label">S</span>${tiles(S, scls)}</div>
+            <div class="row"><span class="label">T</span>${tiles(TT, (_, j) => f.j === j ? "cur" : "")}</div>
+            <table class="grid"><thead><tr><th>T \\ S</th>${head}</tr></thead><tbody>${body}</tbody></table>
+            ${win}`;
+        }
+      }
+    };
+
+    let scene = "def";
+    let idx = 0;
+    let timer = null;
+    let playing = true;
+
+    function render() {
+      const sc = SCENES[scene];
+      const f = sc.frames[idx];
+      document.getElementById("stage").innerHTML = sc.render(f);
+      document.getElementById("tick").textContent = `${idx + 1} / ${sc.frames.length}`;
+    }
+
+    function next() {
+      const sc = SCENES[scene];
+      idx = (idx + 1) % sc.frames.length;
+      render();
+    }
+
+    function playLoop() {
+      stop();
+      timer = setInterval(next, 1100);
+      playing = true;
+      document.getElementById("play").textContent = "暂停";
+    }
+
+    function stop() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      playing = false;
+      document.getElementById("play").textContent = "播放";
+    }
+
+    document.querySelectorAll(".scene").forEach((b) => {
+      b.addEventListener("click", () => {
+        document.querySelectorAll(".scene").forEach((x) => x.setAttribute("aria-current", String(x === b)));
+        scene = b.dataset.id;
+        idx = 0;
+        render();
+      });
+    });
+    document.getElementById("play").addEventListener("click", () => playing ? stop() : playLoop());
+    document.getElementById("step").addEventListener("click", () => { stop(); next(); });
+    document.getElementById("reset").addEventListener("click", () => { idx = 0; render(); });
+
+    render();
+    playLoop();
+  </script>
+</body>
+</html>
