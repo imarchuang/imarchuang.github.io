@@ -62,6 +62,11 @@
     td.bad { background: var(--warn); color: var(--ink); }
     .path { margin-top: 10px; font-size: 14px; }
     .win { display: inline-block; margin-top: 10px; padding: 6px 10px; border: 1px solid var(--mark); color: var(--mark); }
+    html.embed header { padding: 12px 16px 0; }
+    html.embed h1, html.embed .lede, html.embed .note { display: none; }
+    html.embed nav, html.embed main { padding-left: 16px; padding-right: 16px; }
+    html.embed main { padding-bottom: 16px; }
+    html.embed .stage { min-height: 360px; }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   </style>
 </head>
@@ -89,6 +94,9 @@
     <section class="stage" id="stage"></section>
   </main>
   <script>
+    if (/[?&]embed=1(?:&|$)/.test(location.search)) {
+      document.documentElement.classList.add("embed");
+    }
     const T = "abbacd";
     const NUMS = [1, 2, 3];
     const S = "abcdebdde";
