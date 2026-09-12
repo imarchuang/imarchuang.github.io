@@ -1,5 +1,7 @@
 # 二叉树后序遍历的题型
 
+<iframe src="/drops/algo-lab/?note=tree-postorder&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 - [刷题列表(6 道)](#刷题列表)
 
 这类题主要有意思的地方在于`都涉及跨越左右子树找答案`的情况。

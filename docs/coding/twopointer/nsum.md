@@ -1,5 +1,7 @@
 # nSum类
 
+<iframe src="/drops/algo-lab/?note=twopointer-nsum&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 >最经典的双指针策略。
 
 ### **刷题列表**

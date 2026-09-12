@@ -1,5 +1,7 @@
 # 数据结构题，不是数据结构设计
 
+<iframe src="/drops/algo-lab/?note=datastructure-index&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **这章主要是讲几个技巧类的数据结构** 
 
 ### 先BB

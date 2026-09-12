@@ -1,5 +1,7 @@
 # 贪心算法
 
+<iframe src="/drops/algo-lab/?note=dp-greedy&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ### **敲黑板** 关于决策类动规的思考
 
 

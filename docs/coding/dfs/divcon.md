@@ -1,5 +1,7 @@
 # 用分治法暴力穷举
 
+<iframe src="/drops/algo-lab/?note=dfs-divcon&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 #### **关于分治**
 
 > 我个人是非常推崇暴力穷举算法的，因为这是其他奇淫异巧类算法如动规和单调栈等的基础。关于**暴力美学**，我个人认为有两个框架：回溯和分治。回溯呢我们已经说过难点是在于把*回溯树*画出来（细节请看[回溯这篇](./coding/dfs/backtracking)），相对应分治法，我这篇只想关注那些**暴力美学**类的几道题，比如说单词拆分题 II。

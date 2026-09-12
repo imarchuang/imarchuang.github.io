@@ -1,5 +1,7 @@
 # 字符串匹配相关的几个问题
 
+<iframe src="/drops/algo-lab/?note=classic-match&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ### 第一类：数字为距离
 !> **敲黑板** 这里穷举问题多数都是子串切割问题，
 1. [Facebook真题. 有效单词缩写](#有效单词缩写) 

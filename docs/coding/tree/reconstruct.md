@@ -1,4 +1,6 @@
 # 二叉树的构建
+
+<iframe src="/drops/algo-lab/?note=tree-reconstruct&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
 - [刷题列表(4道)](#刷题列表)
 
 **重要的事情说三遍**：一定要自顶而下的考虑，先思考怎么构造出根节点和其左右儿子！！！

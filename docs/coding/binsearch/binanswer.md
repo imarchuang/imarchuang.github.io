@@ -1,5 +1,7 @@
 # 二分法之二分答案
 
+<iframe src="/drops/algo-lab/?note=binsearch-binanswer&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ### 能否找到单调函数？
 1. 怎么能够从题目语义中抽象出来一个基于自变量x的单调函数f(x)，外加一个目标值target。
 1. 抽象出单调函数后，把题目转化成`计算满足约束条件f(x)==target时候x的（最大/最小）值`。

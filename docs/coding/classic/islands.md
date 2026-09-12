@@ -1,5 +1,7 @@
 # 岛屿问题
 
+<iframe src="/drops/algo-lab/?note=classic-islands&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 > 岛屿问题又称floodfill，很形象吧？就是水没金山寺的感觉。
 
 ### 一些心得总结

@@ -1,5 +1,7 @@
 # 关于递归
 
+<iframe src="/drops/algo-lab/?note=classic-recursion&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 > 计算机的构造似乎给二有着不解之缘，更抽象点说，我们人类设计算法时候总是希望把问题先一切两半，大事化小。
 >
 > 1.  我们说**整个计算机其实只有两种结构**，一个是数组一个是链表。

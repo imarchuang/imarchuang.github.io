@@ -1,5 +1,7 @@
 # 表达式相关的几个问题之掏心问题
 
+<iframe src="/drops/algo-lab/?note=classic-expr&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 > 单个字符串做输入，或者一堆字符串的`array`做输入，你的思路不外乎以下几种：
 >
 > -  动规思路，刷到今天，这种题型应该很容易辨别出来了，就是**蛙跳**嘛，基本上都是子序列相关的问题，经典的例子像[最长回文子序](https://leetcode.com/problems/longest-palindromic-subsequence/)之类的。当然了，类似思路还有更原始的题型，比如说[找字符串中符合word的子序列](#https://www.lintcode.com/problem/1024/)，这子序类的思路在[这篇](./coding/classic/subsequence)详细讲解过，请温习。

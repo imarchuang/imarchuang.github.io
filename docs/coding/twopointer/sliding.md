@@ -1,5 +1,7 @@
 # 同向型双指针 - 滑动窗口老猛男
 
+<iframe src="/drops/algo-lab/?note=twopointer-sliding&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 > 之前提过同向型双指针主要是快慢指针，这篇重点讲一下同向型双指针的另一类 -> **滑动窗口老猛男**
 
 滑动窗口的题leetcode上挺多的，但是我想开篇提一下我刚刚在wayfair面试的时候遇到的[这道题](#wayfair面试真题)。正好沉着对滑动窗口的热度，今天把这个老猛男能解决的问题都扫一遍。

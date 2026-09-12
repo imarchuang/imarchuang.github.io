@@ -1,5 +1,7 @@
 # 二叉树的经典题
 
+<iframe src="/drops/algo-lab/?note=tree-classic&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 #### **刷题列表**
 > 1. [236. 二叉树的最近公共祖先 (中等)](#二叉树的最近公共祖先)
 

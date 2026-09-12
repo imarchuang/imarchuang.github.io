@@ -1,5 +1,7 @@
 # 深度搜素：回溯，分治
 
+<iframe src="/drops/algo-lab/?note=dfs-index&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 #### **文章列表**
 
 > 1. [关于穷举遍历](./coding/dfs/traversal)

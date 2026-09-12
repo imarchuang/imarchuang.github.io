@@ -1,5 +1,7 @@
 # 矩阵的遍历
 
+<iframe src="/drops/algo-lab/?note=dfs-traversal&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 >起这篇的意义主要是让我们脑子里对于DFS遍历的流程能够在脑子里形成记忆，所以这篇也是作为DFS的入门篇。
 >
 >这篇还想借着[东哥的这篇帖子(一文秒杀所有岛屿题目)](https://labuladong.gitee.io/algo/4/30/111/)来整理加深一下`DFS`和`BFS`之间的不同作战规则。这里的题都是基于`矩阵`（亦是`图`）的遍历，主要是想让你专注于DFS本身而不是有时候比较复杂的遍历方向上。

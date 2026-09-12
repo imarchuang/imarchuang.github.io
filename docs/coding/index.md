@@ -1,5 +1,7 @@
 # 刷刷刷
 
+<iframe src="/drops/algo-lab/?note=index&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 不止不觉中刷题已经半年有余了，这时候是时候记录一下所有面过的公司了:
 1. **Meta**: 基本上就是没准备好，面E6给E5也是说明Recruiter不是很给力啊！
 1. **Noom**: 也算是自己为了面Meta而练手的，不过说实话他们的面试流程还是很不错的；

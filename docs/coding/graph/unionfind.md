@@ -1,5 +1,7 @@
 # 并查集 Union-Find
 
+<iframe src="/drops/algo-lab/?note=graph-unionfind&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **UnionFind应用更新(2023-10-06)** 并查集UnionFind主要解决图论中`动态连通性`的问题，这个所谓的`动态连通性`问题，其实在面试题中的应用非常多，这个更新主要就是正对面试中的一些具体问题来的：
 > 最近看了这篇[大神文章](http://toughcoder.net/blog/2022/09/08/disjoint-set-data-structure/)，深有感触，扯着热度扯两句自己对于UnionFind的理解。这部分用几个实际的例题，来阐述一下UnionFind这个数据结构的优雅！
 >

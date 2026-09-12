@@ -1,5 +1,7 @@
 # 关于快排快选
 
+<iframe src="/drops/algo-lab/?note=twopointer-quickselect&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **这篇主要是深入讲解传说中的partition算法**
 >
 >我们之前讲过**归并排序**，核心思想就是**先把左半边数组排好序，再把右半边排好序，然后把两个数组合并**。这种分治的思想应该算是计算机最最最基础的算法思想之一，沿着这个思想，我们加深一下。何谓快排？简单来说，就是**先将一个元素排好序，再将剩下的元素排好序**，这里就有一个核心中的核心函数**partition**，顺着分治思想，就是给你一个数组nums，然后给你一个区间nums[lo...hi]，让你在其中找个分界点p，通过元素交换使得nums[lo...p-1]都小于等于nums[p]，且nums[p+1...hi]都大于nums[p]。

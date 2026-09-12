@@ -1,5 +1,7 @@
 # 隐式图的bfs
 
+<iframe src="/drops/algo-lab/?note=bfs-bfs_adv&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 >深入思考一下拓扑排序(**2022-07-07**):
 >
 >人们总是喜欢**有序**的集合，这里有序也体现在猴群社会里。

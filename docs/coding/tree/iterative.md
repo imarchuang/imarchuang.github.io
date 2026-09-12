@@ -1,4 +1,6 @@
 # 递归转迭代
+
+<iframe src="/drops/algo-lab/?note=tree-iterative&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
 - [刷题列表(6道)](#刷题列表)
 
 递归做法写起来非常简洁易懂，但是随着程序员行业的内卷，越来越多公司的面试官经常想考察candidate的迭代写码能力。

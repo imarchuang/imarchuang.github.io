@@ -1,4 +1,6 @@
 # 关于链表的一些小技巧
+
+<iframe src="/drops/algo-lab/?note=classic-linkedlist&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
 > 
 > **更新(2023-07-05)**
 > 写个最简单的总结，说说为什么要刷单链表。

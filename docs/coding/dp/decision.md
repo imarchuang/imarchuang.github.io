@@ -1,5 +1,7 @@
 # 决策类(单子序)动规题型概论
 
+<iframe src="/drops/algo-lab/?note=dp-decision&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **子序型动规的最大特点是给定一个数列`[1...n]`，`dp[i]`的值通常需要看前i的元素`[1...i-1]`的选与不选的决策来决定**
 
 >深入思考一下决策类动规题(**2022-07-04**):

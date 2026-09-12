@@ -1,5 +1,7 @@
 # 经验型动规
 
+<iframe src="/drops/algo-lab/?note=dp-unknown&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **刷到了一些题，背后的数学理论证明着实高深，所以在无法提供数学证明的状态下，我感觉把他们暂且归类为经验型吧**
 
 ?> 这篇帖子里的题多数算是比较难的，面试中如果遇到的话只能诚实的跟面试官说自己无法提供数学证明，但是根据**常识common sense**这种思路应该是可以的。

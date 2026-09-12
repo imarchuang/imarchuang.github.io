@@ -1,5 +1,7 @@
 # 二叉树的层级遍历
 
+<iframe src="/drops/algo-lab/?note=bfs-levels&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 !> 说的二叉树层级遍历，如果题目不要求在最小的层数结束，其实BFS和DFS思路都是可行的，这篇文章对相应的题会展示两个思路的解法，以加深对BFS和DFS的理解。
 
 > 这篇文章里会用DFS思路去解决涉及到层级遍历的题，这里有个通用的思维框架，其实就是回溯框架的缩小版应用在二叉树上。`depth++`就是做选择，`depth--`就是撤销选择。

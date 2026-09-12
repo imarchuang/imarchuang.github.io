@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>算法笔记 · 逐步演示</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --board: #16382b; --board-2: #1f4a39; --chalk: #efe6c9; --mute: #b7c4b0;
+      --match: #7ec8c3; --warn: #e07a7a; --mark: #e8c547; --ink: #0f241c;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--board); color: var(--chalk); }
+    body { font-family: "Noto Sans SC", sans-serif; line-height: 1.45; }
+    .mono, .tile, table, code { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+    header { padding: 20px 20px 8px; max-width: 1100px; margin: 0 auto; }
+    .kicker { letter-spacing: .14em; text-transform: uppercase; font-size: 11px; color: var(--mute); }
+    h1 { font-size: 22px; margin: 6px 0 8px; }
+    .lede { color: var(--mute); font-size: 14px; margin: 0; }
+    html.embed header { padding: 10px 16px 0; }
+    html.embed h1, html.embed .lede { display: none; }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 0 20px 10px; max-width: 1100px; margin: 0 auto; }
+    html.embed .controls { padding: 0 16px 8px; }
+    button.ctrl {
+      background: var(--board-2); color: var(--chalk); border: 1px solid #3d6a56;
+      padding: 7px 12px; cursor: pointer; font: inherit;
+    }
+    main { padding: 0 20px 32px; max-width: 1100px; margin: 0 auto; }
+    html.embed main { padding: 0 16px 12px; }
+    .stage { background: var(--board-2); border: 1px solid #2f5a46; padding: 16px; min-height: 380px; }
+    .caption { color: var(--mute); font-size: 14px; min-height: 3em; margin: 0 0 12px; }
+    .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+    .label { min-width: 72px; color: var(--mute); font-size: 12px; }
+    .tile {
+      min-width: 36px; height: 36px; padding: 0 6px; display: grid; place-items: center;
+      border: 1px dashed #4a7a64; background: #143328; font-size: 14px;
+    }
+    .tile.on { background: var(--match); color: var(--ink); border-style: solid; border-color: var(--match); }
+    .tile.miss { background: var(--warn); color: var(--ink); border-color: var(--warn); }
+    .tile.cur { outline: 2px solid var(--mark); outline-offset: 2px; }
+    .tile.skip { opacity: .4; }
+    .idx { font-size: 10px; color: var(--mute); text-align: center; }
+    table.grid { border-collapse: collapse; font-size: 12px; }
+    table.grid th, table.grid td { border: 1px solid #3d6a56; padding: 5px 7px; text-align: center; min-width: 28px; }
+    td.hi { background: var(--match); color: var(--ink); }
+    td.scan { background: var(--mark); color: var(--ink); }
+    td.bad { background: var(--warn); color: var(--ink); }
+    .win { margin-top: 8px; padding: 6px 10px; border: 1px solid var(--mark); color: var(--mark); display: inline-block; }
+    pre.tree { font-size: 13px; color: var(--chalk); margin: 8px 0; white-space: pre; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="kicker">敲黑板 · algo lab</div>
+    <h1 id="title">算法逐步演示</h1>
+    <p class="lede" id="lede">来自对应技术笔记的原例。自动播放；也可单步进。</p>
+  </header>
+  <div class="controls">
+    <button class="ctrl" id="play">暂停</button>
+    <button class="ctrl" id="step">下一步</button>
+    <button class="ctrl" id="reset">重来</button>
+    <span class="mono" id="tick" style="color:var(--mute);font-size:13px"></span>
+  </div>
+  <main><section class="stage" id="stage"></section></main>
+  <script src="./notes.js"></script>
+  <script>
+    if (/[?&]embed=1(?:&|$)/.test(location.search)) document.documentElement.classList.add("embed");
+    const params = new URLSearchParams(location.search);
+    const id = params.get("note") || "coding-index";
+    const note = window.ALGO_NOTES[id] || window.ALGO_NOTES["coding-index"];
+    document.getElementById("title").textContent = note.title;
+    document.title = note.title + " · 逐步演示";
+
+    function esc(s) { return String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+    function renderTiles(items, cls) {
+      return items.map((v, i) => {
+        const c = (cls && cls[i]) || "";
+        return `<div><div class="idx">${i}</div><div class="tile ${c}">${esc(v)}</div></div>`;
+      }).join("");
+    }
+
+    function render(f) {
+      let html = `<p class="caption">${esc(f.caption)}</p>`;
+      if (f.rows) {
+        for (const r of f.rows) {
+          html += `<div class="row"><span class="label">${esc(r.label)}</span>${renderTiles(r.items, r.cls)}</div>`;
+        }
+      }
+      if (f.grid) {
+        const { head, body } = f.grid;
+        html += `<table class="grid"><thead><tr>${head.map(h => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>`;
+        for (const row of body) {
+          html += "<tr>" + row.map(cell => {
+            if (typeof cell === "object") return `<td class="${cell.cls||""}">${esc(cell.v)}</td>`;
+            return `<td>${esc(cell)}</td>`;
+          }).join("") + "</tr>";
+        }
+        html += "</tbody></table>";
+      }
+      if (f.tree) html += `<pre class="tree">${esc(f.tree)}</pre>`;
+      if (f.badge) html += `<div class="win">${esc(f.badge)}</div>`;
+      document.getElementById("stage").innerHTML = html;
+    }
+
+    let idx = 0, timer = null, playing = true;
+    const frames = note.frames;
+    function show() {
+      render(frames[idx]);
+      document.getElementById("tick").textContent = `${idx + 1} / ${frames.length}`;
+    }
+    function next() { idx = (idx + 1) % frames.length; show(); }
+    function stop() {
+      if (timer) clearInterval(timer);
+      timer = null; playing = false;
+      document.getElementById("play").textContent = "播放";
+    }
+    function playLoop() {
+      stop();
+      timer = setInterval(next, 1100);
+      playing = true;
+      document.getElementById("play").textContent = "暂停";
+    }
+    document.getElementById("play").onclick = () => playing ? stop() : playLoop();
+    document.getElementById("step").onclick = () => { stop(); next(); };
+    document.getElementById("reset").onclick = () => { idx = 0; show(); };
+    show();
+    playLoop();
+  </script>
+</body>
+</html>

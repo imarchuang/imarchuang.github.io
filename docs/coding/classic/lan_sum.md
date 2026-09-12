@@ -1,5 +1,7 @@
 # 刷题时的常用的语言技巧
 
+<iframe src="/drops/algo-lab/?note=classic-lan_sum&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **敲黑板**：刷题时常用的一些语言技巧汇总。
 
 #### **技巧分类**

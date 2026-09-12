@@ -1,5 +1,7 @@
 # 图论基础
 
+<iframe src="/drops/algo-lab/?note=graph-index&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **引言** 图真的没啥高深的，本质上就是个高级点的多叉树而已，适用于树的 DFS/BFS 遍历算法，全部适用于图。关于图，面试中通常用邻接表和邻接矩阵来实现。
 
 > 比如说下图：

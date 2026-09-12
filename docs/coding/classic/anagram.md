@@ -1,5 +1,7 @@
 # 关于异位词的一些问题见解
 
+<iframe src="/drops/algo-lab/?note=classic-anagram&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ### 刷题列表
 1. [49. 字母异位词分组](#字母异位词分组)
 1. [921. 使括号有效的最少添加](#使括号有效的最少添加)

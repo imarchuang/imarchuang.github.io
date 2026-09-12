@@ -1,5 +1,7 @@
 # 二分图
 
+<iframe src="/drops/algo-lab/?note=graph-bipartite&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **何为二分图** 二分图的顶点集可分割为两个互不相交的子集，图中每条边依附的两个顶点都分属于这两个子集，且两个子集内的顶点不相邻。说人话就是：给你一幅「图」，请你用两种颜色将图中的所有顶点着色，且使得任意一条边的两个端点的颜色都不相同，你能做到吗？
 > ![](./pictures/bipartite0.png)
 

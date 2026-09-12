@@ -1,5 +1,7 @@
 # 双子序型动规
 
+<iframe src="/drops/algo-lab/?note=dp-subsequence&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 [单子序动规](./coding/dp/subsequence)那篇里我们说：**子序型动规的最大特点是给定一个数列`[1...n]`，`dp[i]`的值通常需要看前i的元素`[1...i-1]`的选与不选的决策来决定**，双子序的动规可以说更加有章可循，其中一个主要原因就是双子序里的选择**就四个**，状态转化方程也是比较直观，就是在这4个选择里取最值。
 
 ?> 借着本文希望能体将双子序型的动规问题扒扒皮，找出共性和解题套路来。

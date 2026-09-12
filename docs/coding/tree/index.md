@@ -1,5 +1,7 @@
 # 关于二叉树，是所有高级图论算法的基础
 
+<iframe src="/drops/algo-lab/?note=tree-index&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ##### 知识要点.
 
 - [二叉树解题全靠套路](#二叉树解题全靠套路)

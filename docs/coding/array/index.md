@@ -1,5 +1,7 @@
 # 数组题的小技巧
 
+<iframe src="/drops/algo-lab/?note=array-index&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ## 数组都考啥？
 >数组吧，涉及到各种算法类型，但是这里讲讲非回溯、动规、或者分治类思想的一些数组问题处理技巧，这里主要是讲当你能很快地想成暴力算法的解法时候，发现暴力解时多项式级别的时间复杂度，比如说`O(n^2)`, `O(nlogn)`甚至`O(n)`，这时候你需要followup思考更优解。
 

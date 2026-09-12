@@ -1,5 +1,7 @@
 # 非典型坐标型动规
 
+<iframe src="/drops/algo-lab/?note=dp-indices_adv&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 >之前说过坐标型动规是动规里最简单的一类，是因为坐标型动规每一步都存在最优子结构的最优解，而且最优解通常**存于之前有限个状态值**。
 >
 > 1. 比如说第62题在一个矩阵里找路径总数，这个思路很直接，就是根据它的左边的单元格`grid[i][j-1]`和上边的单元格`grid[i-1][j]`确定到达当前单元格`grid[i][j]`的路径总和。然后遍历的步骤也一是非常规律的按每行一个一个单元格的走，所以你想想stepSize其实是每个单元格；

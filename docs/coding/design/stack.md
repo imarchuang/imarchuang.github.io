@@ -1,5 +1,7 @@
 # 二分法的四种境界
 
+<iframe src="/drops/algo-lab/?note=design-stack&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ### BFS知识要点列表
 1. [套模板](./coding/binsearch/template.md)
 1. [OOXX](./coding/binsearch/ooxx.md)

@@ -1,5 +1,7 @@
 # 家族关系图谱
 
+<iframe src="/drops/algo-lab/?note=graph-family&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **Instacart面试** 今天Instacart的面试，说实话进行的没有我想象中那么顺利，不论结果如何，趁着还没忘干净，还是写写面试后的总结吧。
 
 !> **总结** 看到图（多叉树）相关的问题，第一反应应该是`建邻接链表`。图实际上分为有向图和无向图，邻接链表在无向图里比较`你中有我，我中有你`；而在有向图里其实可以建两个`邻接链表`，比如说在家族关系图谱里，这个`邻接链表`可以是两个hashmap，一个以child作为key，然后value是它的直接父节点；另一个可以以parent作为key，然后value是它的直接子节点。根据题目需求，可以快速的判断需要那种hashmap，甚至可能两个map都需要。

@@ -1,5 +1,7 @@
 # 关于二叉搜素树（BST)的一些操作
 
+<iframe src="/drops/algo-lab/?note=tree-bst&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 > **[更新 2023-07-18]**：一直强调先刷二叉树，因为他的递归性最强。二叉树里有一种特殊类叫做BST，这个其实是很多高级数据结构的基础，比如说红黑树，AVL树，B+树，线段树之类的。但是至于算法面试的话，只考察BST的两个特性：
 > 1. BST的**中序遍历**是有序的，相当于一个有序数组；比如说[二叉搜索树中第K小的元素](https://leetcode.com/problems/kth-smallest-element-in-a-bst/)这题，解法简单粗暴，那就是直接按照中序遍历有序这个特性，直接去遍历得到第k个元素。
 >     * 这题其实是个O(N)的解法，并非完全利用了BST的特性。假设你能够在BST节点中维护额外信息size，记录以节点自己为根的这棵二叉树有多少个节点。有了这个额外信息，你能想到O(logN)的解法吗？这题其实就是一道Google的面试真题，要深入了解，可以读读这篇[Order Statistic Tree](https://en.wikipedia.org/wiki/Order_statistic_tree).

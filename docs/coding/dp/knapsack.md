@@ -1,5 +1,7 @@
 # 背包型动规
 
+<iframe src="/drops/algo-lab/?note=dp-knapsack&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **背包型动规是动规里最难一眼看出来的一类。背包类问题的解法通常比较直接，但是如何把问题转化成背包问题就挺玄学。真是会得不难，难的不会**
 
 ?> 借着本文希望能体将背包型的动规问题扒扒皮，试图找出共性和解题套路。但是实话实话，到目前为止，背包类的问题对我来说还是玄学。

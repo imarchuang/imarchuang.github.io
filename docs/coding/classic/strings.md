@@ -1,5 +1,7 @@
 # 关于字符串的几大类问题
 
+<iframe src="/drops/algo-lab/?note=classic-strings&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 > 关于字符串，永远都是面试题里最受欢迎的，而且我也写过好几篇相关总结类的帖子了，比如说一下三个
 >
 > 1.  [表达式处理](./coding/classic/expr) - 主要是总结了**掏心**的概念，是一类特殊的`字串问题`，主要的特点在切割过程中有嵌套的特点，所以需要一个 stack 栈来维护**层**的概念。

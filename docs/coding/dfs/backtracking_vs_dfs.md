@@ -1,5 +1,7 @@
 # 回溯与DFS遍历的细微差别
 
+<iframe src="/drops/algo-lab/?note=dfs-backtracking_vs_dfs&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 这篇来掰扯掰扯回溯与DFS遍历的细微差别。
 
 ### **明明都是窮舉遍歷**

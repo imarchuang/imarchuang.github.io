@@ -1,5 +1,7 @@
 # 用BFS找最短路径
 
+<iframe src="/drops/algo-lab/?note=bfs-shortest&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 !> 所有BFS题目的本质就是`让你从一幅图中从起点start到达终点end的最短距离`。BFS 相对 DFS 的最主要的区别是：BFS 找到的路径一定是最短的，但代价就是空间复杂度可能比 DFS 大很多。
 
 ### **刷题列表**

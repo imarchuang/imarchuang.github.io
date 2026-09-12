@@ -1,5 +1,7 @@
 # 股票买卖之动态机
 
+<iframe src="/drops/algo-lab/?note=dp-stock&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 **坐标型动规是动规里最简单的一类。与子序型动规需要看前i的元素[1...i-1]的特征来决定最优值相比，坐标型动规往往在dp[i][j]这个坐标上就能计算出最优子结构的最优值**
 
 ?> 借着本文希望能体将子序型的动规问题扒扒皮，找出共性和解题套路来解答坐标型动规题。

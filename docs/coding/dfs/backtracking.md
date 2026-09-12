@@ -1,5 +1,7 @@
 # 回溯算法，深扒一下子集的问题
 
+<iframe src="/drops/algo-lab/?note=dfs-backtracking&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ### 回溯树的抽象
 
 > 我个人是非常推举暴力穷举算法的，因为我觉得当你一下想不到讨巧的奇淫异巧的时候，你其实可以回到暴力穷举上来，只要你有章可循的暴力穷举，这过程中其实很容易让你发现**剪枝优化**的。

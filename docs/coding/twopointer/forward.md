@@ -1,5 +1,7 @@
 # 同向型双指针
 
+<iframe src="/drops/algo-lab/?note=twopointer-forward&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 ### 同向型双指针主要是快慢指针
 1. 链表上的快慢双指针
 1. 数组上的快慢双指针

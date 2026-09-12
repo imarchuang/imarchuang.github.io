@@ -1,5 +1,7 @@
 # 关于括号的常见问题
 
+<iframe src="/drops/algo-lab/?note=classic-parentheses&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 > 括号类的题有两种，一种是跟括号的合法性相关，另一种是关于括号生成的。
 >
 >1. 关于第一类，主要就是要维护一个rolling state的概念，这个思路类似于扫描线数飞机，遇到左括号就+1，遇到右括号就-1，以此来判定括号的合理性。这里的rolling state是两个参数值，一个叫left，一个叫right，就是说如果当前left==0，说明state里没有左括号（或者说左括号已经被平衡掉），这时候再遇到右括号，需要right++，这样能遍历一遍就找到不合法的左括号数和右括号数。

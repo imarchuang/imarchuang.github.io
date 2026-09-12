@@ -1,5 +1,7 @@
 # 二叉搜索树的一些非常规题
 
+<iframe src="/drops/algo-lab/?note=tree-bst_hard&embed=1" title="算法交互演示" width="100%" height="720" style="border:0;width:100%;height:720px;background:#16382b;"></iframe>
+
 #### **重要讲一下面试重点实际题**
 > 1. [Google 面试真题 - 带size参数的二叉搜索树](#带size参数的二叉搜索树)
 
