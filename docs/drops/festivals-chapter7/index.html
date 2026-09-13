@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2a0e12">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>How do we celebrate festivals?｜五年级英语 Unit 7</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#1c0b0e; --ink:#fff7f2; --muted:#e8b4aa;
+      --gold:#ffd166; --red:#ff6b6b; --mint:#7ee0c8; --cream:#ffe8c8;
+      --card:rgba(255,255,255,.08); --line:rgba(255,255,255,.16);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink)}
+    body{font-family:Outfit,sans-serif}
+    button{font:inherit}
+    .deck{width:100%;height:100%;position:relative}
+    .slide{
+      position:absolute;inset:0;
+      padding:clamp(28px,5vw,64px) clamp(20px,5.5vw,88px) clamp(62px,8vh,86px);
+      display:grid;align-content:center;gap:12px;
+      opacity:0;transform:translateY(12px);pointer-events:none;visibility:hidden;z-index:0;
+      transition:.42s cubic-bezier(.22,.8,.25,1);overflow:auto;
+      background:
+        radial-gradient(900px 420px at 8% -8%,rgba(196,30,58,.28),transparent 55%),
+        radial-gradient(700px 380px at 100% 0%,rgba(255,209,102,.14),transparent 50%),
+        linear-gradient(160deg,#1c0b0e,#2a0e12 55%,#3a1418);
+    }
+    .slide.active{opacity:1;transform:none;pointer-events:auto;visibility:visible;z-index:2}
+    .slide.gold{
+      background:
+        radial-gradient(800px 380px at 90% 10%,rgba(255,209,102,.2),transparent 45%),
+        radial-gradient(700px 400px at 0% 80%,rgba(255,107,107,.16),transparent 50%),
+        linear-gradient(165deg,#241014,#3a181c);
+    }
+    .kicker{font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+    h1,h2,h3,p{margin:0 0 .4em}
+    h1{font-family:Fraunces,serif;font-size:clamp(34px,6.4vw,78px);line-height:.98;font-weight:700}
+    h1 em{font-style:italic;color:var(--gold);font-weight:500}
+    h2{font-family:Fraunces,serif;font-size:clamp(26px,4.4vw,48px);line-height:1.12;font-weight:700}
+    h3{font-size:clamp(15px,1.6vw,20px);color:var(--gold)}
+    p,li{font-size:clamp(15px,1.5vw,20px);line-height:1.58;color:var(--ink)}
+    .lead{font-size:clamp(17px,2vw,26px);max-width:40rem;color:var(--cream)}
+    .zh{font-size:clamp(12px,1.15vw,15px);color:var(--muted);margin-top:4px}
+    .two{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(14px,3.5vw,40px);align-items:center}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .four{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .card{
+      background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;
+    }
+    .card b{display:block;margin-bottom:6px;font-size:clamp(15px,1.5vw,20px)}
+    .card p,.card li{font-size:clamp(13px,1.15vw,16px);margin:0;color:var(--cream)}
+    .rule{
+      font-family:Fraunces,serif;font-size:clamp(18px,2.2vw,28px);color:var(--gold);
+      padding:10px 14px;background:rgba(255,209,102,.12);border-radius:12px
+    }
+    .hintbox{font-size:13px;color:var(--muted)}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .chip,.toolbar button,.nav button,.toc-open,.qbtn{
+      border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);
+      border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:13px
+    }
+    .chip.on{background:var(--gold);border-color:var(--gold);color:#2a0e12}
+    .chip.ok{background:var(--mint);border-color:var(--mint);color:#10221c}
+    .chip.bad{background:#ff8a7a;border-color:#ff8a7a;color:#2a1010}
+    .answer{filter:blur(7px);opacity:.45;transition:.2s;cursor:pointer;user-select:none;display:inline-block;background:rgba(255,209,102,.16);padding:3px 9px;border-radius:8px}
+    .answer:hover,.answer.revealed{filter:none;opacity:1}
+    .quiz{display:grid;gap:10px}
+    .quiz>div{background:var(--card);border-radius:14px;padding:12px 14px;border:1px solid var(--line)}
+    .bubble{background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.28);border-radius:18px 18px 18px 6px;padding:12px 16px}
+    .bubble.b{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.3);border-radius:18px 18px 6px 18px}
+    .bubble .who{font-size:12px;letter-spacing:.12em;color:var(--gold);font-weight:700;margin-bottom:4px}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{border:1px solid var(--line);padding:10px 12px;text-align:left;font-size:clamp(13px,1.2vw,17px)}
+    .table th{color:var(--gold)}
+    .footer{position:fixed;z-index:10;left:22px;right:22px;bottom:14px;display:flex;align-items:center;gap:14px;color:#fff;font:700 12px Outfit,sans-serif}
+    .progress{height:3px;background:rgba(255,255,255,.22);flex:1;border-radius:9px;overflow:hidden}
+    .progress i{height:100%;display:block;background:linear-gradient(90deg,var(--red),var(--gold));width:0;transition:.3s}
+    .nav{display:flex;gap:8px}
+    .nav button{width:38px;height:34px;padding:0}
+    .hint{position:fixed;right:24px;top:18px;z-index:12;color:rgba(255,255,255,.72);font:11px/1.3 Outfit,sans-serif;text-align:right}
+    .dots{position:fixed;z-index:12;right:10px;top:50%;transform:translateY(-50%);display:grid;gap:5px}
+    .dots button{width:6px;height:6px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.35)}
+    .dots button.active{height:16px;border-radius:8px;background:var(--gold)}
+    .toc-open{position:fixed;z-index:30;left:18px;top:16px;letter-spacing:.12em}
+    .toc{position:fixed;z-index:40;inset:0;background:rgba(20,8,10,.96);color:#fff;padding:clamp(28px,5vw,70px);overflow:auto;display:none}
+    .toc.open{display:block}
+    .toc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .toc-grid button{min-height:64px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:inherit;padding:10px;cursor:pointer;text-align:left;border-radius:12px}
+    .toc-grid button:hover{background:rgba(196,30,58,.4)}
+    .toc-close{position:absolute;right:24px;top:18px;background:none;color:inherit;border:1px solid currentColor;border-radius:50%;width:38px;height:38px;cursor:pointer}
+    .writebox{width:100%;min-height:108px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--ink);padding:12px;font:inherit;resize:vertical}
+    .tiny{font-size:13px;color:var(--muted)}
+    @media(max-width:860px){
+      .slide{align-content:start;padding:68px 16px 78px}
+      .two,.three,.four,.toc-grid{grid-template-columns:1fr}
+      .hint,.dots{display:none}
+    }
+    @media(prefers-reduced-motion:reduce){.slide{transition:none}}
+  </style>
+</head>
+<body>
+<button class="toc-open" id="tocOpen">目录</button>
+<div class="hint">← → 或空格翻页 · 点模糊处看答案</div>
+<div class="dots" id="dots"></div>
+<nav class="toc" id="toc" aria-label="目录">
+  <button class="toc-close" id="tocClose" type="button">×</button>
+  <h2>Unit 7 playlist</h2>
+  <p class="zh">沪教牛津五年级上册 · How do we celebrate festivals?</p>
+  <div class="toc-grid" id="tocGrid"></div>
+</nav>
+<main class="deck" id="deck">
+
+  <section class="slide active" data-toc="封面">
+    <div class="two">
+      <div>
+        <div class="kicker">沪教牛津 · 五年级上册 · Unit 7</div>
+        <h1>How do we<br>celebrate <em>festivals</em>?</h1>
+        <p class="lead">We eat special food. We visit family. We do lucky things. Today we name four Chinese festivals, use <i>will</i>, and write a festival plan.</p>
+        <p class="zh">大问题：我们怎样过节？学节日、学 will、写信、看世界各地的新年。</p>
+      </div>
+      <svg viewBox="0 0 360 280" width="100%" aria-hidden="true">
+        <ellipse cx="180" cy="248" rx="110" ry="14" fill="rgba(0,0,0,.28)"/>
+        <path d="M180 36c42 52 72 92 72 132a72 72 0 1 1-144 0c0-40 30-80 72-132z" fill="#c41e3a"/>
+        <path d="M180 64c30 38 50 66 50 96a50 50 0 1 1-100 0c0-30 20-58 50-96z" fill="#ffd166"/>
+        <rect x="174" y="228" width="12" height="28" rx="2" fill="#ffd166"/>
+        <text x="180" y="148" text-anchor="middle" fill="#2a0e12" font-size="42" font-family="Georgia,serif" font-weight="700">福</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="slide gold" data-toc="学习目标">
+    <div class="kicker">Learning goals · 约 40 分钟</div>
+    <h2>By the end of class</h2>
+    <div class="four">
+      <div class="card"><b>Festivals</b><p>Name Spring, Lantern, Dragon Boat, and Mid-Autumn Festival.</p><p class="zh">月份、天气、食物、活动</p></div>
+      <div class="card"><b>Compare</b><p>Say how two families celebrate the Spring Festival in different cities.</p><p class="zh">food + activity</p></div>
+      <div class="card"><b>Grammar</b><p>Use will / I’ll / we’ll for plans.</p><p class="zh">It will be… I will…</p></div>
+      <div class="card"><b>Write</b><p>Plan a festival day with family in 4–6 sentences.</p><p class="zh">仿 Katie / Li Na 的信</p></div>
+    </div>
+    <p class="rule">Key sentence: It will be the … Festival in …. I will …</p>
+  </section>
+
+  <section class="slide" data-toc="四个节日">
+    <div class="kicker">Get ready · 知识点</div>
+    <h2>Four Chinese festivals</h2>
+    <p class="zh">点卡片，看月份、天气和活动。再点一次收回。</p>
+    <div class="four" id="festCards"></div>
+  </section>
+
+  <section class="slide gold" data-toc="配对练习">
+    <div class="kicker">Get ready · 练习 p.74</div>
+    <h2>Match the festival</h2>
+    <p class="zh">先自己说，再点模糊答案。</p>
+    <div class="quiz">
+      <div>January / February · cold · eat fish and <i>jiaozi</i> · visit relatives<br>→ <span class="answer">Spring Festival</span></div>
+      <div>February / March · cold · eat <i>yuanxiao</i> · watch lanterns<br>→ <span class="answer">Lantern Festival</span></div>
+      <div>May / June · hot · eat <i>zongzi</i> · have a dragon boat race<br>→ <span class="answer">Dragon Boat Festival</span></div>
+      <div>September / October · cool · eat mooncakes · look at the moon<br>→ <span class="answer">Mid-Autumn Festival</span></div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="广州和北京">
+    <div class="kicker">Preview · p.75</div>
+    <h2>Li Bo and Wu Yan</h2>
+    <p>Same festival, different cities. Fill the table.</p>
+    <table class="table">
+      <tr><th></th><th>Li Bo · Guangzhou</th><th>Wu Yan · Beijing</th></tr>
+      <tr><td>Food</td><td><span class="answer">rice cakes</span></td><td><span class="answer">jiaozi</span></td></tr>
+      <tr><td>Activity</td><td><span class="answer">visiting the flower market</span></td><td><span class="answer">paper-cutting and lion dances</span></td></tr>
+    </table>
+    <p class="zh">预读：中国最大的节日是春节。人们扫房、吃团圆饭、走亲戚。</p>
+  </section>
+
+  <section class="slide gold" data-toc="两封信">
+    <div class="kicker">Explore · 阅读要点（原创改写，不是课文逐字）</div>
+    <h2>How two friends celebrate</h2>
+    <div class="two">
+      <div class="bubble">
+        <div class="who">A FRIEND IN CHINA</div>
+        The Spring Festival is coming. We will clean the house. I will help make <i>jiaozi</i>. Then I will watch a lion dance. We will visit family and have a big meal. This is hard work, but it will bring good luck.
+      </div>
+      <div class="bubble b">
+        <div class="who">A FRIEND IN THE UK</div>
+        That sounds fun! Our main festival is Christmas. We put up a tree. On Christmas Eve I put a stocking by my bed. In the morning there are gifts. My grandparents come. First we open gifts. Then we eat a big meal.
+      </div>
+    </div>
+    <p class="tiny">Talk: How do the children and their families celebrate festivals?</p>
+  </section>
+
+  <section class="slide" data-toc="语法 will">
+    <div class="kicker">Grammar in use</div>
+    <h2>Talk about the future with <em>will</em></h2>
+    <div class="three">
+      <div class="card"><b>I will / I’ll</b><p>I will help my grandma. I’ll watch a lion dance.</p></div>
+      <div class="card"><b>We will / We’ll</b><p>We’ll clean our house. We will have a big meal.</p></div>
+      <div class="card"><b>It will</b><p>It will be the Spring Festival next month. It will bring good luck.</p></div>
+    </div>
+    <p class="rule">In one hour, I will be at my grandma’s.</p>
+    <p class="zh">will = 将要。后面接动词原形：will eat / will visit / will watch。</p>
+  </section>
+
+  <section class="slide gold" data-toc="派对计划">
+    <div class="kicker">Look and say · p.79</div>
+    <h2>New Year party plan</h2>
+    <div class="four">
+      <div class="card"><b>29 Dec · Sat</b><p>think about party games</p><p class="zh">this afternoon</p></div>
+      <div class="card"><b>30 Dec · Sun</b><p>buy food and drinks</p><p class="zh">tomorrow</p></div>
+      <div class="card"><b>31 Dec · Mon</b><p>have the party</p><p class="zh">on Monday</p></div>
+      <div class="card"><b>1 Jan · Tue</b><p>New Year holiday</p><p class="zh">on Tuesday</p></div>
+    </div>
+    <div class="quiz" style="margin-top:8px">
+      <div>They’ll think about party games <span class="answer">this afternoon</span>.</div>
+      <div>They’ll buy food and drinks <span class="answer">tomorrow</span>.</div>
+      <div>They’ll have the party <span class="answer">on Monday</span>.</div>
+      <div>They’ll have a New Year holiday <span class="answer">on Tuesday</span>.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="节日贺卡">
+    <div class="kicker">Communicate · p.80</div>
+    <h2>Making festival cards</h2>
+    <p>Tap a child, then tap a card.</p>
+    <div class="toolbar" id="kidRow"></div>
+    <div class="toolbar" id="cardRow"></div>
+    <p id="cardMsg" class="hintbox">Pairs you make will show here.</p>
+    <p>Classroom key: <span class="answer">Li Binbin → lion (Spring Festival) · Liu Yue → rabbit lantern (Lantern Festival) · Zhao Min → mooncake (Mid-Autumn Festival)</span></p>
+    <p class="tiny">Say: Look at the card with a …. It’s for the … Festival. People … at this festival.</p>
+  </section>
+
+  <section class="slide gold" data-toc="口语句型">
+    <div class="kicker">Think and talk · p.81</div>
+    <h2>Favourite festival</h2>
+    <div class="two">
+      <div class="bubble"><div class="who">A</div>Hey, Tina. What’s your favourite festival?<br>What’s your plan for the Mid-Autumn Festival?</div>
+      <div class="bubble b"><div class="who">B</div>My favourite festival is the Spring Festival. We usually eat <i>jiaozi</i> and visit relatives. I’ll help clean the house. I’ll watch a lion dance.</div>
+    </div>
+    <p class="zh">替换：Dragon Boat Festival / eat zongzi / have a dragon boat race。</p>
+  </section>
+
+  <section class="slide" data-toc="写作">
+    <div class="kicker">Think and write · p.81</div>
+    <h2>Plan a festival day</h2>
+    <p class="zh">哪一个节日快到了？用 will 写一天的计划。可先抄范文，再改成自己家的。</p>
+    <p class="tiny">Model:</p>
+    <div class="card">
+      <p>It will be the Mid-Autumn Festival in September. I will eat mooncakes with my family. We will look at the beautiful moon. We will visit my grandparents and have a big meal together.</p>
+    </div>
+    <textarea class="writebox" id="writer" placeholder="It will be the ______ Festival in ______. I will ... We will ..."></textarea>
+  </section>
+
+  <section class="slide gold" data-toc="世界新年">
+    <div class="kicker">Around the world · p.83–84</div>
+    <h2>New Year’s Day</h2>
+    <p class="zh">点国家，看人们做什么。</p>
+    <div class="toolbar" id="countryRow"></div>
+    <div class="card" id="countryOut" style="min-height:90px"><b>Choose a country</b><p>China, USA, Scotland, or Spain.</p></div>
+    <div class="quiz" style="margin-top:10px">
+      <div>In China: <span class="answer">relax and have fun with family and friends</span></div>
+      <div>In the USA: <span class="answer">watch American football; watch fireworks</span></div>
+      <div>In Scotland: <span class="answer">visit family and friends; bring a piece of coal for good luck</span></div>
+      <div>In Spain: <span class="answer">wait for the clock at midnight; eat 12 grapes</span></div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="大问题">
+    <div class="kicker">Think more about the Big Question</div>
+    <h2>How do we celebrate festivals?</h2>
+    <div class="three">
+      <div class="card"><b>Special activities</b><p>We clean the house, watch lion dances, look at lanterns, or race dragon boats.</p></div>
+      <div class="card"><b>Traditional food</b><p>We make and enjoy <i>jiaozi</i>, mooncakes, <i>zongzi</i>, and <i>yuanxiao</i>.</p></div>
+      <div class="card"><b>Family</b><p>We visit relatives and have a big meal together.</p></div>
+    </div>
+  </section>
+
+  <section class="slide gold" data-toc="小测">
+    <div class="kicker">Check · 练习 + 拔高</div>
+    <h2>Can you say it?</h2>
+    <div class="quiz">
+      <div>1. People eat mooncakes at the <span class="answer">Mid-Autumn Festival</span>.</div>
+      <div>2. Next month it <span class="answer">will be</span> the Spring Festival.</div>
+      <div>3. I <span class="answer">will help</span> my grandmother make <i>jiaozi</i>.</div>
+      <div>4. Stretch: Why do people clean the house before the Spring Festival?<br><span class="answer">Because they think it will bring good luck. / to start the new year clean</span></div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="回家作业">
+    <div class="kicker">Homework letter</div>
+    <h2>Write and tell me</h2>
+    <p>Use Liwei’s letter shape, but write about a festival — like the emails in this unit.</p>
+    <div class="card">
+      <p>Dear Liwei,</p>
+      <p>The Spring Festival sounds fun! My favourite festival is the Mid-Autumn Festival. It will be in September. I will eat mooncakes. We will look at the moon. We will visit my grandparents and have a big meal together.</p>
+      <p>What festivals do you celebrate in Chengdu?</p>
+      <p>Yours,</p>
+    </div>
+    <p class="zh">把食物换成火锅、饺子也可以。作业：把信抄在本子上，再用 will 说给家长听。</p>
+  </section>
+</main>
+<div class="footer">
+  <span id="pg">1</span>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="nav">
+    <button type="button" id="prev" aria-label="Previous">←</button>
+    <button type="button" id="next" aria-label="Next">→</button>
+  </div>
+</div>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0,sx=0;
+  const bar=document.getElementById('bar'), pg=document.getElementById('pg');
+  const dots=document.getElementById('dots'), tocGrid=document.getElementById('tocGrid');
+  const toc=document.getElementById('toc');
+
+  slides.forEach((s,n)=>{
+    const d=document.createElement('button');
+    d.type='button';
+    if(n===0)d.classList.add('active');
+    d.addEventListener('click',()=>go(n));
+    dots.appendChild(d);
+    const b=document.createElement('button');
+    b.type='button';
+    b.textContent=(n+1)+'  '+(s.dataset.toc||'');
+    b.addEventListener('click',()=>{go(n);toc.classList.remove('open')});
+    tocGrid.appendChild(b);
+  });
+
+  function go(n){
+    if(n<0||n>=slides.length)return;
+    slides[i].classList.remove('active');
+    i=n;
+    slides[i].classList.add('active');
+    pg.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    [...dots.children].forEach((d,k)=>d.classList.toggle('active',k===i));
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.getElementById('tocOpen').onclick=()=>toc.classList.add('open');
+  document.getElementById('tocClose').onclick=()=>toc.classList.remove('open');
+  document.addEventListener('keydown',e=>{
+    if(['INPUT','TEXTAREA'].includes(e.target.tagName))return;
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    if(e.key==='Escape')toc.classList.remove('open');
+  });
+  document.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX},{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].screenX-sx;
+    if(Math.abs(dx)>50) go(dx<0?i+1:i-1);
+  },{passive:true});
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('.answer');
+    if(a)a.classList.toggle('revealed');
+  });
+  go(0);
+
+  const festivals=[
+    {name:'Spring Festival', zh:'春节', when:'Jan / Feb · cold', do:'eat jiaozi · visit relatives · lion dances'},
+    {name:'Lantern Festival', zh:'元宵节', when:'Feb / Mar · cold', do:'eat yuanxiao · watch lanterns'},
+    {name:'Dragon Boat Festival', zh:'端午节', when:'May / Jun · hot', do:'eat zongzi · dragon boat race'},
+    {name:'Mid-Autumn Festival', zh:'中秋节', when:'Sep / Oct · cool', do:'eat mooncakes · look at the moon'}
+  ];
+  const wrap=document.getElementById('festCards');
+  festivals.forEach(f=>{
+    const el=document.createElement('button');
+    el.type='button';
+    el.className='card';
+    el.style.cursor='pointer';
+    el.style.textAlign='left';
+    el.innerHTML='<b>'+f.name+'</b><p>'+f.zh+'</p>';
+    el.onclick=()=>{
+      const open=el.dataset.open==='1';
+      el.dataset.open=open?'0':'1';
+      el.innerHTML=open
+        ? '<b>'+f.name+'</b><p>'+f.zh+'</p>'
+        : '<b>'+f.name+'</b><p>'+f.when+'</p><p>'+f.do+'</p>';
+    };
+    wrap.appendChild(el);
+  });
+
+  const kids=['Li Binbin','Liu Yue','Zhao Min'];
+  const cards=['lion · Spring Festival','rabbit lantern · Lantern Festival','mooncake · Mid-Autumn'];
+  const kidRow=document.getElementById('kidRow');
+  const cardRow=document.getElementById('cardRow');
+  let pickKid=null, pairs={};
+  kids.forEach(k=>{
+    const c=document.createElement('button');
+    c.className='chip'; c.type='button'; c.textContent=k;
+    c.onclick=()=>{pickKid=k;[...kidRow.children].forEach(x=>x.classList.toggle('on',x.textContent===k))};
+    kidRow.appendChild(c);
+  });
+  cards.forEach(f=>{
+    const c=document.createElement('button');
+    c.className='chip'; c.type='button'; c.textContent=f;
+    c.onclick=()=>{
+      if(!pickKid){document.getElementById('cardMsg').textContent='先点一个小朋友。';return}
+      pairs[pickKid]=f;
+      document.getElementById('cardMsg').textContent=Object.entries(pairs).map(([a,b])=>a+' → '+b).join(' · ');
+    };
+    cardRow.appendChild(c);
+  });
+
+  const countries={
+    China:'People relax and have fun with family and friends. We eat a big meal together.',
+    USA:'People watch American football. Many families watch fireworks.',
+    Scotland:'People visit family and friends. They bring a piece of coal for good luck.',
+    Spain:'People wait for the clock at midnight. They eat 12 grapes — one for each chime.'
+  };
+  const countryRow=document.getElementById('countryRow');
+  Object.keys(countries).forEach(name=>{
+    const c=document.createElement('button');
+    c.className='chip'; c.type='button'; c.textContent=name;
+    c.onclick=()=>{
+      [...countryRow.children].forEach(x=>x.classList.toggle('on',x.textContent===name));
+      document.getElementById('countryOut').innerHTML='<b>'+name+'</b><p>'+countries[name]+'</p>';
+    };
+    countryRow.appendChild(c);
+  });
+})();
+</script>
+</body>
+</html>
