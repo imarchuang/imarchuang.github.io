@@ -97,6 +97,15 @@
     .toc-close{position:absolute;right:24px;top:18px;background:none;color:inherit;border:1px solid currentColor;border-radius:50%;width:38px;height:38px;cursor:pointer}
     .mark{font-family:"ZCOOL XiaoWei",serif;font-size:clamp(28px,4vw,48px);color:var(--terra)}
     .tiny{font-size:13px;color:var(--muted)}
+    .diff-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700;margin-right:6px}
+    .diff-1{background:rgba(44,122,110,.18);color:#1b574e}
+    .diff-2{background:rgba(232,184,109,.3);color:#8a5600}
+    .diff-3{background:rgba(196,92,38,.2);color:#9e3c0e}
+    .ink .diff-1{background:rgba(44,122,110,.4);color:#8be3d4}
+    .ink .diff-2{background:rgba(232,184,109,.35);color:#ffd899}
+    .ink .diff-3{background:rgba(196,92,38,.45);color:#ffab82}
+    .hint-text{display:block;font-size:13px;color:var(--muted);margin:4px 0 8px;font-style:italic}
+    .ink .hint-text{color:rgba(255,253,248,.68)}
     @media(max-width:860px){
       .slide{align-content:start;padding:68px 16px 78px}
       .two,.three,.four,.toc-grid{grid-template-columns:1fr}
@@ -130,13 +139,14 @@
   </section>
 
   <section class="slide" data-toc="学习目标">
-    <div class="kicker">25—40 分钟</div>
-    <h2>今天要能说清楚四件事</h2>
-    <div class="four">
-      <div class="card"><b>再认识（一）</b><p>同一分数可以表示面积、个数，也可以表示一组东西里的几份。</p></div>
-      <div class="card"><b>练一练（一）</b><p>在线段、圆和一堆物品上，认出几分之几。</p></div>
-      <div class="card"><b>再认识（二）</b><p>用纸条量东西，余下的写成分数；认识分数墙和分数单位。</p></div>
-      <div class="card"><b>练一练（二）</b><p>十分之几：厘米与分米、角与元、0 到 1 的数轴，以及谁更靠近 0 或 1。</p></div>
+    <div class="kicker">30—45 分钟</div>
+    <h2>今天要闯过的五大关卡</h2>
+    <div class="four" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+      <div class="card"><b>再认识（一）</b><p>同一分数表示面积、个数与集合。</p></div>
+      <div class="card"><b>练一练（一）</b><p>在线段、圆和一堆物品上认出几分之几。</p></div>
+      <div class="card"><b>再认识（二）</b><p>纸条度量、分数墙与分数单位。</p></div>
+      <div class="card"><b>练一练（二）</b><p>十分之几：厘米/分米、角/元、数轴。</p></div>
+      <div class="card" style="border-color:var(--terra)"><b>拔高题集 🌟</b><p>8 道星级挑战题：逆向还原、整除约束、单位等价与数轴推理。</p></div>
     </div>
     <p class="rule">记住一句话：先问「谁是 1」，再平均分，再数份数。</p>
   </section>
@@ -415,6 +425,90 @@
     </div>
   </section>
 
+  <section class="slide" data-toc="拔高集 · 面积与整体">
+    <div class="kicker">拔高题集 · 关卡一</div>
+    <h2>再认识（一）：见微知著看「整体」</h2>
+    <div class="quiz">
+      <div>
+        <span class="diff-badge diff-2">★★ 逆向还原</span>
+        <b>第 1 题：已知局部画整体</b>
+        <p>在方格纸上，一个小「L 形」（占 2 个小方格）正好是整个图形的 1/3。整个图形一共由几个小方格组成？请你想一想，整个图形只有一种形状吗？</p>
+        <span class="hint-text">💡 提示：1 份是 2 格，整个图形是这样的 3 份。形状必须唯一吗？</span>
+        <span class="answer" data-ans>共 2×3＝6 个方格。不唯一！只要由 6 个方格拼成，无论排成长条（1×6 或 2×3）、弯折形还是十字形，面积都是 6 格，都可以作为原图形。</span>
+      </div>
+      <div>
+        <span class="diff-badge diff-3">★★★ 整体变化</span>
+        <b>第 2 题：分数相同，量谁多？</b>
+        <p>两盒一模一样的蜡笔，每盒都是 12 支。小禾从第一盒中拿出了 1/3，阿南从第二盒中拿走了 3 支。剩下的蜡笔中，哪一盒剩下的更多？如果小禾又从第一盒里拿走剩下部分的 1/2，第一盒还剩几支？</p>
+        <span class="hint-text">💡 提示：算算 12 支的 1/3 是几支；小禾拿第二次时，「整体 1」变成了谁？</span>
+        <span class="answer" data-ans>第一问：第一盒拿出 12÷3＝4 支剩 8 支；第二盒拿 3 支剩 9 支，第二盒剩下多。第二问：剩下的 8 支变成了新的「1」，8 支的 1/2 是 4 支，第一盒最后还剩 4 支。</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="拔高集 · 整除与分组">
+    <div class="kicker">拔高题集 · 关卡二</div>
+    <h2>练一练（一）：整数约束与集合分拆</h2>
+    <div class="quiz">
+      <div>
+        <span class="diff-badge diff-1">★ 逆推总数</span>
+        <b>第 3 题：这盒糖原来有多少？</b>
+        <p>老师把一盒糖果平均分给 4 个小组，每个小组分到了 5 颗。这盒糖果一共有多少颗？如果分给 3 个小组，每组能分到全部糖果的几分之几？</p>
+        <span class="hint-text">💡 提示：4 份中的 1 份是 5 颗，总数就是 4 份合起来。</span>
+        <span class="answer" data-ans>原来共有 5×4＝20 颗。分给 3 个小组时，每个小组分到总数的 1/3（把整盒糖看作 1，平均分成 3 份，每份就是 1/3）。</span>
+      </div>
+      <div>
+        <span class="diff-badge diff-2">★★ 为什么不能正好分？</span>
+        <b>第 4 题：不打破整体的分数思考</b>
+        <p>美术课上有 10 个石膏几何体。小禾说：「我想取出全部几何体的 1/3 做静物写生，但不能切开石膏。」小禾能做到吗？为什么？如果总数改成 12 个呢？改成 15 个呢？</p>
+        <span class="hint-text">💡 提示：物品不能切开时，分母和总数之间必须有什么整除关系？</span>
+        <span class="answer" data-ans>做不到。因为 10 不能被 3 整除（10÷3＝3 余 1），不能平均分成 3 整数份。如果是 12 个，能取 12÷3＝4 个；如果是 15 个，能取 15÷3＝5 个。集合模型中，总数必须是分母的倍数，才能整除均分。</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="拔高集 · 纸条与单位">
+    <div class="kicker">拔高题集 · 关卡三</div>
+    <h2>再认识（二）：分数单位与测量累加</h2>
+    <div class="quiz">
+      <div>
+        <span class="diff-badge diff-2">★★ 纸条测量组合</span>
+        <b>第 5 题：量黑板的纸条</b>
+        <p>小禾用一根 1 米长的纸条量黑板的宽度，正好量了 2 整次，第三次量时纸条超出了黑板，剩下的缝隙正好是纸条对折再对折后的一小段（1/4 米）。这块黑板的宽是多少米？</p>
+        <span class="hint-text">💡 提示：2 个整纸条加上超出前的最后一部分（1 米里的 1/4）。</span>
+        <span class="answer" data-ans>黑板宽为 2 米加上 1/4 米（即 2 又 1/4 米，或 9/4 米）。相当于 2 个整纸条单位加上 1 个「1/4 分数单位」。</span>
+      </div>
+      <div>
+        <span class="diff-badge diff-3">★★★ 分数墙上的等价</span>
+        <b>第 6 题：看分数墙找「好朋友」</b>
+        <p>在分数墙上，找一找哪些分数单位拼起来和 1/2 一样长？你能找出 3 种不同的拼法吗？（例如：几个 1/4，几个 1/6，几个 1/8？）你能发现分母和分子有什么悄悄藏着的规律？</p>
+        <span class="hint-text">💡 提示：观察每一行对齐 1/2 正中央刻度线的垂直对齐线。</span>
+        <span class="answer" data-ans>拼法：2 个 1/4（2/4）、3 个 1/6（3/6）、4 个 1/8（4/8）都等于 1/2。规律：只要分母是分子的 2 倍（或者说分子恰好是分母的一半），这个分数就等于 1/2！</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide ink" data-toc="拔高集 · 数轴与区间">
+    <div class="kicker">拔高题集 · 关卡四</div>
+    <h2>练一练（二）：数轴区间与十分之几</h2>
+    <div class="quiz">
+      <div>
+        <span class="diff-badge diff-2">★★ 数轴夹击</span>
+        <b>第 7 题：比 1/2 大、比 1 小的十分之几</b>
+        <p>在 0 到 1 的数轴上，1/2 对应哪个十分之几？在大于 1/2 但小于 1 之间，一共有几个「十分之几」的分数？请把它们全写出来。</p>
+        <span class="hint-text">💡 提示：10 的一半是 5，所以 1/2 就是 5/10；1 就是 10/10。</span>
+        <span class="answer" data-ans>1/2 对应 5/10。大于 5/10 且小于 10/10 的十分之几共有 4 个：6/10、7/10、8/10、9/10。</span>
+      </div>
+      <div>
+        <span class="diff-badge diff-3">★★★ 综合推理</span>
+        <b>第 8 题：神秘的分数猜猜看</b>
+        <p>有一个分数，它的分数单位是 1/10。它比 1/2 大，更靠近 1；如果在这个分数的分子上加上 2，就恰好变成了 1。这个分数是多少？它表示几厘米（以 1 分米为整体）？</p>
+        <span class="hint-text">💡 提示：分数单位是 1/10 说明分母是 10；加 2 变成 1，说明加上 2 个 1/10 后等于 10/10。</span>
+        <span class="answer" data-ans>这个分数是 8/10。分母为 10，分子加 2 是 10，所以分子是 8。8/10 大于 5/10 且非常靠近 1。因为 1 分米＝10 厘米，8/10 分米就是 8 厘米。</span>
+      </div>
+    </div>
+  </section>
+
   <section class="slide ink" data-toc="小结">
     <div class="kicker">带回教室的三句话</div>
     <h2>分数，是在说「份」</h2>
@@ -428,7 +522,7 @@
 </main>
 
 <footer class="footer">
-  <span id="counter">01 / 22</span>
+  <span id="counter">01 / 26</span>
   <div class="progress"><i id="bar"></i></div>
   <div class="nav">
     <button type="button" id="prev" aria-label="上一页">←</button>
