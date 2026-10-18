@@ -1,0 +1,1450 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0d1b2a">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>倍数与因数｜数论探秘·四年级数学互动课件</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a1128;
+      --bg-card: rgba(16, 32, 64, 0.72);
+      --bg-light: #f4f7fb;
+      --paper: #ffffff;
+      --ink: #0d1b2a;
+      --ink-soft: #415a77;
+      --primary: #0077b6;
+      --cyan: #00f5d4;
+      --mint: #10b981;
+      --amber: #f59e0b;
+      --coral: #ef4444;
+      --purple: #8b5cf6;
+      --border-dark: rgba(0, 245, 212, 0.22);
+      --border-light: rgba(13, 27, 42, 0.12);
+      --font-code: "Fira Code", monospace;
+      --font-art: "ZCOOL KuaiLe", "Noto Sans SC", cursive;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; width: 100%; height: 100%;
+      overflow: hidden; background: var(--bg-dark);
+      color: var(--ink); font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
+      user-select: text;
+    }
+    button { font: inherit; }
+    .deck { width: 100%; height: 100%; position: relative; }
+    
+    .slide {
+      position: absolute; inset: 0;
+      padding: clamp(24px, 4.5vw, 64px) clamp(20px, 5.5vw, 92px) clamp(56px, 7vh, 84px);
+      display: grid; align-content: center; gap: 14px;
+      opacity: 0; transform: translateY(12px) scale(0.995);
+      pointer-events: none; visibility: hidden; z-index: 0;
+      transition: opacity 0.38s cubic-bezier(0.2, 0.8, 0.25, 1), transform 0.38s cubic-bezier(0.2, 0.8, 0.25, 1);
+      overflow-y: auto; overflow-x: hidden;
+      background:
+        radial-gradient(1200px 600px at 85% -10%, rgba(0, 119, 182, 0.08), transparent 60%),
+        radial-gradient(800px 500px at 5% 105%, rgba(16, 185, 129, 0.06), transparent 50%),
+        repeating-linear-gradient(0deg, rgba(13, 27, 42, 0.02) 0 24px, rgba(13, 27, 42, 0.05) 24px 25px),
+        linear-gradient(170deg, #f8fafc 0%, #edf2f7 100%);
+    }
+    .slide.active {
+      opacity: 1; transform: translateY(0) scale(1);
+      pointer-events: auto; visibility: visible; z-index: 2;
+    }
+    .slide.exit {
+      opacity: 0; transform: translateY(-10px) scale(0.995);
+      visibility: hidden;
+    }
+
+    /* Cosmic Dark Theme for Title & Capstone */
+    .slide.cosmic {
+      color: #f1f5f9;
+      background:
+        radial-gradient(circle at 80% 20%, rgba(0, 245, 212, 0.16), transparent 36%),
+        radial-gradient(circle at 15% 85%, rgba(139, 92, 246, 0.18), transparent 42%),
+        radial-gradient(circle at 50% 50%, rgba(0, 119, 182, 0.14), transparent 55%),
+        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0 8px, transparent 8px 24px),
+        linear-gradient(145deg, #060d1d, #0b172d 55%, #10213d);
+    }
+
+    .kicker {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 800; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--primary);
+    }
+    .cosmic .kicker { color: var(--cyan); }
+    .badge-icon {
+      display: inline-block; width: 22px; height: 22px;
+      line-height: 22px; border-radius: 6px; text-align: center;
+      background: rgba(0, 119, 182, 0.14); color: var(--primary); font-size: 12px; font-weight: 900;
+    }
+    .cosmic .badge-icon { background: rgba(0, 245, 212, 0.2); color: var(--cyan); }
+
+    h1, h2, h3, p { margin: 0 0 0.38em; }
+    h1 {
+      font-family: var(--font-art);
+      font-size: clamp(40px, 7vw, 96px); line-height: 1.05; letter-spacing: -0.02em;
+    }
+    h2 {
+      font-family: var(--font-art);
+      font-size: clamp(26px, 3.8vw, 50px); line-height: 1.18; color: var(--ink);
+    }
+    .cosmic h2 { color: #f8fafc; }
+    h3 { font-size: clamp(17px, 1.7vw, 24px); font-weight: 700; }
+    p, li { font-size: clamp(15px, 1.45vw, 19px); line-height: 1.65; }
+    .lead { font-size: clamp(17px, 1.8vw, 24px); max-width: 50rem; color: var(--ink-soft); }
+    .cosmic .lead { color: #cbd5e1; }
+
+    /* Layout Grids */
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 3vw, 36px); align-items: center; }
+    .two-wide { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: clamp(16px, 3vw, 36px); align-items: stretch; }
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+    /* Cards */
+    .card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border-light);
+      border-radius: 18px; padding: clamp(14px, 1.8vw, 22px);
+      box-shadow: 0 8px 24px rgba(13, 27, 42, 0.05);
+      position: relative;
+    }
+    .cosmic .card {
+      background: var(--bg-card);
+      border-color: var(--border-dark);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      color: #f1f5f9;
+    }
+    .card.highlight {
+      border-color: var(--primary);
+      box-shadow: 0 10px 28px rgba(0, 119, 182, 0.12);
+    }
+    .cosmic .card.highlight {
+      border-color: var(--cyan);
+      box-shadow: 0 10px 30px rgba(0, 245, 212, 0.2);
+    }
+    .card b { display: block; font-size: clamp(16px, 1.5vw, 20px); margin-bottom: 6px; }
+
+    /* Law formula callout */
+    .law-box {
+      background: linear-gradient(135deg, rgba(0, 119, 182, 0.08), rgba(0, 245, 212, 0.08));
+      border-left: 6px solid var(--primary);
+      padding: 14px 18px; border-radius: 0 14px 14px 0; margin: 10px 0;
+    }
+    .cosmic .law-box {
+      background: linear-gradient(135deg, rgba(0, 245, 212, 0.12), rgba(139, 92, 246, 0.15));
+      border-left-color: var(--cyan);
+    }
+    .law-box .eq {
+      font-family: var(--font-art);
+      font-size: clamp(22px, 2.5vw, 34px); color: var(--primary);
+    }
+    .cosmic .law-box .eq { color: var(--cyan); }
+
+    /* Answer reveal trigger */
+    .answer {
+      display: inline-block;
+      background: rgba(0, 119, 182, 0.12);
+      color: var(--primary);
+      padding: 2px 10px;
+      border-radius: 8px;
+      border-bottom: 2px dashed currentColor;
+      cursor: pointer;
+      user-select: none;
+      filter: blur(7px);
+      opacity: 0.3;
+      transition: filter 0.2s cubic-bezier(0.2,0.8,0.25,1), opacity 0.2s, background 0.2s;
+    }
+    .answer:hover {
+      filter: blur(2px); opacity: 0.7;
+    }
+    .answer.revealed {
+      filter: none; opacity: 1;
+      background: rgba(16, 185, 129, 0.18);
+      color: #065f46;
+      border-bottom: 2px solid #10b981;
+    }
+    .cosmic .answer {
+      background: rgba(0, 245, 212, 0.15);
+      color: var(--cyan);
+    }
+    .cosmic .answer.revealed {
+      background: rgba(0, 245, 212, 0.25);
+      color: #5eead4;
+      border-bottom-color: var(--cyan);
+    }
+    .reveal-all-btn {
+      font-size: 12px; padding: 4px 10px; border-radius: 6px;
+      background: rgba(0, 119, 182, 0.1); border: 1px solid rgba(0, 119, 182, 0.3);
+      color: var(--primary); cursor: pointer; margin-left: 8px; font-weight: 600;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block; padding: 3px 9px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.05em;
+    }
+    .badge-star1 { background: rgba(16, 185, 129, 0.16); color: #047857; }
+    .badge-star2 { background: rgba(245, 158, 11, 0.18); color: #b45309; }
+    .badge-star3 { background: rgba(239, 68, 68, 0.18); color: #b91c1c; }
+    .badge-tip { background: rgba(139, 92, 246, 0.16); color: #6d28d9; }
+
+    /* Quiz Container */
+    .quiz-stack { display: grid; gap: 12px; }
+    .quiz-item {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--border-light);
+      border-radius: 12px; padding: 12px 16px;
+    }
+    .cosmic .quiz-item {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    /* Interactive Component Containers */
+    .interactive-panel {
+      background: #ffffff; border-radius: 16px;
+      border: 1px solid var(--border-light);
+      padding: 14px; box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    }
+    .cosmic .interactive-panel {
+      background: #0d1b2a; border-color: var(--border-dark);
+    }
+
+    /* River Crossing Game */
+    .river-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px;
+    }
+    .stone {
+      padding: 14px 8px; text-align: center; border-radius: 12px;
+      background: #e2e8f0; font-family: var(--font-art); font-size: 24px;
+      cursor: pointer; transition: 0.2s transform, 0.2s background;
+      border: 2px solid transparent; user-select: none;
+    }
+    .stone:hover { transform: translateY(-3px); }
+    .stone.ok { background: #10b981; color: #fff; border-color: #059669; }
+    .stone.wrong { background: #ef4444; color: #fff; animation: shake 0.3s; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    /* Hundred Chart */
+    .chart-controls {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px;
+    }
+    .btn-tab {
+      border: 1px solid rgba(0, 119, 182, 0.25); background: #f8fafc;
+      color: var(--ink); border-radius: 8px; padding: 6px 12px;
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s;
+    }
+    .btn-tab.active, .btn-tab:hover {
+      background: var(--primary); color: #fff; border-color: var(--primary);
+    }
+    .chart-grid {
+      display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px;
+      max-width: 480px; margin: 0 auto; user-select: none;
+    }
+    .cell-num {
+      aspect-ratio: 1; display: grid; place-items: center;
+      background: #f1f5f9; border-radius: 6px; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: 0.15s transform, 0.15s background;
+      font-family: var(--font-code);
+    }
+    .cell-num:hover { transform: scale(1.15); z-index: 2; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+    .cell-num.mult2 { background: #bae6fd; color: #0369a1; }
+    .cell-num.mult5 { background: #fed7aa; color: #c2410c; }
+    .cell-num.mult25 { background: #bbf7d0; color: #15803d; font-weight: 900; }
+    .cell-num.mult3 { background: #fbcfe8; color: #be185d; }
+    .cell-num.mult9 { background: #fde047; color: #854d0e; font-weight: 900; }
+    .cell-num.prime-sieved { background: #10b981; color: #fff; font-weight: 900; transform: scale(1.04); }
+    .cell-num.crossed { background: #e2e8f0; color: #94a3b8; text-decoration: line-through; opacity: 0.55; }
+
+    /* Rectangle factor builder */
+    .rect-controls {
+      display: flex; gap: 8px; margin-bottom: 12px; align-items: center;
+    }
+    .canvas-rect-holder {
+      width: 100%; min-height: 240px; background: #fafafa;
+      border: 1px dashed #cbd5e1; border-radius: 12px;
+      display: grid; place-items: center; overflow: hidden;
+    }
+
+    /* Navigation UI */
+    .footer {
+      position: fixed; z-index: 20; left: 20px; right: 20px; bottom: 12px;
+      display: flex; align-items: center; gap: 14px;
+      color: #fff; font-size: 12px; font-weight: 700;
+      mix-blend-mode: difference;
+    }
+    .progress {
+      height: 4px; background: rgba(255, 255, 255, 0.25);
+      flex: 1; border-radius: 999px; overflow: hidden;
+    }
+    .progress i {
+      height: 100%; display: block; background: #00f5d4; width: 0;
+      transition: width 0.3s cubic-bezier(0.2, 0.8, 0.25, 1);
+    }
+    .nav-buttons { display: flex; gap: 8px; }
+    .nav-btn {
+      width: 38px; height: 34px; border: 1px solid rgba(255, 255, 255, 0.6);
+      background: rgba(0, 0, 0, 0.35); color: #fff; border-radius: 999px;
+      cursor: pointer; display: grid; place-items: center; font-size: 15px;
+      backdrop-filter: blur(8px); transition: 0.2s background;
+    }
+    .nav-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+    .toc-trigger {
+      position: fixed; z-index: 30; left: 18px; top: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 999px;
+      padding: 7px 16px; background: rgba(10, 17, 40, 0.85); color: #00f5d4;
+      cursor: pointer; font-weight: 800; font-size: 13px; letter-spacing: 0.08em;
+      backdrop-filter: blur(10px); box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+    }
+    .page-hint {
+      position: fixed; right: 20px; top: 18px; z-index: 20;
+      color: rgba(255, 255, 255, 0.8); font-size: 12px;
+      mix-blend-mode: difference; text-align: right;
+    }
+
+    /* Modal TOC */
+    .toc-modal {
+      position: fixed; inset: 0; z-index: 50;
+      background: rgba(6, 13, 29, 0.96); backdrop-filter: blur(16px);
+      padding: clamp(24px, 5vw, 60px);
+      color: #fff; display: none; overflow-y: auto;
+    }
+    .toc-modal.open { display: block; }
+    .toc-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;
+      margin-top: 24px;
+    }
+    .toc-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(0, 245, 212, 0.2);
+      border-radius: 12px; padding: 14px; cursor: pointer;
+      text-align: left; color: inherit; transition: 0.2s;
+    }
+    .toc-card:hover {
+      background: rgba(0, 245, 212, 0.15); border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+    .toc-close {
+      position: absolute; right: 24px; top: 20px;
+      background: none; border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #fff; width: 38px; height: 38px; border-radius: 50%;
+      cursor: pointer; font-size: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .two, .two-wide, .three, .four { grid-template-columns: 1fr; }
+      .slide { padding: 64px 16px 74px; align-content: start; }
+      .page-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="toc-trigger" id="tocOpen">✦ 课程目录</button>
+<div class="page-hint">← → 或 空格翻页 ｜ 点模糊区域看答案 ｜ 可点画布操作</div>
+
+<!-- Table of Contents Modal -->
+<div class="toc-modal" id="tocModal">
+  <button class="toc-close" id="tocClose">✕</button>
+  <div style="max-width: 1000px; margin: 0 auto;">
+    <span class="kicker"><span class="badge-icon">★</span> 导航罗盘</span>
+    <h2 style="color:#00f5d4; margin-top:8px;">数论探秘：倍数与因数全景地图</h2>
+    <p style="color:#94a3b8;">共 12 幕探究场景，预计 40 分钟沉浸式教学。点击任意卡片瞬间跳转。</p>
+    <div class="toc-grid" id="tocGrid"></div>
+  </div>
+</div>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: Title -->
+  <section class="slide cosmic active" data-title="封面：数论探秘">
+    <div style="max-width: 880px;">
+      <span class="kicker"><span class="badge-icon">01</span> 北师大版四年级数学上·数论初探</span>
+      <h1 style="color: #00f5d4; margin-top: 10px;">倍数与因数</h1>
+      <p class="lead">从矩阵阵列、百数表奇观，到两千年前埃拉托色尼的古老筛子。揭开自然数之间隐秘的“血缘密码”与宇宙积木。</p>
+      
+      <div class="three" style="margin-top: 24px;">
+        <div class="card">
+          <b style="color:var(--cyan);">🎯 核心目标</b>
+          <p style="font-size:13px; color:#cbd5e1;">理解倍数与因数的相互依存，掌握 2、3、5 倍数特征，建立质数与合数认知。</p>
+        </div>
+        <div class="card">
+          <b style="color:var(--cyan);">🧩 交互实验</b>
+          <p style="font-size:13px; color:#cbd5e1;">百数表透视镜、几何长方形拼合器、埃氏筛法点灯机、数论迷阵挑战。</p>
+        </div>
+        <div class="card">
+          <b style="color:var(--cyan);">⏱ 课时设计</b>
+          <p style="font-size:13px; color:#cbd5e1;">40 分钟互动授课，含知识精讲、随堂巩固与 4 道阶梯级数论拔高题。</p>
+        </div>
+      </div>
+      
+      <div style="margin-top: 28px; display:flex; gap:14px; align-items:center;">
+        <button class="btn-tab active" style="font-size:15px; padding:10px 24px;" onclick="goToSlide(1)">🚀 开启探秘之旅（按空格）</button>
+        <span style="font-size:13px; color:#94a3b8;">支持键盘左右键翻页、点击模糊答案即时揭晓</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: 倍数与因数的认识 (p31) -->
+  <section class="slide" data-title="倍数与因数的相互依存">
+    <div class="two-wide">
+      <div>
+        <span class="kicker"><span class="badge-icon">02</span> 几何阵列与乘法法则</span>
+        <h2>点阵方阵里的乘法密码</h2>
+        <p class="lead">探究队伍排列：当 4 排同学、每排 9 人整齐列队时，一共有 \(4 \times 9 = 36\) 人。</p>
+        
+        <div class="law-box">
+          <div class="eq">\(a \times b = c\) （\(a, b, c\) 为非零自然数）</div>
+          <p style="margin: 6px 0 0; font-size:15px;">
+            我们就说：<b>\(c\) 是 \(a\) 和 \(b\) 的倍数</b>，<b>\(a\) 和 \(b\) 是 \(c\) 的因数</b>。
+          </p>
+        </div>
+
+        <div class="card highlight" style="margin-top:14px;">
+          <b>⚠️ 关键法则：相互依存，形影不离</b>
+          <p style="font-size:14px; color:var(--ink-soft); margin:0;">
+            不能孤立地说“36 是倍数”或“9 是因数”。必须完整表达为：<br>
+            「<span class="answer">36 是 9 和 4 的倍数</span>，<span class="answer">9 和 4 是 36 的因数</span>」。<br>
+            <i>（注意：研究倍数与因数时，我们约定在非零自然数范围内讨论。）</i>
+          </p>
+        </div>
+      </div>
+
+      <div class="interactive-panel">
+        <h3 style="margin-bottom:8px;">🎨 互动点阵模拟器</h3>
+        <p style="font-size:13px; color:var(--ink-soft); margin-bottom:8px;">拖动滑块观察点阵变化，感受因数如何编织出总数（倍数）：</p>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+          <label style="font-size:13px; font-weight:700;">行数: <span id="dotRowsVal">4</span></label>
+          <input type="range" id="dotRows" min="2" max="8" value="4" style="flex:1;">
+          <label style="font-size:13px; font-weight:700;">列数: <span id="dotColsVal">9</span></label>
+          <input type="range" id="dotCols" min="2" max="10" value="9" style="flex:1;">
+        </div>
+        <div style="background:#0f172a; border-radius:10px; padding:12px; display:grid; place-items:center;">
+          <canvas id="dotCanvas" width="340" height="180" style="width:100%; max-width:340px; height:auto;"></canvas>
+        </div>
+        <div id="dotExplain" style="font-size:13px; text-align:center; margin-top:8px; font-weight:700; color:var(--primary);">
+          4 × 9 = 36 ➔ 36 是 4 和 9 的倍数
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: 练一练与找7的倍数 (p31-32) -->
+  <section class="slide" data-title="判断与基础说理">
+    <div>
+      <span class="kicker"><span class="badge-icon">03</span> 随堂小试</span>
+      <h2>判断与说理：谁是谁的倍数？</h2>
+      <p class="lead">通过乘除法关系，判断倍数因数，并试着找出 7 的倍数。</p>
+
+      <div class="two" style="margin-top:16px;">
+        <div class="quiz-stack">
+          <div class="quiz-item">
+            <b>1. 根据算式说一说：</b>
+            <p style="margin:4px 0;">① \(25 \times 3 = 75\)</p>
+            <div style="font-size:14px;">
+              ➔ <span class="answer">75 是 25 和 3 的倍数，25 和 3 是 75 的因数</span>
+            </div>
+            <p style="margin:8px 0 4px;">② \(45 \div 9 = 5\)</p>
+            <div style="font-size:14px;">
+              ➔ <span class="answer">45 是 9 和 5 的倍数，9 和 5 是 45 的因数</span>
+            </div>
+          </div>
+
+          <div class="quiz-item">
+            <b>2. 寻找 7 的倍数雷达</b>
+            <p style="font-size:13px; color:var(--ink-soft); margin-bottom:6px;">下面哪些数是 7 的倍数？点击查看检验方法：</p>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <span class="badge badge-star1">7</span>
+              <span class="badge badge-star1">14</span>
+              <span class="badge badge-tip">17</span>
+              <span class="badge badge-tip">25</span>
+              <span class="badge badge-star1">77</span>
+            </div>
+            <div style="margin-top:8px; font-size:13px;">
+              结论：<span class="answer">7 (7×1), 14 (7×2), 77 (7×11) 是 7 的倍数；17÷7=2...3，25÷7=3...4 有余数不是</span>。
+            </div>
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <span class="badge badge-star2">拔高思考·递进题</span>
+          <h3 style="margin:8px 0 6px;">若 \(A \div B = 4\)，一定能说 \(A\) 是 \(B\) 的倍数吗？</h3>
+          <p style="font-size:14px; color:var(--ink-soft);">
+            小明说：“因为 \(1.2 \div 0.3 = 4\)，所以 1.2 是 0.3 的倍数。”他的说法对吗？为什么？
+          </p>
+          <div style="margin-top:10px;">
+            <b>提示：</b>研究倍数与因数的数系范围前提是什么？<br>
+            <b>揭秘：</b><span class="answer">不对！倍数与因数必须在非零自然数（整数）范围内讨论，小数不存在倍数与因数关系。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4: 沿3的倍数过河与公倍数初现 (p32) -->
+  <section class="slide" data-title="小游戏：沿 3 的倍数过河">
+    <div class="two-wide">
+      <div>
+        <span class="kicker"><span class="badge-icon">04</span> 趣味过河与公倍数</span>
+        <h2>小探险家过河：踩准 3 的倍数石阶</h2>
+        <p class="lead">河面上有许多数字浮石，小探险家必须<b>只踩 3 的倍数</b>才能安全抵达对岸树屋！</p>
+
+        <div class="card" style="margin-top:14px;">
+          <b>探险任务提示：</b>
+          <p style="font-size:14px; color:var(--ink-soft);">
+            点击右侧石阶，若是 3 的倍数会亮起翡翠绿，不是则会晃动警告。找出一条通向对岸的全部石阶！
+          </p>
+          <div style="margin-top:8px; font-size:14px;">
+            标准安全石阶集合：<br>
+            <span class="answer">6, 9, 15, 18, 24 （它们除以 3 都能整除且没有余数）</span>
+          </div>
+        </div>
+
+        <div class="quiz-item" style="margin-top:12px;">
+          <span class="badge badge-star2">思维进阶·公倍数萌芽</span>
+          <p style="font-size:14px; margin:6px 0 4px;"><b>在 4, 6, 9, 12, 18, 20, 24, 30, 48 中：</b></p>
+          <p style="font-size:13px; color:var(--ink-soft);">哪些数既是 4 的倍数，又是 6 的倍数？</p>
+          <div style="font-size:14px; margin-top:4px;">
+            ➔ <span class="answer">12, 24, 48 （这些就是 4 和 6 的公倍数，其中 12 是最小公倍数）</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3 style="margin:0;">🌊 浮石阵列（点击测试）</h3>
+          <button class="btn-tab" onclick="resetRiver()">重置石阶</button>
+        </div>
+        <div class="river-grid" id="riverGrid">
+          <!-- Populated by JS -->
+        </div>
+        <div id="riverFeedback" style="margin-top:12px; font-size:13px; text-align:center; min-height:20px; font-weight:700; color:var(--primary);">
+          点击石阶开始过河挑战
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 5: 2 和 5 的倍数特征 (p33-34) -->
+  <section class="slide" data-title="2 和 5 的倍数特征与奇偶数">
+    <div>
+      <span class="kicker"><span class="badge-icon">05</span> 个位侦探</span>
+      <h2>2 与 5 的倍数：只看个位就能一秒破案！</h2>
+      <p class="lead">为什么看个位就能判断？百位是 100（2 和 5 的倍数），十位是 10（也是它们的倍数），决定命运的只有个位！</p>
+
+      <div class="three" style="margin-top:16px;">
+        <div class="card highlight">
+          <div style="font-size:28px; margin-bottom:4px;">✌️ 2 的倍数与偶数</div>
+          <b>个位是 0, 2, 4, 6, 8</b>
+          <p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">
+            在自然数中，是 2 的倍数的数叫做<b>偶数（双数）</b>；不是 2 的倍数的数叫做<b>奇数（单数）</b>。<br>
+            <i>0 也是偶数哦！</i>
+          </p>
+        </div>
+
+        <div class="card highlight">
+          <div style="font-size:28px; margin-bottom:4px;">🖐️ 5 的倍数</div>
+          <b>个位是 0 或 5</b>
+          <p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">
+            例如：35、80、105、990 都是 5 的倍数。凡是结尾是 0 或 5 的，5 人一组总能刚好分完。
+          </p>
+        </div>
+
+        <div class="card highlight" style="border-color:#10b981;">
+          <div style="font-size:28px; margin-bottom:4px;">🎯 2 和 5 的共同倍数</div>
+          <b style="color:#059669;">个位必定是 0！</b>
+          <p style="font-size:13px; color:var(--ink-soft); margin-top:4px;">
+            既是 2 的倍数（个位需偶数），又是 5 的倍数（个位需 0 或 5），交集只有 <b>0</b>！<br>
+            如：10, 20, 90, 500。
+          </p>
+        </div>
+      </div>
+
+      <div class="two" style="margin-top:16px;">
+        <div class="quiz-item">
+          <b>🍞 生活应用：面包包装问题</b>
+          <p style="font-size:14px; margin:6px 0;">
+            面包房烤好了 85 个羊角面包。<br>
+            • 每 2 个装一袋，能正好装完吗？为什么？<br>
+            ➔ <span class="answer">不能。因为 85 的个位是 5，不是 2 的倍数（是奇数），装完会余 1 个。</span><br>
+            • 每 5 个装一袋，能正好装完吗？<br>
+            ➔ <span class="answer">能。因为 85 的个位是 5，是 5 的倍数，正好装 17 袋。</span>
+          </p>
+        </div>
+
+        <div class="quiz-item">
+          <span class="badge badge-star2">拔高探索·奇偶运算律</span>
+          <p style="font-size:14px; margin:6px 0;">
+            不计算结果，说出运算结果是奇数还是偶数：<br>
+            ① \(8 + 13\) 是 <span class="answer">奇数（偶+奇=奇）</span><br>
+            ② \(15 + 27\) 是 <span class="answer">偶数（奇+奇=偶）</span><br>
+            ③ \(99 \times 3\) 是 <span class="answer">奇数（奇×奇=奇）</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: 3 的倍数特征与百数表对角线 (p35-36) -->
+  <section class="slide" data-title="3 的倍数与数字和规律">
+    <div class="two-wide">
+      <div>
+        <span class="kicker"><span class="badge-icon">06</span> 神奇的数字之和</span>
+        <h2>3 的倍数：打破个位魔咒！</h2>
+        <p class="lead">只看个位行不通啦！13、23 的个位是 3 却不是 3 的倍数；12、24 的个位不是 3 却是 3 的倍数！</p>
+
+        <div class="law-box">
+          <div class="eq">各个数位上的数字之和是 3 的倍数</div>
+          <p style="margin:6px 0 0; font-size:14px;">
+            例如：2022 年冬奥会 ➔ \(2 + 0 + 2 + 2 = 6\)，6 是 3 的倍数，所以 <b>2022 一定是 3 的倍数</b>！(\(2022 \div 3 = 674\))
+          </p>
+        </div>
+
+        <div class="quiz-item" style="margin-top:12px;">
+          <b>🎈 快速判断：下面谁能被 3 整除？</b>
+          <div style="font-size:14px; margin-top:6px; line-height:1.8;">
+            • 53 ➔ \(5+3=8\) <span class="answer">不是</span><br>
+            • 87 ➔ \(8+7=15\) <span class="answer">是 (3×29)</span><br>
+            • 128 ➔ \(1+2+8=11\) <span class="answer">不是</span><br>
+            • 453 ➔ \(4+5+3=12\) <span class="answer">是 (3×151)</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:10px;">
+          <span class="badge badge-star3">9 的倍数在百数表中的几何之美</span>
+          <p style="font-size:13px; color:var(--ink-soft); margin:6px 0 0;">
+            9 的倍数各个数位之和是 9 的倍数。更奇妙的是，在百数表上它们排成一条条<b>斜对角线</b>（9, 18, 27, 36... 每走一步，十位加 1，个位减 1，和恒等于 9）！
+          </p>
+        </div>
+      </div>
+
+      <div class="interactive-panel">
+        <div class="chart-controls">
+          <span style="font-size:13px; font-weight:700;">百数表透视：</span>
+          <button class="btn-tab active" onclick="setChartFilter('all')">全部</button>
+          <button class="btn-tab" onclick="setChartFilter('mult2')">2的倍数(列)</button>
+          <button class="btn-tab" onclick="setChartFilter('mult5')">5的倍数</button>
+          <button class="btn-tab" onclick="setChartFilter('mult3')">3的倍数</button>
+          <button class="btn-tab" onclick="setChartFilter('mult9')">9的对角线</button>
+        </div>
+        <div class="chart-grid" id="chartGridHundred">
+          <!-- 100 cells generated via JS -->
+        </div>
+        <p id="chartCaption" style="font-size:12px; color:var(--ink-soft); text-align:center; margin-top:6px;">
+          点击上方按钮观察不同倍数在百数表中的对称排列
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: 找因数与长方形拼图 (p37-38) -->
+  <section class="slide" data-title="找因数与成对几何拼法">
+    <div class="two-wide">
+      <div>
+        <span class="kicker"><span class="badge-icon">07</span> 几何与代数的交织</span>
+        <h2>拼长方形：一个数的所有因数成对出现</h2>
+        <p class="lead">用 12 个小正方形拼长方形，有几种拼法？长和宽就是 12 的因数对！</p>
+
+        <div class="three" style="margin:12px 0;">
+          <div class="card" style="text-align:center; padding:10px;">
+            <b style="color:var(--primary);">拼法 ①</b>
+            \(1 \times 12 = 12\)
+          </div>
+          <div class="card" style="text-align:center; padding:10px;">
+            <b style="color:var(--primary);">拼法 ②</b>
+            \(2 \times 6 = 12\)
+          </div>
+          <div class="card" style="text-align:center; padding:10px;">
+            <b style="color:var(--primary);">拼法 ③</b>
+            \(3 \times 4 = 12\)
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <b>💡 寻找因数的不漏秘籍：成对找，中间碰头就打住！</b>
+          <p style="font-size:14px; margin:4px 0;">
+            12 的全部因数从小到大排队：<br>
+            <b>1, 2, 3, 4, 6, 12</b>（共 6 个）。<br>
+            当算到 \(3 \times 4\) 后，下一个是 \(4 \times 3\)，出现重复，立刻停笔！
+          </p>
+        </div>
+
+        <div class="quiz-item" style="margin-top:12px;">
+          <b>练一练：写出 16 和 24 的全部因数</b>
+          <div style="font-size:14px; margin-top:4px;">
+            • 16 的全部因数：<span class="answer">1, 2, 4, 8, 16 （注意 4×4 重复只写一次，共 5 个，拼 3 种长方形）</span><br>
+            • 24 的全部因数：<span class="answer">1, 2, 3, 4, 6, 8, 12, 24 （共 8 个，拼 4 种长方形）</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-panel">
+        <h3 style="margin-bottom:8px;">📐 长方形拼合实验台</h3>
+        <div class="rect-controls">
+          <span style="font-size:13px; font-weight:700;">选择小正方形个数 \(n\):</span>
+          <button class="btn-tab active" onclick="setRectN(12)">12</button>
+          <button class="btn-tab" onclick="setRectN(16)">16</button>
+          <button class="btn-tab" onclick="setRectN(18)">18</button>
+          <button class="btn-tab" onclick="setRectN(24)">24</button>
+        </div>
+        <div class="canvas-rect-holder">
+          <canvas id="rectCanvas" width="380" height="230" style="width:100%; max-width:380px; height:auto;"></canvas>
+        </div>
+        <div id="rectPairsText" style="margin-top:8px; font-size:13px; font-weight:700; color:var(--primary); text-align:center;">
+          12 = 1×12 = 2×6 = 3×4 (共 3 种长方形)
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 8: 因数应用与不能整除的月饼 (p38) -->
+  <section class="slide" data-title="因数实战与公因数思维">
+    <div>
+      <span class="kicker"><span class="badge-icon">08</span> 包装工程与公因数</span>
+      <h2>月饼装盒与公因数重叠</h2>
+      <p class="lead">从能整除的因数分解，到“顽固”的质数萌芽。</p>
+
+      <div class="two" style="margin-top:16px;">
+        <div class="card highlight">
+          <span class="badge badge-star1">真实情境 1</span>
+          <h3 style="margin:8px 0 6px;">🥮 48 块月饼装盒 vs 47 块月饼</h3>
+          <p style="font-size:14px;">
+            <b>问：</b>把 48 块月饼装盒，每个盒子装同样多且装完，有几种装法？每种装法各需几个盒子？<br>
+            ➔ <span class="answer">48的因数有：1, 2, 3, 4, 6, 8, 12, 16, 24, 48。若每盒至少装2块且不止1盒，有 8 种装法（如每盒2块需24盒、每盒3块需16盒等）。</span>
+          </p>
+          <p style="font-size:14px; margin-top:8px; border-top:1px dashed #cbd5e1; padding-top:8px;">
+            <b>如果变成 47 块月饼呢？</b><br>
+            ➔ <span class="answer">47 只能装 1 盒（47块）或 47 盒（每盒1块）！除了 1 和 47 它没有别的因数，根本无法均匀分装成常规礼盒！</span>
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="badge badge-star2">真实情境 2</span>
+          <h3 style="margin:8px 0 6px;">⭕ 公因数相遇：15 与 21 的共同约数</h3>
+          <p style="font-size:14px; margin:6px 0;">
+            15 的因数有：<span class="answer">1, 3, 5, 15</span><br>
+            21 的因数有：<span class="answer">1, 3, 7, 21</span><br>
+            既是 15 的因数，又是 21 的因数有：<br>
+            ➔ <span class="answer">1 和 3 （这就是它们的公因数，3 是最大公因数）</span>
+          </p>
+          <div style="background:rgba(0,119,182,0.06); border-radius:10px; padding:10px; margin-top:10px; font-size:13px;">
+            <b>神奇的 1001 数学黑洞：</b><br>
+            任意写一个三位数如 654，重复写一遍成 654654。<br>
+            连续除以 7、除以 11、除以 13，最终奇迹般变回 <span class="answer">654</span>！<br>
+            <i>原因：\(7 \times 11 \times 13 = 1001\)，\(654 \times 1001 = 654654\)！</i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: 质数与合数 (p39-40) -->
+  <section class="slide" data-title="质数与合数：数的原子">
+    <div>
+      <span class="kicker"><span class="badge-icon">09</span> 数的基因库</span>
+      <h2>质数与合数：自然数世界的“元素周期表”</h2>
+      <p class="lead">按照因数的个数，非零自然数可以分成三大家族：</p>
+
+      <div class="three" style="margin-top:16px;">
+        <div class="card highlight" style="border-color:#10b981;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:#059669; font-size:22px;">💎 质数 (素数)</b>
+            <span class="badge" style="background:#10b981; color:#fff;">只有 2 个因数</span>
+          </div>
+          <p style="font-size:14px; margin-top:8px;">
+            一个数，如果<b>只有 1 和它本身两个因数</b>，这样的数叫质数。<br>
+            例如：2, 3, 5, 7, 11, 13, 17, 19...<br>
+            <b>★ 唯一的偶质数：2</b>（最小的质数）
+          </p>
+        </div>
+
+        <div class="card highlight" style="border-color:#0077b6;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:#0077b6; font-size:22px;">🧱 合数</b>
+            <span class="badge" style="background:#0077b6; color:#fff;">3 个或更多因数</span>
+          </div>
+          <p style="font-size:14px; margin-top:8px;">
+            除了 1 和它本身，<b>还有别的因数</b>（可以拆解成更小积木）。<br>
+            例如：4, 6, 8, 9, 10, 12, 14, 15...<br>
+            <b>★ 最小的合数：4</b>
+          </p>
+        </div>
+
+        <div class="card highlight" style="border-color:#f59e0b;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:#d97706; font-size:22px;">👑 特殊孤岛：1</b>
+            <span class="badge" style="background:#f59e0b; color:#fff;">只有 1 个因数</span>
+          </div>
+          <p style="font-size:14px; margin-top:8px;">
+            <b>1 既不是质数，也不是合数！</b><br>
+            它是自然数的单位元，也是因数分类中特立独行的存在。千万别把它漏掉或错划给质数合数！
+          </p>
+        </div>
+      </div>
+
+      <div class="two" style="margin-top:16px;">
+        <div class="quiz-item">
+          <b>分一分：将 2~16 归入各自家族</b>
+          <p style="font-size:14px; margin:6px 0;">
+            • 质数家族：<span class="answer">2, 3, 5, 7, 11, 13 (只能拼 1 种长条长方形)</span><br>
+            • 合数家族：<span class="answer">4, 6, 8, 9, 10, 12, 14, 15, 16 (能拼 2 种及以上长方形)</span>
+          </p>
+        </div>
+
+        <div class="quiz-item">
+          <span class="badge badge-tip">知识小窗·质因数分解</span>
+          <p style="font-size:13px; color:var(--ink-soft); margin:6px 0;">
+            任何大于 1 的合数，都可以唯一写成几个质数相乘的积：<br>
+            \(12 = 2 \times 2 \times 3\)<br>
+            \(30 = 2 \times 3 \times 5\)<br>
+            这就像将复合分子拆成纯净原子，质数就是自然数的“数根”！
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: 综合分类与猜数 (p41) -->
+  <section class="slide" data-title="综合分类与猜数游戏">
+    <div>
+      <span class="kicker"><span class="badge-icon">10</span> 跨维度推理</span>
+      <h2>四象限数论：奇偶与质合的双重面具</h2>
+      <p class="lead">同一个数字可以在不同分类标准下拥有多重身份：4 是偶数又是合数；2 是质数又是偶数。</p>
+
+      <div class="two-wide">
+        <div class="quiz-stack">
+          <div class="quiz-item">
+            <b>1. 双重条件密码锁：</b>
+            <p style="font-size:14px; margin:4px 0;">
+              有一个数，<b>既是 6 的倍数，又是 24 的因数</b>，这个数可能是多少？
+            </p>
+            <div style="font-size:14px; margin-top:4px;">
+              6的倍数：6, 12, 18, 24...<br>
+              24的因数：1, 2, 3, 4, 6, 8, 12, 24<br>
+              ➔ 这个数可能是：<span class="answer">6 或 12 或 24</span>！
+            </div>
+          </div>
+
+          <div class="quiz-item">
+            <b>2. 数学小侦探：猜猜我是谁？</b>
+            <div style="font-size:14px; line-height:1.7; margin-top:4px;">
+              ① 我比 3 大，比 7 小，我是奇数。➔ 我是 <span class="answer">5</span><br>
+              ② 我和另一个数都是质数，我们的和是 15。➔ 我们是 <span class="answer">2 和 13</span>（唯一的偶质数破局）<br>
+              ③ 两个精灵手拉手，都是质数，和是 10，积是 21。➔ 我们是 <span class="answer">3 和 7</span><br>
+              ④ 我是一个两位数偶数，十位和个位的积是 18。➔ 我是 <span class="answer">29 不是偶数，所以是 36 或 92</span> (十位与个位积为18: 2×9, 3×6, 6×3, 9×2，偶数有 92, 36)
+            </div>
+          </div>
+        </div>
+
+        <div class="card highlight">
+          <h3 style="margin-bottom:8px;">📊 四大家族分类表（给数字找家）</h3>
+          <p style="font-size:13px; color:var(--ink-soft); margin-bottom:8px;">测试这组数：1, 10, 12, 25, 37, 54, 102, 417, 23, 298</p>
+          <div style="font-size:13px; line-height:1.8;">
+            • <b>奇数：</b><span class="answer">1, 25, 37, 417, 23</span><br>
+            • <b>偶数：</b><span class="answer">10, 12, 54, 102, 298</span><br>
+            • <b>质数：</b><span class="answer">37, 23 （注意 417 的 4+1+7=12 能被3整除，不是质数！）</span><br>
+            • <b>合数：</b><span class="answer">10, 12, 25, 54, 102, 417, 298</span><br>
+            • <b>既非质数也非合数：</b><span class="answer">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: 哥德巴赫猜想与质数和 (p42) -->
+  <section class="slide" data-title="数学史话：哥德巴赫猜想">
+    <div class="two-wide">
+      <div>
+        <span class="kicker"><span class="badge-icon">11</span> 皇冠上的明珠</span>
+        <h2>哥德巴赫猜想与素数和</h2>
+        <p class="lead">1742 年数学家哥德巴赫提出猜想：任何一个不小于 4 的偶数，都可以写成两个质数之和。</p>
+
+        <div class="card highlight" style="margin:14px 0;">
+          <b>📜 猜想的两种情形：</b>
+          <p style="font-size:14px; margin:6px 0;">
+            • <b>偶数猜想：</b>偶数（≥4）= 质数 + 质数 （如 \(4 = 2+2\), \(6 = 3+3\), \(8 = 3+5\)）<br>
+            • <b>奇数猜想：</b>奇数（≥7）= 质数 + 质数 + 质数 （如 \(7 = 2+2+3\), \(9 = 3+3+3\) 或 \(2+2+5\)）<br>
+            中国数学家<b>陈景润</b>证明了著名的“1+2”，距离明珠仅一步之遥！
+          </p>
+        </div>
+
+        <div class="quiz-item">
+          <b>原创小试：把下列数写成质数之和</b>
+          <div style="font-size:14px; line-height:1.9; margin-top:6px;">
+            • \(10 = \)<span class="answer">3 + 7 或 5 + 5</span><br>
+            • \(16 = \)<span class="answer">3 + 13 或 5 + 11</span><br>
+            • \(40 = \)<span class="answer">3 + 37 或 11 + 29 或 17 + 23</span><br>
+            • \(11 = \)<span class="answer">2 + 2 + 7 或 3 + 3 + 5</span><br>
+            • \(15 = \)<span class="answer">2 + 2 + 11 或 3 + 5 + 7 或 5 + 5 + 5</span><br>
+            • \(21 = \)<span class="answer">3 + 5 + 13 或 7 + 7 + 7 或 2 + 2 + 17</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="interactive-panel">
+        <h3 style="margin-bottom:8px;">🧮 偶数拆解验证机</h3>
+        <p style="font-size:13px; color:var(--ink-soft); margin-bottom:10px;">输入 4~100 任意偶数，计算机将寻找它的双质数拆解：</p>
+        <div style="display:flex; gap:8px;">
+          <input type="number" id="goldbachInput" min="4" max="100" step="2" value="28" style="padding:8px 12px; border-radius:8px; border:1px solid #cbd5e1; font-size:16px; width:100px; font-weight:700;">
+          <button class="btn-tab active" onclick="checkGoldbach()">验证拆解</button>
+        </div>
+        <div id="goldbachResult" style="margin-top:14px; font-size:15px; background:#f8fafc; padding:14px; border-radius:10px; border:1px solid #e2e8f0; min-height:80px; line-height:1.7;">
+          28 = 5 + 23<br>28 = 11 + 17
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: 埃拉托色尼筛法 (p43) -->
+  <section class="slide" data-title="算法经典：埃拉托色尼筛法">
+    <div class="two-wide">
+      <div>
+        <span class="kicker"><span class="badge-icon">12</span> 两千年前的数学之网</span>
+        <h2>埃拉托色尼筛法：如何筛出 1~100 的全部质数？</h2>
+        <p class="lead">公元前 200 多年古希腊学者埃拉托色尼发明的神奇“筛子”：合数必有质因数，只要筛掉所有质数的倍数，剩下的全是纯净质数！</p>
+
+        <div class="card" style="margin:12px 0;">
+          <b>筛除 5 部曲：</b>
+          <ol style="font-size:14px; padding-left:18px; margin:6px 0;">
+            <li>划掉 1（既不是质数也不是合数）</li>
+            <li>保留 2，划掉 2 的所有倍数 (4, 6, 8, ...)</li>
+            <li>保留 3，划掉 3 的所有倍数 (6, 9, 12, ...)</li>
+            <li>保留 5，划掉 5 的所有倍数 (10, 15, 20, ...)</li>
+            <li>保留 7，划掉 7 的所有倍数 (14, 21, 28, ...)</li>
+          </ol>
+          <div style="font-size:13px; color:var(--primary); font-weight:700; margin-top:4px;">
+            思考：为什么只要筛到 7 就不需要筛 11 了？因为 \(11 \times 11 = 121 > 100\)，100 以内的合数必定含有不超过 10 的质因数！
+          </div>
+        </div>
+
+        <div class="quiz-item">
+          <b>筛法思考题：</b>
+          <p style="font-size:14px; margin:4px 0;">
+            1~100 中一共有多少个质数？<br>
+            ➔ <span class="answer">正好 25 个质数！</span><br>
+            除去 2 和 3，其余所有质数除以 6 的余数一定是 <span class="answer">1 或 5</span>！
+          </p>
+        </div>
+      </div>
+
+      <div class="interactive-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <h3 style="margin:0;">🧪 埃氏筛法互动试验台</h3>
+          <button class="btn-tab" onclick="resetSieve()">重置</button>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+          <button class="btn-tab" id="sieveStep1" onclick="runSieveStep(1)">① 划掉 1</button>
+          <button class="btn-tab" id="sieveStep2" onclick="runSieveStep(2)">② 筛 2 的倍数</button>
+          <button class="btn-tab" id="sieveStep3" onclick="runSieveStep(3)">③ 筛 3 的倍数</button>
+          <button class="btn-tab" id="sieveStep5" onclick="runSieveStep(5)">④ 筛 5 的倍数</button>
+          <button class="btn-tab" id="sieveStep7" onclick="runSieveStep(7)">⑤ 筛 7 的倍数</button>
+        </div>
+        <div class="chart-grid" id="sieveGrid" style="max-width:440px;">
+          <!-- 100 cells generated via JS -->
+        </div>
+        <div id="sieveStatus" style="font-size:12px; font-weight:700; color:var(--primary); text-align:center; margin-top:6px;">
+          请按顺序点击上方步骤，亲历两千年前的筛数奇迹
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: 拔高题集 (Original Capstone Problems) -->
+  <section class="slide cosmic" data-title="拔高题集：数论大宗师挑战">
+    <div style="max-width: 960px;">
+      <span class="kicker"><span class="badge-icon">★</span> 巅峰思维营</span>
+      <h2 style="color:var(--cyan);">数论拔高题集：智者的四重封印</h2>
+      <p class="lead">四道精选原创挑战题，融合公倍数、成对因数、质合极值与筛法逻辑。点击对应卡片揭晓巧思解法！</p>
+
+      <div class="two" style="gap:16px; margin-top:16px;">
+        <!-- Q1: Simultaneous Multiples -->
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:var(--cyan);">第 1 题：同步公倍数与余数</b>
+            <span class="badge badge-star1">★ 进阶</span>
+          </div>
+          <p style="font-size:14px; margin:8px 0;">
+            一个三位数既是 2 的倍数，又是 5 的倍数，各个数位之和是 12，这个三位数最大是多少？最小是多少？
+          </p>
+          <div style="font-size:13px; line-height:1.7;">
+            <b>思路点拨：</b>同时是 2 和 5 的倍数 ➔ 个位必为 0。百位 + 十位 = 12。<br>
+            • 最大：让百位尽可能大（最大取 9，十位为 3）➔ <span class="answer">930</span><br>
+            • 最小：让百位尽可能小（十位最大取 9，百位为 3）➔ <span class="answer">390</span>
+          </div>
+        </div>
+
+        <!-- Q2: Paired Factors & Geometry -->
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:var(--cyan);">第 2 题：奇特因数之谜</b>
+            <span class="badge badge-star2">★★ 高难</span>
+          </div>
+          <p style="font-size:14px; margin:8px 0;">
+            通常自然数的因数都是成对出现的，所以因数个数大多是偶数个。但有些自然数的因数个数是<b>奇数个</b>。1~100 中有哪些数具有这种特征？为什么？
+          </p>
+          <div style="font-size:13px; line-height:1.7;">
+            <b>思路点拨：</b>只有当 \(a \times a = n\)（两个相同因数相乘，重复只能算一个）时，总因数才是奇数！它们就是<b>完全平方数</b>。<br>
+            ➔ 答案：<span class="answer">1, 4, 9, 16, 25, 36, 49, 64, 81, 100（共 10 个）</span>
+          </div>
+        </div>
+
+        <!-- Q3: Prime / Composite Edge Cases -->
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:var(--cyan);">第 3 题：连续质数与极值陷阱</b>
+            <span class="badge badge-star2">★★ 高难</span>
+          </div>
+          <p style="font-size:14px; margin:8px 0;">
+            自然数中，有两个相邻的自然数都是质数，它们是哪两个？有两个连续的奇数都是合数，最小的一对是多少？
+          </p>
+          <div style="font-size:13px; line-height:1.7;">
+            <b>思路点拨：</b><br>
+            ① 相邻自然数必有一奇一偶，偶质数只有 2 ➔ 相邻质数只有 <span class="answer">2 和 3</span>。<br>
+            ② 最小的奇合数是 9，下一个连续奇数是 11（质数），13（质数），15（合数）不连续；而 25 和 27 连续；但在更前面：9 和 15？连续奇数指相差 2！
+            找连续奇合数即形如 \(2k-1, 2k+1\) 且皆为合数 ➔ 最小的是 <span class="answer">25 和 27</span>（或 9 是奇合数但 7, 11 都是质数）。
+          </div>
+        </div>
+
+        <!-- Q4: Sieve Reasoning -->
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="color:var(--cyan);">第 4 题：筛法大推理</b>
+            <span class="badge badge-star3">★★★ 宗师</span>
+          </div>
+          <p style="font-size:14px; margin:8px 0;">
+            若把埃拉托色尼筛法扩展到 1~200 的百数表，请问我们只要筛掉哪些质数的倍数，剩下的就全部是质数？最后一个需要执行划倍数操作的质数是多少？
+          </p>
+          <div style="font-size:13px; line-height:1.7;">
+            <b>思路点拨：</b>因为 \(13 \times 13 = 169 < 200\)，而下一个质数 \(17 \times 17 = 289 > 200\)。<br>
+            任何 200 以内的合数，必含有不超过 \(\sqrt{200} \approx 14.14\) 的质因数！<br>
+            ➔ 需要筛的质数：<span class="answer">2, 3, 5, 7, 11, 13</span>。<br>
+            最后一个需要划倍数的质数是：<span class="answer">13</span>！
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Footer Controls -->
+<div class="footer">
+  <span id="slideCounter">01 / 13</span>
+  <div class="progress"><i id="progressBar"></i></div>
+  <div class="nav-buttons">
+    <button class="nav-btn" id="prevBtn" title="上一页 (←)">‹</button>
+    <button class="nav-btn" id="nextBtn" title="下一页 (→)">›</button>
+  </div>
+</div>
+
+<script>
+  // Slide Presentation Logic
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const totalSlides = slides.length;
+  let currentSlide = 0;
+  const slideCounter = document.getElementById('slideCounter');
+  const progressBar = document.getElementById('progressBar');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const tocModal = document.getElementById('tocModal');
+  const tocOpen = document.getElementById('tocOpen');
+  const tocClose = document.getElementById('tocClose');
+  const tocGrid = document.getElementById('tocGrid');
+
+  function updateSlide(index) {
+    if (index < 0) index = 0;
+    if (index >= totalSlides) index = totalSlides - 1;
+    
+    slides.forEach((s, i) => {
+      s.classList.remove('active', 'exit');
+      if (i === index) {
+        s.classList.add('active');
+      } else if (i < index) {
+        s.classList.add('exit');
+      }
+    });
+
+    currentSlide = index;
+    const pad = n => (n < 10 ? '0' + n : n);
+    slideCounter.textContent = `${pad(currentSlide + 1)} / ${pad(totalSlides)}`;
+    progressBar.style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+
+    // Trigger canvas renders if slide contains them
+    if (currentSlide === 1) renderDots();
+    if (currentSlide === 5) renderHundredChart();
+    if (currentSlide === 6) renderRectangles();
+    if (currentSlide === 11) initSieveGrid();
+  }
+
+  function nextSlide() {
+    if (currentSlide < totalSlides - 1) updateSlide(currentSlide + 1);
+  }
+  function prevSlide() {
+    if (currentSlide > 0) updateSlide(currentSlide - 1);
+  }
+  function goToSlide(idx) {
+    updateSlide(idx);
+    tocModal.classList.remove('open');
+  }
+
+  nextBtn.addEventListener('click', nextSlide);
+  prevBtn.addEventListener('click', prevSlide);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault();
+      nextSlide();
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      prevSlide();
+    } else if (e.key === 'Escape') {
+      tocModal.classList.remove('open');
+    }
+  });
+
+  // Touch Swipe for Mobile
+  let touchStartX = 0;
+  window.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+  window.addEventListener('touchend', e => {
+    let diff = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(diff) > 50) {
+      if (diff < 0) nextSlide();
+      else prevSlide();
+    }
+  }, {passive: true});
+
+  // TOC Generation
+  slides.forEach((s, idx) => {
+    const title = s.getAttribute('data-title') || `第 ${idx + 1} 页`;
+    const card = document.createElement('div');
+    card.className = 'toc-card';
+    card.innerHTML = `<span style="font-size:12px; font-weight:800; color:#00f5d4;">#${idx+1 < 10 ? '0'+(idx+1) : idx+1}</span><div style="font-weight:700; margin-top:4px;">${title}</div>`;
+    card.onclick = () => goToSlide(idx);
+    tocGrid.appendChild(card);
+  });
+  tocOpen.onclick = () => tocModal.classList.add('open');
+  tocClose.onclick = () => tocModal.classList.remove('open');
+
+  // Answer reveal clicks
+  document.querySelectorAll('.answer').forEach(el => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('revealed');
+    });
+  });
+
+  // 1. Dot Array Canvas (Slide 2)
+  const dotRows = document.getElementById('dotRows');
+  const dotCols = document.getElementById('dotCols');
+  const dotRowsVal = document.getElementById('dotRowsVal');
+  const dotColsVal = document.getElementById('dotColsVal');
+  const dotCanvas = document.getElementById('dotCanvas');
+  const dotExplain = document.getElementById('dotExplain');
+
+  function renderDots() {
+    if (!dotCanvas) return;
+    const ctx = dotCanvas.getContext('2d');
+    const r = parseInt(dotRows.value);
+    const c = parseInt(dotCols.value);
+    dotRowsVal.textContent = r;
+    dotColsVal.textContent = c;
+    const total = r * c;
+    dotExplain.textContent = `${r} × ${c} = ${total} ➔ ${total} 是 ${r} 和 ${c} 的倍数，${r} 与 ${c} 是 ${total} 的因数`;
+
+    ctx.clearRect(0, 0, dotCanvas.width, dotCanvas.height);
+    const paddingX = 30, paddingY = 25;
+    const availW = dotCanvas.width - paddingX * 2;
+    const availH = dotCanvas.height - paddingY * 2;
+    const gapX = c > 1 ? availW / (c - 1) : 0;
+    const gapY = r > 1 ? availH / (r - 1) : 0;
+
+    for (let i = 0; i < r; i++) {
+      for (let j = 0; j < c; j++) {
+        const x = c === 1 ? dotCanvas.width / 2 : paddingX + j * gapX;
+        const y = r === 1 ? dotCanvas.height / 2 : paddingY + i * gapY;
+        ctx.beginPath();
+        ctx.arc(x, y, 6.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#00f5d4';
+        ctx.shadowColor = 'rgba(0, 245, 212, 0.4)';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+  }
+  if (dotRows && dotCols) {
+    dotRows.addEventListener('input', renderDots);
+    dotCols.addEventListener('input', renderDots);
+  }
+
+  // 2. River Crossing (Slide 4)
+  const riverNumbers = [6, 8, 9, 15, 16, 18, 20, 24, 29, 31, 33, 40];
+  const riverGrid = document.getElementById('riverGrid');
+  const riverFeedback = document.getElementById('riverFeedback');
+
+  function initRiver() {
+    if (!riverGrid) return;
+    riverGrid.innerHTML = '';
+    riverNumbers.forEach(n => {
+      const stone = document.createElement('div');
+      stone.className = 'stone';
+      stone.textContent = n;
+      stone.onclick = () => {
+        if (n % 3 === 0) {
+          stone.classList.add('ok');
+          stone.classList.remove('wrong');
+          riverFeedback.textContent = `🎯 妙啊！${n} ÷ 3 = ${n/3}，能被 3 整除，踏上安全石！`;
+          riverFeedback.style.color = '#059669';
+        } else {
+          stone.classList.add('wrong');
+          riverFeedback.textContent = `⚠️ 扑通！${n} ÷ 3 = ${Math.floor(n/3)} 余 ${n%3}，不是 3 的倍数！`;
+          riverFeedback.style.color = '#dc2626';
+          setTimeout(() => stone.classList.remove('wrong'), 800);
+        }
+      };
+      riverGrid.appendChild(stone);
+    });
+  }
+  function resetRiver() {
+    initRiver();
+    riverFeedback.textContent = '石阶已重置，请沿 3 的倍数前进！';
+    riverFeedback.style.color = 'var(--primary)';
+  }
+  initRiver();
+
+  // 3. Hundred Chart (Slide 6)
+  const chartGridHundred = document.getElementById('chartGridHundred');
+  const chartCaption = document.getElementById('chartCaption');
+  let currentChartFilter = 'all';
+
+  function renderHundredChart() {
+    if (!chartGridHundred) return;
+    chartGridHundred.innerHTML = '';
+    for (let i = 1; i <= 100; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell-num';
+      cell.textContent = i;
+      
+      const is2 = (i % 2 === 0);
+      const is5 = (i % 5 === 0);
+      const is3 = (i % 3 === 0);
+      const is9 = (i % 9 === 0);
+
+      if (currentChartFilter === 'mult2' && is2) {
+        cell.classList.add('mult2');
+      } else if (currentChartFilter === 'mult5' && is5) {
+        cell.classList.add('mult5');
+      } else if (currentChartFilter === 'mult3' && is3) {
+        cell.classList.add('mult3');
+      } else if (currentChartFilter === 'mult9' && is9) {
+        cell.classList.add('mult9');
+      }
+      chartGridHundred.appendChild(cell);
+    }
+  }
+
+  function setChartFilter(filter) {
+    currentChartFilter = filter;
+    document.querySelectorAll('.chart-controls .btn-tab').forEach(b => b.classList.remove('active'));
+    if (event && event.target) event.target.classList.add('active');
+    
+    if (filter === 'mult2') {
+      chartCaption.textContent = '2 的倍数全部整齐排列在第 2, 4, 6, 8, 10 这五列！个位全是双数。';
+    } else if (filter === 'mult5') {
+      chartCaption.textContent = '5 的倍数全部笔直地落在第 5 列与第 10 列！末尾只有 0 或 5。';
+    } else if (filter === 'mult3') {
+      chartCaption.textContent = '3 的倍数像斜线雨点般交错分布，各个数位加起来都是 3 的倍数。';
+    } else if (filter === 'mult9') {
+      chartCaption.textContent = '看！9 的倍数排成了极其工整的【反斜对角线】！每一行十位+1，个位-1，和永远是 9！';
+    } else {
+      chartCaption.textContent = '点击上方按钮观察不同倍数在百数表中的对称排列';
+    }
+    renderHundredChart();
+  }
+  renderHundredChart();
+
+  // 4. Rectangle Factor Builder (Slide 7)
+  let currentRectN = 12;
+  const rectCanvas = document.getElementById('rectCanvas');
+  const rectPairsText = document.getElementById('rectPairsText');
+
+  function setRectN(n) {
+    currentRectN = n;
+    document.querySelectorAll('.rect-controls .btn-tab').forEach(b => {
+      b.classList.toggle('active', parseInt(b.textContent) === n);
+    });
+    renderRectangles();
+  }
+
+  function getFactorPairs(num) {
+    const pairs = [];
+    for (let i = 1; i * i <= num; i++) {
+      if (num % i === 0) {
+        pairs.push([i, num / i]);
+      }
+    }
+    return pairs;
+  }
+
+  function renderRectangles() {
+    if (!rectCanvas) return;
+    const ctx = rectCanvas.getContext('2d');
+    ctx.clearRect(0, 0, rectCanvas.width, rectCanvas.height);
+    const pairs = getFactorPairs(currentRectN);
+
+    rectPairsText.textContent = `${currentRectN} 的因数分解：` + pairs.map(p => `${p[0]}×${p[1]}`).join(' = ') + ` (可拼成 ${pairs.length} 种长方形)`;
+
+    const count = pairs.length;
+    const boxW = rectCanvas.width / count;
+    
+    pairs.forEach((p, idx) => {
+      const hUnits = p[0];
+      const wUnits = p[1];
+      const maxDim = Math.max(wUnits, hUnits);
+      const unitSize = Math.min((boxW - 24) / maxDim, 80 / maxDim);
+      
+      const drawW = wUnits * unitSize;
+      const drawH = hUnits * unitSize;
+      const startX = idx * boxW + (boxW - drawW) / 2;
+      const startY = (rectCanvas.height - drawH) / 2 - 10;
+
+      // Draw grid rectangle
+      ctx.fillStyle = '#bae6fd';
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(startX, startY, drawW, drawH);
+      ctx.strokeRect(startX, startY, drawW, drawH);
+
+      // Inner grid lines
+      ctx.strokeStyle = 'rgba(2, 132, 199, 0.35)';
+      ctx.lineWidth = 0.8;
+      for (let c = 1; c < wUnits; c++) {
+        ctx.beginPath();
+        ctx.moveTo(startX + c * unitSize, startY);
+        ctx.lineTo(startX + c * unitSize, startY + drawH);
+        ctx.stroke();
+      }
+      for (let r = 1; r < hUnits; r++) {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY + r * unitSize);
+        ctx.lineTo(startX + drawW, startY + r * unitSize);
+        ctx.stroke();
+      }
+
+      // Dimension labels
+      ctx.fillStyle = '#0369a1';
+      ctx.font = 'bold 12px "Noto Sans SC"';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${wUnits}`, startX + drawW / 2, startY + drawH + 16);
+      ctx.fillText(`${hUnits}`, startX - 8, startY + drawH / 2 + 4);
+    });
+  }
+
+  // 5. Goldbach Verifier (Slide 11)
+  function isPrime(n) {
+    if (n < 2) return false;
+    for (let i = 2; i * i <= n; i++) {
+      if (n % i === 0) return false;
+    }
+    return true;
+  }
+
+  function checkGoldbach() {
+    const input = document.getElementById('goldbachInput');
+    const resultBox = document.getElementById('goldbachResult');
+    const n = parseInt(input.value);
+    if (!n || n < 4 || n % 2 !== 0) {
+      resultBox.innerHTML = '<span style="color:#ef4444;">请输入 ≥ 4 的偶数！</span>';
+      return;
+    }
+    const pairs = [];
+    for (let p = 2; p <= n / 2; p++) {
+      if (isPrime(p) && isPrime(n - p)) {
+        pairs.push(`${n} = ${p} + ${n - p}`);
+      }
+    }
+    if (pairs.length > 0) {
+      resultBox.innerHTML = `<b>🎉 验证成功！符合哥德巴赫猜想的拆解有 ${pairs.length} 组：</b><br>` + pairs.join('<br>');
+    } else {
+      resultBox.innerHTML = '未找到质数对（数学史上尚未出现反例）。';
+    }
+  }
+
+  // 6. Eratosthenes Sieve (Slide 12)
+  const sieveGrid = document.getElementById('sieveGrid');
+  const sieveStatus = document.getElementById('sieveStatus');
+  let sieveState = {
+    1: false,
+    2: false,
+    3: false,
+    5: false,
+    7: false
+  };
+
+  function initSieveGrid() {
+    if (!sieveGrid) return;
+    sieveGrid.innerHTML = '';
+    for (let i = 1; i <= 100; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell-num';
+      cell.id = `sieve-cell-${i}`;
+      cell.textContent = i;
+      sieveGrid.appendChild(cell);
+    }
+  }
+
+  function runSieveStep(step) {
+    sieveState[step] = true;
+    const btn = document.getElementById(`sieveStep${step}`);
+    if (btn) btn.classList.add('active');
+
+    if (step === 1) {
+      document.getElementById('sieve-cell-1').classList.add('crossed');
+      sieveStatus.textContent = '已划掉 1：1 既不是质数也不是合数！';
+    } else {
+      // Mark multiples of step (excluding step itself)
+      for (let i = step * 2; i <= 100; i += step) {
+        const c = document.getElementById(`sieve-cell-${i}`);
+        if (c) c.classList.add('crossed');
+      }
+      sieveStatus.textContent = `已划掉所有 ${step} 的倍数（保留质数 ${step}）！`;
+    }
+
+    // If all steps done, highlight remaining primes
+    if (sieveState[1] && sieveState[2] && sieveState[3] && sieveState[5] && sieveState[7]) {
+      let primeCount = 0;
+      for (let i = 1; i <= 100; i++) {
+        const c = document.getElementById(`sieve-cell-${i}`);
+        if (!c.classList.contains('crossed')) {
+          c.classList.add('prime-sieved');
+          primeCount++;
+        }
+      }
+      sieveStatus.textContent = `✨ 筛法大功告成！百数表中剩下的翡翠绿色全是质数，正好有 ${primeCount} 个！`;
+    }
+  }
+
+  function resetSieve() {
+    sieveState = { 1: false, 2: false, 3: false, 5: false, 7: false };
+    document.querySelectorAll('[id^="sieveStep"]').forEach(b => b.classList.remove('active'));
+    initSieveGrid();
+    sieveStatus.textContent = '试验台已重置，请按顺序点击步骤按钮';
+  }
+  initSieveGrid();
+
+  // Initial setup
+  updateSlide(0);
+</script>
+</body>
+</html>
