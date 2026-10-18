@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102218">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Why should we take care of the Earth?｜五年级英语 Unit 6</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#102218; --ink:#f4fff6; --muted:#b7d4c4;
+      --gold:#ffd166; --leaf:#7ee0a8; --mint:#c8f5d4; --sky:#8fd0ff;
+      --card:rgba(255,255,255,.08); --line:rgba(255,255,255,.16);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink)}
+    body{font-family:Outfit,sans-serif}
+    button{font:inherit}
+    .deck{width:100%;height:100%;position:relative}
+    .slide{
+      position:absolute;inset:0;
+      padding:clamp(28px,5vw,64px) clamp(20px,5.5vw,88px) clamp(62px,8vh,86px);
+      display:grid;align-content:center;gap:12px;
+      opacity:0;transform:translateY(12px);pointer-events:none;visibility:hidden;z-index:0;
+      transition:.42s cubic-bezier(.22,.8,.25,1);overflow:auto;
+      background:
+        radial-gradient(900px 420px at 8% -8%,rgba(46,140,90,.32),transparent 55%),
+        radial-gradient(700px 380px at 100% 0%,rgba(255,209,102,.12),transparent 50%),
+        linear-gradient(160deg,#0c1a14,#102218 55%,#163528);
+    }
+    .slide.active{opacity:1;transform:none;pointer-events:auto;visibility:visible;z-index:2}
+    .slide.alt{
+      background:
+        radial-gradient(800px 380px at 90% 10%,rgba(143,208,255,.16),transparent 45%),
+        radial-gradient(700px 400px at 0% 80%,rgba(126,224,168,.16),transparent 50%),
+        linear-gradient(165deg,#0e1c16,#1a3324);
+    }
+    .kicker{font-size:12px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--leaf);margin-bottom:4px}
+    h1,h2,h3,p{margin:0 0 .4em}
+    h1{font-family:Fraunces,serif;font-size:clamp(32px,5.8vw,70px);line-height:1;font-weight:700}
+    h1 em{font-style:italic;color:var(--gold);font-weight:500}
+    h2{font-family:Fraunces,serif;font-size:clamp(26px,4.2vw,46px);line-height:1.12;font-weight:700}
+    p,li{font-size:clamp(15px,1.5vw,20px);line-height:1.55;color:var(--ink)}
+    .lead{font-size:clamp(17px,2vw,24px);max-width:42rem;color:var(--mint)}
+    .zh{font-size:clamp(12px,1.15vw,15px);color:var(--muted);margin-top:4px}
+    .two{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(14px,3.5vw,40px);align-items:center}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .four{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .six{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px}
+    .card b{display:block;margin-bottom:6px;font-size:clamp(15px,1.5vw,20px)}
+    .card p{font-size:clamp(13px,1.15vw,16px);margin:0;color:var(--mint)}
+    .rule{font-family:Fraunces,serif;font-size:clamp(18px,2.2vw,28px);color:var(--gold);padding:10px 14px;background:rgba(255,209,102,.12);border-radius:12px}
+    .quiz{display:grid;gap:10px}
+    .quiz>div{background:var(--card);border-radius:14px;padding:12px 14px;border:1px solid var(--line)}
+    .answer{filter:blur(7px);opacity:.45;transition:.2s;cursor:pointer;user-select:none;display:inline-block;background:rgba(255,209,102,.16);padding:3px 9px;border-radius:8px}
+    .answer:hover,.answer.revealed{filter:none;opacity:1}
+    .chip,.nav button,.toc-open{
+      border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);
+      border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:13px
+    }
+    .chip.on{background:var(--gold);border-color:var(--gold);color:#102218}
+    .chip.ok{background:var(--leaf);border-color:var(--leaf);color:#102218}
+    .chip.bad{background:#ff8a7a;border-color:#ff8a7a;color:#2a1010}
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px}
+    .bubble{background:rgba(126,224,168,.12);border:1px solid rgba(126,224,168,.28);border-radius:18px;padding:12px 16px}
+    .writebox{width:100%;min-height:96px;border-radius:16px;border:1px solid var(--line);background:rgba(0,0,0,.22);color:var(--ink);padding:12px;font:inherit;resize:vertical}
+    .tiny{font-size:13px;color:var(--muted)}
+    .footer{position:fixed;z-index:10;left:22px;right:22px;bottom:14px;display:flex;align-items:center;gap:14px;color:#fff;font:700 12px Outfit,sans-serif}
+    .progress{height:3px;background:rgba(255,255,255,.22);flex:1;border-radius:9px;overflow:hidden}
+    .progress i{height:100%;display:block;background:linear-gradient(90deg,var(--leaf),var(--gold));width:0;transition:.3s}
+    .nav{display:flex;gap:8px}
+    .nav button{width:38px;height:34px;padding:0}
+    .hint{position:fixed;right:24px;top:18px;z-index:12;color:rgba(255,255,255,.72);font:11px/1.3 Outfit,sans-serif;text-align:right}
+    .dots{position:fixed;z-index:12;right:10px;top:50%;transform:translateY(-50%);display:grid;gap:5px}
+    .dots button{width:6px;height:6px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.35)}
+    .dots button.active{height:16px;border-radius:8px;background:var(--leaf)}
+    .toc-open{position:fixed;z-index:30;left:18px;top:16px;letter-spacing:.12em}
+    .toc{position:fixed;z-index:40;inset:0;background:rgba(8,18,12,.96);color:#fff;padding:clamp(28px,5vw,70px);overflow:auto;display:none}
+    .toc.open{display:block}
+    .toc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .toc-grid button{min-height:64px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:inherit;padding:10px;cursor:pointer;text-align:left;border-radius:12px}
+    .toc-close{position:absolute;right:24px;top:18px;background:none;color:inherit;border:1px solid currentColor;border-radius:50%;width:38px;height:38px;cursor:pointer}
+    @media(max-width:860px){
+      .slide{align-content:start;padding:68px 16px 78px}
+      .two,.three,.four,.six,.toc-grid{grid-template-columns:1fr}
+      .hint,.dots{display:none}
+    }
+    @media(prefers-reduced-motion:reduce){.slide{transition:none}}
+  </style>
+</head>
+<body>
+<button class="toc-open" id="tocOpen">目录</button>
+<div class="hint">← → 或空格翻页 · 点模糊处看答案</div>
+<div class="dots" id="dots"></div>
+<nav class="toc" id="toc" aria-label="目录">
+  <button class="toc-close" id="tocClose" type="button">×</button>
+  <h2>Unit 6 playlist</h2>
+  <p class="zh">沪教牛津五年级上册 · Why should we take care of the Earth?</p>
+  <div class="toc-grid" id="tocGrid"></div>
+</nav>
+<main class="deck" id="deck">
+
+  <section class="slide active" data-toc="封面">
+    <div class="two">
+      <div>
+        <div class="kicker">沪教牛津 · 五年级上册 · Unit 6</div>
+        <h1>Why should we take care of <em>the Earth</em>?</h1>
+        <p class="lead">The Earth gives us air, water, wood and land. Today we name the problems, say what we should and shouldn’t do, and write a plan to help.</p>
+        <p class="zh">大问题：我们为什么要保护地球？学自然资源、should / shouldn’t，再写自己能做的事。</p>
+      </div>
+      <svg viewBox="0 0 360 280" width="100%" aria-hidden="true">
+        <ellipse cx="180" cy="250" rx="120" ry="14" fill="rgba(0,0,0,.28)"/>
+        <circle cx="180" cy="130" r="88" fill="#1f6b4a"/>
+        <path d="M110 140c28-36 48-20 70 8 22-40 52-36 78 6" fill="none" stroke="#b7f0c8" stroke-width="10" stroke-linecap="round"/>
+        <circle cx="150" cy="108" r="10" fill="#ffd166"/>
+        <rect x="168" y="210" width="24" height="36" rx="4" fill="#6b4a2a"/>
+        <path d="M180 168c-28 8-40 28-36 48h72c4-20-8-40-36-48z" fill="#2f8f57"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="slide alt" data-toc="学习目标">
+    <div class="kicker">Learning goals · 约 40 分钟</div>
+    <h2>By the end of class</h2>
+    <div class="four">
+      <div class="card"><b>Problems</b><p>smoke, dirty air, dirty water, rubbish</p><p class="zh">地球现在怎么了</p></div>
+      <div class="card"><b>Resources</b><p>air, water, wood, land</p><p class="zh">自然资源，以及我们为什么需要它们</p></div>
+      <div class="card"><b>Grammar</b><p>should / shouldn’t</p><p class="zh">该做、不该做</p></div>
+      <div class="card"><b>Write</b><p>three ways to help the Earth</p><p class="zh">用 We should / We shouldn’t 写一段</p></div>
+    </div>
+    <p class="rule">Key sentence: We should … We shouldn’t …</p>
+  </section>
+
+  <section class="slide" data-toc="问题与办法">
+    <div class="kicker">Get ready · p.62</div>
+    <h2>Problems, then help</h2>
+    <p class="zh">点词，看一句能说出口的话。</p>
+    <div class="toolbar" id="wordRow"></div>
+    <div class="card" id="wordOut" style="min-height:88px"><b>Choose a word</b><p>smoke · dirty · rubbish · recycle · reduce</p></div>
+  </section>
+
+  <section class="slide alt" data-toc="六种做法">
+    <div class="kicker">Complete the poster · p.62</div>
+    <h2>6 ways to help the Earth</h2>
+    <div class="six">
+      <div class="card"><b>1</b><p>Turn off lights.</p></div>
+      <div class="card"><b>2</b><p>Walk more.</p></div>
+      <div class="card"><b>3</b><p>Plant trees on our land.</p></div>
+      <div class="card"><b>4</b><p>Put <span class="answer">rubbish</span> in the bin.</p></div>
+      <div class="card"><b>5</b><p><span class="answer">Recycle</span> water bottles.</p></div>
+      <div class="card"><b>6</b><p><span class="answer">Reduce</span> the use of plastic bags.</p></div>
+    </div>
+    <p class="zh">recycle = 回收再用；reduce = 少用一些。点金色模糊处核对。</p>
+  </section>
+
+  <section class="slide" data-toc="公园规则">
+    <div class="kicker">Main idea and details · p.63</div>
+    <h2>Rules in parks</h2>
+    <div class="three">
+      <div class="card"><b>Rule 1</b><p>Put rubbish in the bin.</p></div>
+      <div class="card"><b>Rule 2</b><p>Clean up after eating.</p></div>
+      <div class="card"><b>Rule 3</b><p>Don’t give food to the birds.</p></div>
+    </div>
+    <div class="quiz">
+      <div>1 Main idea: <span class="answer">We should follow the rules so parks stay clean and animals stay safe.</span></div>
+      <div>2 Details: <span class="answer">bin · clean up · don’t feed the birds</span></div>
+    </div>
+    <p class="tiny">大意是“要遵守公园规则”。三条规则是细节，不要把细节写成大意。</p>
+  </section>
+
+  <section class="slide alt" data-toc="自然资源">
+    <div class="kicker">Explore · 阅读要点（课堂转述，不是课文原文）</div>
+    <h2>Natural resources</h2>
+    <div class="three">
+      <div class="card"><b>What they are</b><p>Air, water, wood and land. The Earth gives them to us.</p><p class="zh">自然资源</p></div>
+      <div class="card"><b>Why we need them</b><p>Living things need clean air and water. Plants need water and land. We use wood for paper, chairs and houses.</p></div>
+      <div class="card"><b>How we hurt them</b><p>Smoke from cars and factories makes air dirty. Rubbish makes land and water dirty. Dirty air can make people sick.</p></div>
+    </div>
+    <p class="rule">We should use things longer, reduce what we use, and recycle rubbish.</p>
+  </section>
+
+  <section class="slide" data-toc="结构图">
+    <div class="kicker">Read and write · p.66</div>
+    <h2>Three headings</h2>
+    <div class="three">
+      <div class="card"><b>Heading 1</b><p>Why we need natural resources</p><p>Main idea: <span class="answer">We need clean air, water, land and wood to live and to make things.</span></p></div>
+      <div class="card"><b>Heading 2</b><p><span class="answer">How we hurt our natural resources</span></p><p>Main idea: We should not hurt our natural resources.</p><p>Details: <span class="answer">smoke / dirty air / rubbish / dirty water and land</span></p></div>
+      <div class="card"><b>Heading 3</b><p><span class="answer">How we should take care of our natural resources</span></p><p>Main idea: <span class="answer">Use longer, reduce, recycle.</span></p></div>
+    </div>
+  </section>
+
+  <section class="slide alt" data-toc="猜词">
+    <div class="kicker">Word bank · p.66 A</div>
+    <h2>sick · factories · hurt</h2>
+    <div class="quiz">
+      <div>1 The girl has a cold. She is <span class="answer">sick</span>.</div>
+      <div>2 People make goods in these places. They are <span class="answer">factories</span>.</div>
+      <div>3 Strong light can <span class="answer">hurt</span> our eyes.</div>
+    </div>
+    <p class="zh">sick 生病的；factories 工厂；hurt 伤害。阅读里：工厂的烟让空气变脏，脏空气会让人生病。</p>
+  </section>
+
+  <section class="slide" data-toc="语法">
+    <div class="kicker">Grammar in use · p.67</div>
+    <h2>should / shouldn’t</h2>
+    <div class="two">
+      <div class="card"><b>We should + 动词原形</b><p>We should recycle things.</p><p>We should turn off lights.</p></div>
+      <div class="card"><b>should not = shouldn’t</b><p>We should not hurt our natural resources.</p><p>We shouldn’t cut down trees.</p></div>
+    </div>
+    <p class="rule">建议别人：We should … / We shouldn’t …</p>
+    <p class="zh">后面不要加 to，也不要加 -s。We should recycle. 不是 We should to recycle.</p>
+  </section>
+
+  <section class="slide alt" data-toc="该做不该做">
+    <div class="kicker">Choose and say · p.67–69</div>
+    <h2>Help the Earth</h2>
+    <p class="zh">先点 Do 或 Don’t，再点做法。绿的是该做，红的是不该做。</p>
+    <div class="toolbar" id="doRow"></div>
+    <div class="toolbar" id="actRow"></div>
+    <p id="doMsg" class="tiny">Your sentence will show here.</p>
+    <div class="quiz" style="margin-top:8px">
+      <div>turn off lights → <span class="answer">We should turn off lights.</span></div>
+      <div>recycle things / bottles → <span class="answer">We should recycle things.</span></div>
+      <div>throw rubbish into the river → <span class="answer">We shouldn’t throw rubbish into the river.</span></div>
+      <div>cut down trees / leave the lights on → <span class="answer">We shouldn’t cut down trees. We shouldn’t leave the lights on.</span></div>
+    </div>
+  </section>
+
+  <section class="slide" data-toc="小河">
+    <div class="kicker">Communicate · p.68 · 听录音填空</div>
+    <h2>How can we help the river?</h2>
+    <div class="quiz">
+      <div>Ducks, fish, <span class="answer">birds</span> and other animals live in the river.<br><span class="tiny">听录音核对。空格是一种动物，常见答案是 birds。</span></div>
+      <div>We go for walks and <span class="answer">picnics</span> near the river.<br><span class="tiny">听录音核对。</span></div>
+      <div>We pick <span class="answer">rubbish</span> out of the river in the morning.</div>
+      <div>We <span class="answer">plant trees</span> near the river in the afternoon.<br><span class="tiny">听录音核对。若录音不是 plant trees，以录音为准。</span></div>
+    </div>
+    <p>Say: Liu Xin’s family help clean the river near their home. They pick rubbish out of the river. They plant trees near the river.</p>
+  </section>
+
+  <section class="slide alt" data-toc="写作">
+    <div class="kicker">Think and write · p.69</div>
+    <h2>Let’s take care of the Earth</h2>
+    <div class="card">
+      <p>The Earth is important for all of us. It gives us natural resources. It is sick now. Let’s help it get better.</p>
+      <p>We should <span class="answer">turn off the lights</span>.</p>
+      <p>We should <span class="answer">recycle bottles and put rubbish in the bin</span>.</p>
+      <p>We shouldn’t <span class="answer">cut down trees or throw rubbish into the river</span>.</p>
+      <p>Let’s all make the Earth a better place.</p>
+    </div>
+    <textarea class="writebox" placeholder="We should ______. We should ______. We shouldn't ______."></textarea>
+  </section>
+
+  <section class="slide" data-toc="果汁盒">
+    <div class="kicker">A juice carton’s journey · 顺序（课堂转述）</div>
+    <h2>From shop to notebook</h2>
+    <div class="quiz">
+      <div>1 <span class="answer">The carton is in a supermarket.</span></div>
+      <div>2 <span class="answer">A girl takes it.</span></div>
+      <div>3 <span class="answer">She leaves it on the grass. The wind blows it into the water.</span></div>
+      <div>4 <span class="answer">A man puts it in his boat with a plastic bottle.</span></div>
+      <div>5 <span class="answer">People sort cartons and plastic bottles into different bins.</span></div>
+      <div>6 <span class="answer">The carton becomes a notebook.</span></div>
+    </div>
+    <p class="zh">p.72 勾选时，划掉 “A man puts the juice carton in his boat” 之前的错序，按上面 1–6 排。不要选 “People recycle it” 放在落水之前。</p>
+  </section>
+
+  <section class="slide alt" data-toc="大问题">
+    <div class="kicker">Big Question</div>
+    <h2>Why should we take care of the Earth?</h2>
+    <div class="four">
+      <div class="card"><b>Gifts</b><p>The Earth gives us natural resources.</p></div>
+      <div class="card"><b>Limits</b><p>Those resources are limited.</p></div>
+      <div class="card"><b>Actions</b><p>There are different ways to help.</p></div>
+      <div class="card"><b>Recycle</b><p>Recycling turns rubbish into new things.</p></div>
+    </div>
+    <p>Think: How does recycling help? <span class="answer">We use fewer new resources, and less rubbish stays on the land and in the water.</span></p>
+  </section>
+
+  <section class="slide" data-toc="小测">
+    <div class="kicker">Check</div>
+    <h2>Can you say it?</h2>
+    <div class="quiz">
+      <div>1 Air, water, wood and land are <span class="answer">natural resources</span>.</div>
+      <div>2 Smoke from factories can make the air <span class="answer">dirty</span> and people <span class="answer">sick</span>.</div>
+      <div>3 We <span class="answer">should</span> recycle. We <span class="answer">shouldn’t</span> throw rubbish into the river.</div>
+      <div>4 Stretch: Why shouldn’t we give food to birds in a park?<br><span class="answer">Park food can hurt them. Rules keep animals safe.</span></div>
+    </div>
+  </section>
+</main>
+<div class="footer">
+  <span id="pg">1</span>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="nav">
+    <button type="button" id="prev" aria-label="Previous">←</button>
+    <button type="button" id="next" aria-label="Next">→</button>
+  </div>
+</div>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0,sx=0;
+  const bar=document.getElementById('bar'), pg=document.getElementById('pg');
+  const dots=document.getElementById('dots'), tocGrid=document.getElementById('tocGrid');
+  const toc=document.getElementById('toc');
+  slides.forEach((s,n)=>{
+    const d=document.createElement('button');
+    d.type='button';
+    d.addEventListener('click',()=>go(n));
+    dots.appendChild(d);
+    const b=document.createElement('button');
+    b.type='button';
+    b.textContent=(n+1)+'  '+(s.dataset.toc||'');
+    b.addEventListener('click',()=>{go(n);toc.classList.remove('open')});
+    tocGrid.appendChild(b);
+  });
+  function go(n){
+    if(n<0||n>=slides.length)return;
+    slides[i].classList.remove('active');
+    i=n;
+    slides[i].classList.add('active');
+    pg.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    [...dots.children].forEach((d,k)=>d.classList.toggle('active',k===i));
+  }
+  document.getElementById('prev').onclick=()=>go(i-1);
+  document.getElementById('next').onclick=()=>go(i+1);
+  document.getElementById('tocOpen').onclick=()=>toc.classList.add('open');
+  document.getElementById('tocClose').onclick=()=>toc.classList.remove('open');
+  document.addEventListener('keydown',e=>{
+    if(['INPUT','TEXTAREA'].includes(e.target.tagName))return;
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    if(e.key==='Escape')toc.classList.remove('open');
+  });
+  document.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX},{passive:true});
+  document.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].screenX-sx;
+    if(Math.abs(dx)>50) go(dx<0?i+1:i-1);
+  },{passive:true});
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('.answer');
+    if(a)a.classList.toggle('revealed');
+  });
+  go(0);
+
+  const words={
+    smoke:'Smoke from cars and factories makes the air dirty.',
+    dirty:'Dirty air can make people sick. We cannot drink dirty water.',
+    rubbish:'Rubbish makes the land and water dirty. Put it in the bin.',
+    recycle:'Recycle bottles and cartons. Old things can become new things.',
+    reduce:'Reduce means use less. Walk more. Use fewer plastic bags.'
+  };
+  const wordRow=document.getElementById('wordRow');
+  Object.keys(words).forEach(name=>{
+    const c=document.createElement('button');
+    c.className='chip'; c.type='button'; c.textContent=name;
+    c.onclick=()=>{
+      [...wordRow.children].forEach(x=>x.classList.toggle('on',x.textContent===name));
+      document.getElementById('wordOut').innerHTML='<b>'+name+'</b><p>'+words[name]+'</p>';
+    };
+    wordRow.appendChild(c);
+  });
+
+  const dos=['We should','We shouldn’t'];
+  const acts=['turn off lights','recycle bottles','throw rubbish into the river','cut down trees','leave the lights on','plant trees'];
+  const good=new Set(['turn off lights','recycle bottles','plant trees']);
+  const doRow=document.getElementById('doRow');
+  const actRow=document.getElementById('actRow');
+  let pick=null;
+  dos.forEach(k=>{
+    const c=document.createElement('button');
+    c.className='chip'; c.type='button'; c.textContent=k;
+    c.onclick=()=>{pick=k;[...doRow.children].forEach(x=>x.classList.toggle('on',x.textContent===k))};
+    doRow.appendChild(c);
+  });
+  acts.forEach(f=>{
+    const c=document.createElement('button');
+    c.className='chip'; c.type='button'; c.textContent=f;
+    c.onclick=()=>{
+      if(!pick){document.getElementById('doMsg').textContent='先点 We should 或 We shouldn’t。';return}
+      const right=(pick==='We should')===good.has(f);
+      c.classList.add(right?'ok':'bad');
+      document.getElementById('doMsg').textContent=pick+' '+f+'. '+(right?'这句对。':'这句和做法不配，再选一次。');
+    };
+    actRow.appendChild(c);
+  });
+})();
+</script>
+</body>
+</html>
